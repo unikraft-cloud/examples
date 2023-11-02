@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: lua:5.1
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/lua", "/http_server.lua"]
