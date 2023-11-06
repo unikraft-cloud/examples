@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: index.unikraft.io/official/base:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/http_server"]
