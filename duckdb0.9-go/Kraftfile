@@ -1,0 +1,9 @@
+spec: v0.6
+
+name: duckdb-go
+
+runtime: index.unikraft.io/unikraft.org/base:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/server"]
