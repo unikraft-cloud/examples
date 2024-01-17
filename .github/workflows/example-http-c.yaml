@@ -29,6 +29,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        repository: kraftcloud/catalog
+        ref: main
+
+    - name: Build base
+      uses: unikraft/kraftkit@staging
+      with:
+        loglevel: debug
+        workdir: library/base
+        push: false
+        output: oci://official-staging/base:latest
+        auths: |
+          github.com:
+            user: ${{ secrets.GH_USER }}
+            token: ${{ secrets.GH_TOKEN }}
+        before: |
+          set -xe;
+
+          # Replace `prod-stable` with `staging` in the Kraftfile
+          sed -i 's/prod-stable/staging/g' library/base/Kraftfile;
+
+    - uses: actions/checkout@v4
+      with:
+        repository: kraftcloud/examples
+        ref: main
 
     - name: Login to OCI registry
       uses: docker/login-action@v2
@@ -46,6 +71,10 @@ jobs:
           github.com:
             user: ${{ secrets.GH_USER }}
             token: ${{ secrets.GH_TOKEN }}
+        before: |
+          set -xe;
+
+          sed -i 's@base:latest@official-staging/base:latest@g' http-c/Kraftfile;
         after: |
           set -xe;
 
