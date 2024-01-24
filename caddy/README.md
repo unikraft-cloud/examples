@@ -2,11 +2,14 @@
 
 [Caddy](https://caddyserver.com/) is a powerful, enterprise-ready, open source web server with automatic HTTPS written in Go.
 
+
 To run Caddy on KraftCloud, clone this examples repository and `cd` into this directory, then invoke:
 
 ```console
 kraft cloud deploy -p 443:2015 .
 ```
+
+The command will build and deploy the files under `rootfs`. Feel free to modify and redeploy!
 
 ## Learn more
 
