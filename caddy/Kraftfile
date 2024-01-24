@@ -1,0 +1,6 @@
+spec: v0.6
+
+runtime: caddy:latest
+
+rootfs: ./rootfs
+
