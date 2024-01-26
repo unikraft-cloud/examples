@@ -1,0 +1,6 @@
+spec: v0.6
+
+runtime: nginx:latest
+
+rootfs: ./rootfs
+
