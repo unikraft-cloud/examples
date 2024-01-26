@@ -1,0 +1,16 @@
+[api]
+  # Dashboard
+  #
+  # Optional
+  # Default: true
+  #
+  dashboard = true
+  insecure = true
+
+## Static configuration
+[entryPoints]
+  [entryPoints.ping]
+    address = ":8082"
+
+[ping]
+  entryPoint = "ping"
