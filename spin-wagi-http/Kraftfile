@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: spin:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/spin", "up", "--from", "/app/spin.toml", "--listen", "0.0.0.0:3000"]
