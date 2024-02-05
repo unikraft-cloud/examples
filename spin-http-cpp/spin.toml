@@ -1,0 +1,16 @@
+spin_manifest_version = 2
+
+[application]
+description = "A simple application that returns hello."
+name = "spin-hello-world"
+version = "1.0.0"
+
+[[trigger.http]]
+route = "/hello"
+component = "hello"
+
+[component.hello]
+source = "lib.wasm"
+description = "A simple component that returns hello."
+[component.hello.build]
+command = "make"
