@@ -4,4 +4,4 @@ runtime: python:3.12
 
 rootfs: ./Dockerfile
 
-cmd: ["/usr/bin/python", "/src/server.py"]
+cmd: ["/usr/bin/python3", "/src/server.py"]
