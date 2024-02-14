@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: llama2:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["8080"]
