@@ -1,5 +1,11 @@
 import bjoern
 import helloworld.wsgi
+import os
+from werkzeug.middleware.shared_data import SharedDataMiddleware
 
-bjoern.run(helloworld.wsgi.application, "0.0.0.0", 80)
+app = helloworld.wsgi.application
+app = SharedDataMiddleware(app, {
+    '/static': '/app/static',
+})
+bjoern.run(app, "0.0.0.0", 80)
 
