@@ -6,8 +6,10 @@
 To run Traefik on KraftCloud, clone this examples repository and `cd` into this directory, then invoke:
 
 ```console
-kraft cloud deploy -M 256 -p 443:2015 .
+kraft cloud deploy -M 256 -p 443:80/tls+http -p 8080:8080/tls .
 ```
+
+Important security note: this exposes the dashboard on port 8080 *without* authentication.
 
 ## Learn more
 
