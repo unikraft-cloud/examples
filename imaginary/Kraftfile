@@ -1,0 +1,5 @@
+spec: v0.6
+
+runtime: imaginary:1.2
+
+cmd: ["/usr/bin/imaginary", "-p", "8080"]
