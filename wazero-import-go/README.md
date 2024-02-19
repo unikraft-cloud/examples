@@ -6,11 +6,11 @@ In the example, if the current year is 2024, and we give the argument 2000, [age
 
 First build and deploy the application via:
 
-```bash
-kraft cloud run . /age-calculator 2000
+```console
+kraft cloud deploy . /age-calculator 2000
 ```
 
-Then access the logs via `kraft cloud vm logs` and you should see:
+Then access the logs via `kraft cloud instance logs` and you should see:
 
 ```
 println >> 24
