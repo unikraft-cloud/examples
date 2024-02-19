@@ -4,7 +4,7 @@
 
 To run Skipper on KraftCloud, clone this examples repository and `cd` into this directory, then invoke:
 
-```
+```console
 kraft cloud deploy -p 443:9090 .
 ```
 
