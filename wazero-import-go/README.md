@@ -7,7 +7,7 @@ In the example, if the current year is 2024, and we give the argument 2000, [age
 First build and deploy the application via:
 
 ```console
-kraft cloud deploy . /age-calculator 2000
+kraft cloud deploy -p 443:8080 . /age-calculator 2000
 ```
 
 Then access the logs via `kraft cloud instance logs` and you should see:
@@ -15,6 +15,12 @@ Then access the logs via `kraft cloud instance logs` and you should see:
 ```
 println >> 24
 log_i32 >> 24
+```
+
+Or `curl` the endpoint to get the same result:
+
+```console
+curl https://dry-meadow-qi5e3ztl.dal0.kraft.cloud
 ```
 
 ## Background
@@ -38,4 +44,3 @@ system calls (similar to Go's [x/sys](https://pkg.go.dev/golang.org/x/sys/unix))
 ## Learn more
 
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-
