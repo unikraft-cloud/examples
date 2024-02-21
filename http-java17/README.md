@@ -1,15 +1,13 @@
-# Tokio (Rust) Example
+# Java on KraftCloud
 
 To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 
-Start by cloning this repository and `cd` into this directory.
+Then, clone this repository and `cd` into this directory.
 To deploy this application on KraftCloud, invoke:
 
-```console
-kraft cloud deploy -p 443:8080 .
 ```
-
-Then try using curl on the resulting URL.
+kraft cloud deploy -p 443:8080 -M 512 .
+```
 
 ## Learn more
 

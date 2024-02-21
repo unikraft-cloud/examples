@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: java:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/lib/jvm/java-17-openjdk-amd64/bin/java", "-classpath", "/usr/src/", "SimpleHttpServer"]
