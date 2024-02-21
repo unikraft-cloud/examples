@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -18,6 +19,13 @@ import (
 //
 //go:embed testdata/age_calculator.wasm
 var ageCalculatorWasm []byte
+
+// outputBuffer is a buffer to hold the output of the WebAssembly module.
+var outputBuffer []byte
+
+func writeToOutputBuffer(s string) {
+	outputBuffer = append(outputBuffer, []byte(s)...)
+}
 
 // main shows how to define, import and call a Go-defined function from a
 // WebAssembly-defined function.
@@ -42,6 +50,7 @@ func main() {
 		NewFunctionBuilder().
 		WithFunc(func(v uint32) {
 			fmt.Println("log_i32 >>", v)
+			writeToOutputBuffer(fmt.Sprintln("log_i32 >>", v))
 		}).
 		Export("log_i32").
 		NewFunctionBuilder().
@@ -79,10 +88,17 @@ func main() {
 		log.Panicln(err)
 	}
 	fmt.Println("println >>", results[0])
+	writeToOutputBuffer(fmt.Sprintln("println >>", results[0]))
 
 	// First, try calling the "log_age" function and printing to the console externally.
 	_, err = ageCalculator.ExportedFunction("log_age").Call(ctx, birthYear)
 	if err != nil {
 		log.Panicln(err)
 	}
+
+	// Open http server on 8080 to serve the output buffer
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write(outputBuffer)
+	})
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
