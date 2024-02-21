@@ -9,19 +9,7 @@ To deploy this application on KraftCloud, invoke:
 kraft cloud deploy -p 443:8080 .
 ```
 
-Then try visiting one of the available paths:
-- https://<NAME>.<METRO>.kraft.cloud/hello/world
-- https://<NAME>.<METRO>.kraft.cloud/hello/мир
-- https://<NAME>.<METRO>.kraft.cloud/wave/Rocketeer/100
-- https://<NAME>.<METRO>.kraft.cloud/?emoji
-- https://<NAME>.<METRO>.kraft.cloud/?name=Rocketeer
-- https://<NAME>.<METRO>.kraft.cloud/?lang=ру
-- https://<NAME>.<METRO>.kraft.cloud/?lang=ру&emoji
-- https://<NAME>.<METRO>.kraft.cloud/?emoji&lang=en
-- https://<NAME>.<METRO>.kraft.cloud/?name=Rocketeer&lang=en
-- https://<NAME>.<METRO>.kraft.cloud/?emoji&name=Rocketeer
-- https://<NAME>.<METRO>.kraft.cloud/?name=Rocketeer&lang=en&emoji
-- https://<NAME>.<METRO>.kraft.cloud/?lang=ru&emoji&name=Rocketeer
+Then try using curl on the resulting URL.
 
 ## Learn more
 
