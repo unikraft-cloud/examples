@@ -7,7 +7,7 @@ This example was derived from [Rocket's "hello" example](https://github.com/rwf2
 Start by cloning this repository and `cd` into this directory.
 To deploy this application on KraftCloud, invoke:
 
-```
+```console
 kraft cloud deploy -p 443:8080 .
 ```
 

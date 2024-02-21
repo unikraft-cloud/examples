@@ -7,13 +7,13 @@ To run this example, first [install the `kraft` CLI tool](https://unikraft.org/d
 Then, clone this repository and `cd` into this directory.
 To deploy this application on KraftCloud, simply invoke:
 
-```
+```console
 kraft cloud deploy -p 443:3000 -M 2048 .
 ```
 
 Then `curl` the hello route:
 
-```
+```console
 $ curl -i https://little-bird-4f8zuwj5.fra0.kraft.cloud/hello
 HTTP/1.1 200 OK
 content-type: application/text
@@ -25,7 +25,7 @@ Hello
 
 And `curl` the goodbye route:
 
-```
+```console
 $ curl -i https://little-bird-4f8zuwj5.fra0.kraft.cloud/goodbye
 HTTP/1.1 200 OK
 foo: bar

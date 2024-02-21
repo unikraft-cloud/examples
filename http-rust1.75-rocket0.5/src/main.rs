@@ -21,7 +21,7 @@ struct Options<'r> {
 //   http://127.0.0.1:8000/hello/world
 #[get("/world")]
 fn world() -> &'static str {
-    "Hello, world!"
+    "Hello, World!"
 }
 
 // Try visiting:
