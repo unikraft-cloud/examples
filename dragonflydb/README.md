@@ -15,12 +15,6 @@ Get the results of the deployment by running:
 curl  https://green-leaf-29gzos5s.dal0.kraft.cloud
 ```
 
-Or by inspecting the logs:
-
-```console
-kraft cloud instance logs duckdb-go-8qv5t
-```
-
 ## Learn more
 
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
