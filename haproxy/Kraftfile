@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: haproxy:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/haproxy", "-f", "/etc/haproxy/haproxy.conf"]
