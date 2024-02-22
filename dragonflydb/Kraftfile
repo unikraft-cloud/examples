@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: dragonfly:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/dragonfly", "--maxmemory", "256MiB"]
