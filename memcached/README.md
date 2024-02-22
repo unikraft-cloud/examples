@@ -1,6 +1,6 @@
-# DuckDB using Go SDK
+# Memcached
 
-This examples demonstrates how to use [DuckDB](https://duckdb.org), an in-process SQL OLAP database management system, in your Go project.
+This examples demonstrates how to use [Memcached](https://memcached.org), n in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering.
 
 To get started, simply clone this repository and `cd` into this directory.
 Then, run:
