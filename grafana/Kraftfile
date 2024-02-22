@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: grafana:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/share/grafana/bin/grafana", "server", "-homepath", "/usr/share/grafana/"]
