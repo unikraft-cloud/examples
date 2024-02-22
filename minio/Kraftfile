@@ -1,0 +1,13 @@
+spec: v0.6
+
+runtime: minio:latest
+
+rootfs: ./Dockerfile
+
+cmd: [
+  "/usr/bin/minio",
+  "server",
+  "--address", "0.0.0.0:9000",
+  "--console-address", "0.0.0.0:9001",
+  "/data"
+]
