@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: mongo:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/mongod", "--bind_ip_all", "--nounixsocket"]
