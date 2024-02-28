@@ -25,6 +25,8 @@ SECRET_KEY = "django-insecure-gb8wk^txj5ag6)q_wh82@i0nwhw(jhc!ga7!ux#yz^0hsb@=9g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CSRF_TRUSTED_ORIGINS = ["https://*.kraft.host"]
+
 ALLOWED_HOSTS = ["*"]
 
 
