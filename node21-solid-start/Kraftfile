@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: index.unikraft.io/official/node:21
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/node", "/usr/src/server/index.mjs"]
