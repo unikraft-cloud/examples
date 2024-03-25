@@ -1,0 +1,9 @@
+spec: v0.6
+
+name: postgres
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["wrapper.sh", "docker-entrypoint.sh", "postgres"]
