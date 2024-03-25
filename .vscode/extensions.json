@@ -1,5 +1,6 @@
 {
     "recommendations": [
         "stateful.runme",
+        "unikraft.unikraft-ide-vscode",
     ]
 }
