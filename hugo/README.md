@@ -1,21 +1,20 @@
-# Hugo Server
+# Hugo
 
-This example demonstrates how to use [Hugo](https://gohugo.io/commands/hugo_server/), a high performance webserver, with the [ananke](https://github.com/budparr/gohugo-theme-ananke.git) theme.
+[Hugo](https://gohugo.io/) is one of the most popular open-source static site generators.
 
-To get started, simply clone this repository and `cd` into this directory.
-Then, run:
-
-```console
-kraft cloud deploy -p 443:1313 -M 512 .
-```
-
-Fetch the URL from the output and open it in your browser or use `curl`:
+To run Hugo on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-curl https://falling-silence-wb7fv6nr.dal0.kraft.cloud
+kraft cloud deploy --metro fra0 -p 443:1313 -M 512 .
 ```
+
+The command will deploy the files under `site/`.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Hugo's Documentation](https://gohugo.io/documentation/).
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

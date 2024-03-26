@@ -1,16 +1,20 @@
-# Node 21 Remix Example
+# Node 21 Remix
 
-This example uses the [Remix](https://remix.run/).
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Remix](https://remix.run/)  is a full stack web framework that lets you focus on the user interface and work back through web standards to deliver a fast, slick, and resilient user experience.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run Remix on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:3000 -M 512 .
+kraft cloud deploy --metro fra0 -p 443:3000 -M 512 .
 ```
+
+The command will deploy the files in the current directory.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Remix's Documentation](https://remix.run/docs/en/main)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

@@ -1,15 +1,20 @@
-# Simple Node21 HTTP Web Server
+# Node21
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Node,js](https://nodejs.org) is a free, open-source, cross-platform JavaScript runtime environment.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run Node.js on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:8080 -M 256 .
+kraft cloud deploy --metro fra0 -p 443:8080 -M 256 .
 ```
+
+The command will deploy the `server.js` file.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Node.js's Documentation](https://nodejs.org/docs/latest/api/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

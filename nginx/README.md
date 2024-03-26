@@ -1,18 +1,20 @@
-# Nginx on KraftCloud
+# NGINX
 
-[Nginx](https://nginxr.com/) is a web server that can also be used as a reverse proxy, load balancer, mail proxy and HTTP cache
+[NGINX](https://www.nginx.com/) is a web server that can also be used as a reverse proxy, load balancer, mail proxy and HTTP cache.
 
-To run Nginx on KraftCloud, clone this examples repository and `cd` into this directory, then invoke:
+To run NGINX on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:8080 .
+kraft cloud deploy --metro fra0 -p 443:8080 .
 ```
 
-The command will build and deploy the files under the `rootfs/` directory.
-Feel free to modify and redeploy!
+The command will deploy the files under `rootfs/`.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [NGINX's Documentation](https://nginx.org/en/docs/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
-
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

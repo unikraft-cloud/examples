@@ -1,31 +1,21 @@
-# Rocket v0.5 (Rust) Example
+# Rust Rocket v0.5
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Rocket](https://rocket.rs/) is web framework for Rust that makes it simple to write fast, type-safe, secure web applications.
 
-This example was derived from [Rocket's "hello" example](https://github.com/rwf2/Rocket/tree/v0.5/examples/hello).
-
-Start by cloning this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run Rocket on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:8080 .
+kraft cloud deploy --metro fra0 -p 443:8080 .
 ```
 
-Then try visiting one of the available paths:
-- https://<NAME>.<METRO>.kraft.cloud/hello/world
-- https://<NAME>.<METRO>.kraft.cloud/hello/мир
-- https://<NAME>.<METRO>.kraft.cloud/wave/Rocketeer/100
-- https://<NAME>.<METRO>.kraft.cloud/?emoji
-- https://<NAME>.<METRO>.kraft.cloud/?name=Rocketeer
-- https://<NAME>.<METRO>.kraft.cloud/?lang=ру
-- https://<NAME>.<METRO>.kraft.cloud/?lang=ру&emoji
-- https://<NAME>.<METRO>.kraft.cloud/?emoji&lang=en
-- https://<NAME>.<METRO>.kraft.cloud/?name=Rocketeer&lang=en
-- https://<NAME>.<METRO>.kraft.cloud/?emoji&name=Rocketeer
-- https://<NAME>.<METRO>.kraft.cloud/?name=Rocketeer&lang=en&emoji
-- https://<NAME>.<METRO>.kraft.cloud/?lang=ru&emoji&name=Rocketeer
+The command will build and deploy the files under `src/`.
+
+After deploying, you can query the service using the provided URL, followed by paths such as `hello/world`.
+See more in the `src/main.rs` source code file.
 
 ## Learn more
 
+- [Rockets's Documentation](https://api.rocket.rs/v0.5/rocket/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

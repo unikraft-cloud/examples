@@ -1,18 +1,18 @@
 # Memcached
 
-This examples demonstrates how to use [Memcached](https://memcached.org), n in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering.
+[Memcached](https://memcached.org) is an in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering.
 
-To get started, simply clone this repository and `cd` into this directory.
-Then, run:
+To run Memcached on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 11211:11211/tls -M 256 .
+kraft cloud deploy --metro fra0 -p 11211:11211/tls -M 256 .
 ```
 
 Get the results of the deployment by first forwarding the port (save the returned PID):
 
 ```console
-socat tcp-listen:11211,bind=127.0.0.1,fork,reuseaddr openssl:broken-shadow-990cz9og.dal0.kraft.cloud:11211 &
+socat tcp-listen:11211,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.cloud:11211 &
 ```
 
 Then, run the following commands to test that it works (you should see output when incrementing):
@@ -35,5 +35,6 @@ kill -9 <PID>
 
 ## Learn more
 
+- [Memcached's Documentation](https://github.com/memcached/memcached/wiki)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

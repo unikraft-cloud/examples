@@ -1,16 +1,20 @@
-# Node 21 ExpressJS Example
+# Node 21 Express
 
-This example uses the [ExpressJS Node framework](https://expressjs.com/).
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Express](https://expressjs.com/) is a fast, unopinionated, minimalist web framework for Node.js.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run Express on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:3000 -M 256 .
+kraft cloud deploy --metro fra0 -p 443:3000 -M 256 .
 ```
+
+The command will deploy the files under `app/`.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Express's Documentation](https://expressjs.com/en/5x/api.html)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

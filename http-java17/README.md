@@ -1,15 +1,20 @@
-# Java on KraftCloud
+# Simple Java 17 HTTP Server
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+This is a simple HTTP server written in the [Java](https://www.java.com/en/) programming language.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run this example on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```
-kraft cloud deploy -p 443:8080 -M 512 .
+kraft cloud deploy --metro fra0 -p 443:8080 -M 512 .
 ```
+
+The command will build and deploy the `SimpleHTTPServer.java` source code file.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Java's Documentation](https://docs.oracle.com/en/java/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

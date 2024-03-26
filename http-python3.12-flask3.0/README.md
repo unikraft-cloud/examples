@@ -1,15 +1,20 @@
-# Python Flask HTTP Web Server
+# Python Flask
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Flask](https://flask.palletsprojects.com/en/3.0.x/) is a micro web framework written in Python.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run Flask on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -M 512 -p 443:8080 .
+kraft cloud deploy --metro fra0 -M 512 -p 443:8080 .
 ```
+
+The command will deploy files in the current directory.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Flask's Documentation](https://flask.palletsprojects.com/en/3.0.x/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

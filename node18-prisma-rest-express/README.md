@@ -1,4 +1,4 @@
-# Node 18 Prisma REST API Example
+# Node 18 Prisma
 
 This example is derived from [Prisma's REST API Example](https://github.com/prisma/prisma-examples/tree/latest/javascript/rest-express) and shows how to implement a **REST API** using [Express](https://expressjs.com/) and [Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client) and deploy it onto KraftCloud.
 It uses a SQLite database file with some initial dummy data which you can find at [`./prisma/store.db`](./prisma/store.db).
@@ -41,16 +41,15 @@ You can send the API requests implemented in `index.js`, e.g.
 ### 3. Deploy to KraftCloud
 
 To deploy this project onto KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
-
-Then invoke:
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -M 512 -p 443:3000 .
+kraft cloud deploy --metro fra0 -M 512 -p 443:3000 .
 ```
 
-After packaging and deploying the project onto KraftCloud, you can access the same API via the FQDN, e.g.
-[`https://polished-rain-413iy826.fra0.kraft.cloud/feed`](https://polished-rain-413iy826.fra0.kraft.cloud/feed).
+The command will deploy the files in the current directory.
 
+After deploying, you can query the service using the provided URL.
 
 ## Using the REST API
 
@@ -323,3 +322,5 @@ datasource db {
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
 - [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
 - [Prisma's Documentation docs](https://www.prisma.io/docs)
+- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

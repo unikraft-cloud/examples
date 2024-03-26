@@ -2,40 +2,20 @@
 
 This example is derived from [Spin's `spin-wagi-http` example](https://github.com/fermyon/spin/tree/v2.1.0/examples/spin-wagi-http) and shows how to run a Spin application serving routes from two programs written in different languages (Rust and C++) using both the Spin executor and the Wagi executor on KraftCloud.
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
-
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, simply invoke:
+To run Spin Wagi on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:3000 -M 2048 .
+kraft cloud deploy --metro fra0 -p 443:3000 -M 2048 .
 ```
 
-Then `curl` the hello route:
+The command will build and deploy the files in the current directory.
 
-```console
-$ curl -i https://little-bird-4f8zuwj5.fra0.kraft.cloud/hello
-HTTP/1.1 200 OK
-content-type: application/text
-content-length: 7
-date: Thu, 10 Mar 2022 21:38:34 GMT
-
-Hello
-```
-
-And `curl` the goodbye route:
-
-```console
-$ curl -i https://little-bird-4f8zuwj5.fra0.kraft.cloud/goodbye
-HTTP/1.1 200 OK
-foo: bar
-content-length: 7
-date: Thu, 10 Mar 2022 21:38:58 GMT
-
-Goodbye
-```
+After deploying, you can query the service using the provided URL.
+Use the `/hello` and `/goodbye` paths for the URL.
 
 ## Learn more
 
+- [Spin's Documentation](https://developer.fermyon.com/spin/v2/index)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

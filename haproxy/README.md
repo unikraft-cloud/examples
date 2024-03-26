@@ -1,21 +1,18 @@
 # HAProxy
 
-This example demonstrates how to use [HAProxy](https://www.haproxy.org), a free and open source software that provides a high availability load balancer and reverse proxy for TCP and HTTP-based applications that spreads requests across multiple servers.
+[HAProxy](https://www.haproxy.org) is a free and open source software that provides a high availability load balancer and reverse proxy for TCP and HTTP-based applications that spreads requests across multiple servers.
 
-To get started, simply clone this repository and `cd` into this directory.
-Then, run:
-
-```console
-kraft cloud deploy -p 443:8404 -M 256 .
-```
-
-Get the results of the deployment by running or visiting the website:
+To run HAProxy on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-curl  https://green-leaf-29gzos5s.dal0.kraft.cloud/stats
+kraft cloud deploy --metro fra0 -p 443:8404 -M 256 .
 ```
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [HAProxy's Documentation](https://docs.haproxy.org/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

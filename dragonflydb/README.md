@@ -1,20 +1,18 @@
 # DragonflyDB
 
-This examples demonstrates how to use [DragonflyDB](https://www.dragonflydb.io/), a simple, performant, and cost-efficient in-memory data store.
+[DragonflyDB](https://www.dragonflydb.io/) is a simple, performant, and cost-efficient in-memory data store.
 
-To get started, simply clone this repository and `cd` into this directory.
-Then, run:
-
-```console
-kraft cloud deploy -p 443:6379 -M 512 .
-```
-
-Get the results of the deployment by running:
+To run DragonflyDB on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-curl  https://green-leaf-29gzos5s.dal0.kraft.cloud
+kraft cloud deploy --metro fra0 -p 443:6379 -M 512 .
 ```
+
+After deploying, you can use `redis-cli` to query the service using the provided URL.
 
 ## Learn more
 
+- [DragonflyDBS's Documentation](https://www.dragonflydb.io/docs)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

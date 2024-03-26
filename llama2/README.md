@@ -1,18 +1,22 @@
-# Llama2 inference
+# Llama2.c Inference
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Llama2.c](https://github.com/karpathy/llama2.c) is Llama2 inference in one file of pure C.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, simply invoke:
+To run LLama2.c on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -M 1024 -p 443:8080 .
+kraft cloud deploy --metro fra0 -M 1024 -p 443:8080 .
 ```
 
-Note that in this example we assign 1G of memory. The amount required
-will vary depending on the model.
+The command will build and deploy the files under `rootfs/`.
+Note that in this example we assign 1G of memory.
+The amount required will vary depending on the model.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Llama2.c's Documentation](https://github.com/karpathy/llama2.c/blob/master/README.md)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

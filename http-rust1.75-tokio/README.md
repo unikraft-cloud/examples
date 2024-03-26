@@ -1,17 +1,20 @@
-# Tokio (Rust) Example
+# Rust Tokio
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Tokio](https://tokio.rs/) is a runtime for writing reliable asynchronous applications with Rust.
 
-Start by cloning this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run Tokio on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:8080 .
+kraft cloud deploy --metro fra0 -p 443:8080 .
 ```
 
-Then try using curl on the resulting URL.
+The command will build and deploy the files under `src/`.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Tokios's Documentation](https://docs.rs/tokio/latest/tokio/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
