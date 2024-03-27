@@ -1,15 +1,20 @@
-# Simple C++ Boost HTTP Web Server
+# C++ Boost
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Boost](https://www.boost.org/doc/) is a set of libraries for the C++ programming language.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run this example on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:8080 .
+kraft cloud deploy --metro fra0 -p 443:8080 .
 ```
+
+The command will build and deploy the `http_server.cpp` source code file.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Boost's Documentation](https://www.boost.org/doc/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

@@ -1,16 +1,20 @@
-# Node 21 NextJS Example
+# Node 21 NextJS
 
-This example uses the [NextJS Node framework](https://nextjs.org/).
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[NextJS](https://nextjs.org/) enables you to create high-quality web applications with the power of React components.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run NextJS on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:3000 -M 256 .
+kraft cloud deploy --metro fra0 -p 443:3000 -M 256 .
 ```
+
+The command will build the files in the current directory.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [NextJS's Documentation](https://nextjs.org/docs)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

@@ -1,16 +1,20 @@
-# Node 21 Solid Start Example
+# Node 21 Solid Start
 
-This example uses the [Solid Start framework](https://start.solidjs.com).
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+[Solid Start](https://start.solidjs.com/) a meta-framework that provides the platform to put all of web-related pieces together in a one location.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run Solid Start on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:3000 -M 256 .
+kraft cloud deploy --metro fra0 -p 443:3000 -M 256 .
 ```
+
+The command will deploy the files in the current directory.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Solid Starts's Documentation](https://start.solidjs.com/getting-started/what-is-solidstart)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

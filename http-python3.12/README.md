@@ -1,15 +1,20 @@
-# Simple Python 3.12 HTTP Web Server
+# Simple Python 3.12 HTTP Server
 
-To run this example, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+This is a simple HTTP server written in the [Python](https://www.python.org/) programming language.
 
-Then, clone this repository and `cd` into this directory.
-To deploy this application on KraftCloud, invoke:
+To run this example on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -p 443:8080 -M 512 .
+kraft cloud deploy --metro fra0 -p 443:8080 -M 512 .
 ```
+
+The command will build the `server.py` source code file.
+
+After deploying, you can query the service using the provided URL.
 
 ## Learn more
 
+- [Python's Documentation](https://www.python.org/doc/)
 - [KraftCloud's Documentation](https://docs.kraft.cloud)
-- [How to build `Dockerfile` root filesystems with BuildKit](https://unikraft.org/docs/getting-started/integrations/buildkit)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
