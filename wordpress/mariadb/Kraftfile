@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: mariadb:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/sbin/mariadbd", "--user=root", "--log-bin", "--init-file", "/usr/src/init.sql"]
