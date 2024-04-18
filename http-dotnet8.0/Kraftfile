@@ -6,4 +6,4 @@ runtime: base-compat:latest
 
 rootfs: ./Dockerfile
 
-cmd: ["/usr/bin/app/src"]
+cmd: ["/app/src"]
