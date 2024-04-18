@@ -1,0 +1,9 @@
+spec: v0.6
+
+name: erlang
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/wrapper.sh", "/usr/bin/erl", "-noshell", "-s", "http_server"]
