@@ -1,0 +1,10 @@
+services:
+  redis:
+    image: redis:latest
+
+  app:
+    build: .
+    ports:
+    - 443:8080
+    environment:
+    - REDIS_ADDR=http-go122-redis-redis.internal:6379
