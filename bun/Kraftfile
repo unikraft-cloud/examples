@@ -1,0 +1,9 @@
+spec: v0.6
+
+name: bun
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/bun", "run", "/usr/src/server.ts"]
