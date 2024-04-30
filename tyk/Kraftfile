@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: tyk:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/tyk", "start", "--conf", "/etc/tyk.conf"]
