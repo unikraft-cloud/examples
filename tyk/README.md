@@ -3,26 +3,11 @@
 [Tyk](https://tyk.io/) is an API gateway and management platform.
 
 To run Tyk on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
-Then clone this examples repository and `cd` into this directory, and do the steps below.
-Tyk uses Redis as the backend for storing its information.
+Then clone this examples repository and `cd` into this directory, and invoke:
 
-1. Create a service group for the Redis and Tyk instance:
-
-   ```console
-   kraft cloud service create --name tyk-network 443:8080/http+tls
-   ```
-
-1. Create a Redis instance:
-
-   ```console
-   kraft cloud inst create --start --name tyk-redis -g tyk-network redis:7.2
-   ```
-
-1. Create a Tyk instance:
-
-   ```console
-   kraft cloud deploy -g tyk-network .
-   ```
+```console
+kraft cloud compose up
+```
 
 After deploying, you can query the service using the provided URL.
 Use the `/hello` path after the URL, such as below:
