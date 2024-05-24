@@ -1,0 +1,9 @@
+spec: v0.6
+
+name: elixir
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/wrapper.sh", "/usr/local/bin/mix", "run", "--no-halt"]
