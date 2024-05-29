@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY package.json /app
 
+RUN npm install -D @sveltejs/adapter-node
 RUN npm install
 
 FROM deps AS build
