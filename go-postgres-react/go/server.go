@@ -20,7 +20,7 @@ func main() {
 	var err error
 	db, err = sql.Open(
 		"postgres",
-		"user=yourusername dbname=yourdbname sslmode=disable",
+		"user=postgres dbname=postgres password=unikraft host=postgres-wahr0.internal sslmode=disable",
 	)
 	if err != nil {
 		panic(err)
