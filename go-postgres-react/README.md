@@ -2,35 +2,12 @@
 
 This is for creating a Contacts application with the following components:
 
-- a Golang backend
-- a Postgresql database for saving data
-  -- the corresponding Volume for persistent storage
-- a react frontend app for serving the UI
+- [x] a Golang backend
+- [x] a Postgresql database for saving data
+      -- the corresponding Volume for persistent storage
+- [] a react frontend app for serving the UI
 
 ## Create a volume and deploy postgresql
-
-```
-❯ kraft cloud deploy --metro fra0 -M 1024 -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres -v postgres:/volume -p 5432:5432/tls .
- W  could not parse image name: invalid reference format: repository name must be lowercase
-[+] building rootfs... done!                                                                                                                               x86_64 [24.3s]
-[+] packaging index.unikraft.io/sp/postgres:latest... done!                                                                                      kraftcloud/x86_64 [0.2s]
-[+] pushing index.unikraft.io/sp/postgres:latest (kraftcloud/x86_64)... done!                                                                                     [50.3s]
-
-[●] Deployed successfully!
- │
- ├────────── name: postgres-wahr0
- ├────────── uuid: 51095ece-2c34-4ec7-85c9-af0be864c91a
- ├───────── state: running
- ├──────── domain: cool-sound-5t2t69gg.fra0.kraft.host
- ├───────── image: sp/postgres@sha256:944874221c4fb0bd5a617e5e32b05415db071d4bd964eaca822989f772fa3083
- ├───── boot time: 617.25 ms
- ├──────── memory: 1024 MiB
- ├─ service group: cool-sound-5t2t69gg
- ├── private fqdn: postgres-wahr0.internal
- ├──── private ip: 172.18.175.4
- └────────── args: wrapper.sh docker-entrypoint.sh postgres
-
-```
 
 ```console
 $ cd github.com/kraftcloud/examples/postgres
