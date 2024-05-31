@@ -63,6 +63,30 @@ github.com/kraftcloud/examples/go-postgres-react/go$ kraft cloud deploy --metro 
 (Search for `domain` in the output)
 
 # Ensure that the backend API works fine by talking to the db
-$ curl -vv DOMAIN_FROM_ABOVE/contacts
+
+# Empty response first
+$ curl -vv https://DOMAIN_FROM_ABOVE.fra0.kraft.host/contacts
 null
+
+# Create contact next
+$ curl -v https://DOMAIN_FROM_ABOVE.fra0.kraft.host/contacts -d '{ "name": "example1", "email": "one@example.com" }'
+
+# Ensure the new contact is saved and retrieved from db via the backend
+$ curl https://DOMAIN_FROM_ABOVE.fra0.kraft.host/contacts
+[{"name":"example1","email":"one@example.com"}]
+
+# Above backend API confirms data is saved, but let us check in DB also
+$ psql -U postgres -h localhost
+Password for user postgres: unikraft
+psql (16.2)
+Type "help" for help.
+
+postgres=# select * from contacts;
+ id |   name   |      email
+----+----------+-----------------
+  1 | example1 | one@example.com
+(1 row)
+
+postgres=#
+
 ```
