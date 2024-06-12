@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="https://fav.farm/🖨️" />
+    <title>node-express-puppeteer-pdf-example</title>
+  </head>
+  <style>
+    body,html{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    @media print {
+      .print-hide {
+        display: none;
+        visibility: hidden;
+      }
+    }
+
+    h4, h2:nth-of-type(1) {
+        margin: 0;
+    }
+  </style>
+  <body>
+    <h2>You can print this website</h2>
+    ➡ <a id="normal" href="">Click here to print this page</a>
+    <p>
+        Here is some good info about designing for print:<br />
+        ➡ <a href="https://www.smashingmagazine.com/2015/01/designing-for-print-with-css">https://www.smashingmagazine.com/2015/01/designing-for-print-with-css</a>
+    </p>
+    <h4>Quick shout out</h4>
+    ➡ <a id="helpful-contribution" href="">Click here to print a helpful contribution</a> someone posted to the Github repo!</p>
+
+    <hr />
+    <div class="print-hide">
+      <h2>Try print a random website</h2>
+      <input type="text" name="custom-website-input" value="https://google.com" id="custom-website-input" />
+      <a id="custom-website-link" href="/generate-pdf?url=https://google.com">
+        <button>PDF Generator go Brrr!</button>
+      </a>
+      <br />
+      <small>This will not show up in the Generated PDF Document.</small>
+    </div>
+    
+    <hr />
+    <div class="print-hide">
+      <h2>Send HTML as Base64, and get a PDF output!</h2>
+      <form action="/generate-pdf" method="post">
+        <label for="filename">Filename</label><br/>
+        <small>Enter a filename, the following characters will work. [a-z, A-Z, 0-9, _, -]</small><br/>
+        <input id="filename" name="filename" type="text"><br/>
+        <br/>
+
+        <label for="api_key">API Key</label><br/>
+        <small>If the <strong>'PROTECT_ROUTES'</strong> environment variable has been set, you will need to provide an API_KEY.</small><br/>
+        <input id="api_key" name="api_key" type="text"><br/>
+        <br/>
+
+        <label for="filename">Payload</label><br/>
+        <small>Enter your Base64 encoded payload, don't have Base64? Try this <a href="https://www.base64encode.org/" target="_blank" rel="noopener noreferrer">tool</a>!</small><br/>
+        <input id="content" name="content" type="text"><br/>
+        <br/>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("normal").href = "/generate-pdf?url=" + document.location.href;
+      document.getElementById("helpful-contribution").href = "/generate-pdf?url=" + document.location.href + "helpful.html";
+
+      document.getElementById("custom-website-input").addEventListener("change", function (e) {
+        document.getElementById("custom-website-link").href = "/generate-pdf?url=" + encodeURI(e.target.value);
+      });
+    });
+  </script>
+</html>

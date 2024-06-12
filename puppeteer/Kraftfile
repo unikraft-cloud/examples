@@ -1,7 +1,0 @@
-spec: v0.6
-
-runtime: base-compat:latest
-
-rootfs: ./Dockerfile
-
-cmd: ["/usr/bin/wrapper.sh", "/usr/local/bin/node", "/src/pdf.js"]
