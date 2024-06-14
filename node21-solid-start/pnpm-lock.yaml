@@ -945,7 +945,7 @@ packages:
       npmlog: 5.0.1
       rimraf: 3.0.2
       semver: 7.6.0
-      tar: 6.2.0
+      tar: >=6.2.1
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -2558,7 +2558,7 @@ packages:
       nypm: 0.3.8
       ohash: 1.1.3
       pathe: 1.1.2
-      tar: 6.2.0
+      tar: >=6.2.1
     dev: false
 
   /glob-parent@5.1.2:
@@ -3971,7 +3971,7 @@ packages:
       streamx: 2.16.1
     dev: false
 
-  /tar@6.2.0:
+  /tar@6.2.1:
     resolution: {integrity: sha512-/Wo7DcT0u5HUV486xg675HtjNd3BXZ6xDbzsCUZPt5iw8bTQ63bP0Raut3mvro9u+CUyq7YQd8Cx55fsZXxqLQ==}
     engines: {node: '>=10'}
     dependencies:
