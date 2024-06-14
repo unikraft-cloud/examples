@@ -55,7 +55,7 @@ func main() {
 		Export("log_i32").
 		NewFunctionBuilder().
 		WithFunc(func() uint32 {
-			if envYear, err := strconv.ParseUint(os.Getenv("CURRENT_YEAR"), 10, 64); err == nil {
+			if envYear, err := strconv.ParseUint(os.Getenv("CURRENT_YEAR"), 10, 32); err == nil {
 				return uint32(envYear) // Allow env-override to prevent annual test maintenance!
 			}
 			return uint32(time.Now().Year())
