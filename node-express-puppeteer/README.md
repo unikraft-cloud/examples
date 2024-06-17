@@ -1,4 +1,4 @@
-# Puppeteer
+# Node Express Puppeteer Puppeteer
 
 [Puppeteer](https://pptr.dev/) is a Node.js library which provides a high-level API to control browsers, including the option to run them headless (no UI).
 
@@ -6,19 +6,16 @@ To run Puppeteer on KraftCloud, first [install the `kraft` CLI tool](https://uni
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy --metro fra0 -M 4096 .
+kraft cloud deploy --metro fra0 -p 443:3000 -M 4096 .
 ```
 
 The command will deploy the files in the current directory.
-It will run the `pdf.js` example.
-Note that this example won't give you access the generated PDF file.
-To be able to extract the result, you will have to create a service-like implementation on top of the Puppeteer API that can be queried remotely.
+The application and the landing page are part of [this repository](https://github.com/christopher-talke/node-express-puppeteer-pdf-example).
+It uses the [ExpressJS framework](https://expressjs.com/).
 
-To check it worked, use:
-
-```console
-kraft cloud inst logs $(kraft cloud inst ls | grep puppeteer | cut -d ' ' -f 1)
-```
+It results in the creation of a remote web-based service for generating PDF files from browsers.
+Use a browser to access the URL shown by the command above.
+And then use the interface to generate PDF files.
 
 ## Learn more
 

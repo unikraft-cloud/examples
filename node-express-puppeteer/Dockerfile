@@ -19,9 +19,10 @@ RUN set -xe; \
         npm \
     ;
 
-WORKDIR /src
+WORKDIR /app
+COPY . .
 
-RUN npm install puppeteer
+RUN npm install
 
 RUN mkdir /home/tmp
 
@@ -130,7 +131,7 @@ COPY --from=build /usr/lib/x86_64-linux-gnu/libfreebl3.so \
                   /usr/lib/x86_64-linux-gnu/
 
 # Node binary
-COPY --from=build /usr/bin/node /usr/local/bin/node
+COPY --from=build /usr/bin/node /usr/bin/node
 
 # System libraries
 COPY --from=build /lib/x86_64-linux-gnu/libnode.so.108 \
@@ -178,22 +179,10 @@ COPY --from=build /usr/lib/os-release /usr/lib/os-release
 # Configuration files
 COPY --from=build /etc /etc
 
-
-# Node modules, including Puppeteer
-COPY --from=build /src/node_modules /src/node_modules
-
-# Actual source code used by Puppeteer.
-COPY ./pdf.js /src/pdf.js
+# Node modules, including Puppeteer and application
+COPY --from=build /app /app
 
 COPY ./wrapper.sh /usr/bin/wrapper.sh
-
-COPY ./.puppeteerrc.cjs /src/.puppeteerrc.cjs
-
-COPY --from=build /lib/x86_64-linux-gnu/libselinux.so.1 /lib/x86_64-linux-gnu/libselinux.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libpcre2-8.so.0 /lib/x86_64-linux-gnu/libpcre2-8.so.0
-COPY --from=build /bin/rm /bin/rm
-COPY --from=build /bin/mknod /bin/mknod
 
 COPY --from=build /bin/bash /bin/bash
 COPY --from=build /bin/sh /bin/sh

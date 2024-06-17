@@ -3,5 +3,5 @@
 set -e
 
 export HOME=/root
-cd /src
+cd /app
 exec "$@"

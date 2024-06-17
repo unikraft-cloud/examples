@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/wrapper.sh", "/usr/bin/node", "/app/bin/www"]
