@@ -6,4 +6,4 @@ runtime: base-compat:latest
 
 rootfs: ./Dockerfile
 
-cmd: ["/usr/bin/wrapper.sh", "/usr/local/bin/mix", "run", "--no-halt"]
+cmd: ["/usr/bin/wrapper.sh", "_build/dev/rel/server/bin/server", "start"]
