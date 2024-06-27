@@ -1,0 +1,9 @@
+spec: v0.6
+
+name: wordpress
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/local/bin/wrapper.sh"]
