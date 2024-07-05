@@ -1,0 +1,8 @@
+spec: v0.6
+
+runtime: java:17
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/lib/jvm/java-17-openjdk-amd64/bin/java", "-jar", "/usr/src/spring-petclinic-3.3.0-SNAPSHOT.jar"]
+
