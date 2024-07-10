@@ -6,7 +6,7 @@ To run OpenTelemetry Collector on KraftCloud, first [install the `kraft` CLI too
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy --metro fra0 .
+kraft cloud deploy --metro fra0 -M 1024M .
 ```
 
 The command will build and deploy the files under `rootfs` in a Collector instance.
