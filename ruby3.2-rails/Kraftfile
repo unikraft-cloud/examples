@@ -2,6 +2,11 @@ spec: v0.6
 
 runtime: ruby:3.2
 
+labels:
+  cloud.unikraft.v1.instances/scale_to_zero.policy: "idle"
+  cloud.unikraft.v1.instances/scale_to_zero.stateful: "true"
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
+
 rootfs: ./Dockerfile
 
 cmd: ["/usr/bin/ruby", "/app/bin/rails", "server", "-b", "0.0.0.0"]
