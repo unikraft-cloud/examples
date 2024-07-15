@@ -6,4 +6,4 @@ runtime: base-compat:latest
 
 rootfs: ./Dockerfile
 
-cmd: ["wrapper.sh", "docker-entrypoint.sh", "postgres"]
+cmd: ["wrapper.sh", "docker-entrypoint.sh", "postgres", "-c", "shared_preload_libraries='pg_ukc_scaletozero'"]
