@@ -2,6 +2,11 @@ spec: v0.6
 
 runtime: lua:5.1
 
+labels:
+  cloud.unikraft.v1.instances/scale_to_zero.policy: "on"
+  cloud.unikraft.v1.instances/scale_to_zero.stateful: "false"
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
+
 rootfs: ./Dockerfile
 
 cmd: ["/usr/bin/lua", "/http_server.lua"]
