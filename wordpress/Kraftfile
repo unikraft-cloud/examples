@@ -12,4 +12,4 @@ labels:
 
 rootfs: ./Dockerfile
 
-cmd: ["/usr/local/bin/docker-entrypoint.sh", "php-fpm"]
+cmd: ["/usr/local/bin/wrapper.sh", "/usr/local/bin/docker-entrypoint.sh", "php-fpm"]
