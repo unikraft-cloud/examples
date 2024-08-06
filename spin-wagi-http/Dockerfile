@@ -1,4 +1,4 @@
-FROM rust:1.75.0-bookworm AS spin
+FROM rust:1.75.0-bookworm AS spin-devenv
 
 ARG SPIN_VERSION=2.1.0
 
@@ -28,17 +28,18 @@ RUN set -xe; \
     tar xzvf ./wasi-sdk.tar.gz --strip-components 1 -C /opt/wasi-sdk/; \
     rm -rf ./wasi-sdk.tar.gz;
 
-FROM spin AS build
+FROM spin-devenv AS build
 
-COPY ./http-rust /app/http-rust
-WORKDIR /app/http-rust
-RUN cargo build --release
+COPY ./hello-cpp /app/hello-cpp
+COPY ./goodbye-rust /app/goodbye-rust
+COPY ./spin.toml /app/spin.toml
 
-COPY ./wagi-http-cpp /app/wagi-http-cpp
-WORKDIR /app/wagi-http-cpp
-RUN make build
+WORKDIR /app
+
+RUN spin build
 
 FROM scratch
 
-COPY --from=build /app /app
 COPY ./spin.toml /app/spin.toml
+COPY --from=build /app/hello-cpp/hello.wasm /app/hello-cpp/hello.wasm
+COPY --from=build /app/goodbye-rust/target/wasm32-wasi/release/goodbye.wasm /app/goodbye-rust/target/wasm32-wasi/release/goodbye.wasm

@@ -6,7 +6,7 @@ To run Spin Wagi on KraftCloud, first [install the `kraft` CLI tool](https://uni
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy --metro fra0 -p 443:3000 -M 2048 .
+kraft cloud deploy --metro fra0 -p 443:3000 -M 1024 .
 ```
 
 The command will build and deploy the files in the current directory.

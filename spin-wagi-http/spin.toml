@@ -16,11 +16,14 @@ component = "goodbye"
 executor = { type = "http" }
 
 [component.hello]
-source = "wagi-http-cpp/main.wasm"
+source = "hello-cpp/hello.wasm"
+
 [component.hello.build]
-command = "make build -C wagi-http-cpp"
+command = "make build -C hello-cpp"
 
 [component.goodbye]
-source = "http-rust/target/wasm32-wasi/release/goodbyerust.wasm"
+source = "goodbye-rust/target/wasm32-wasi/release/goodbye.wasm"
+
 [component.goodbye.build]
-command = "cargo build --target wasm32-wasi --release --manifest-path http-rust/Cargo.toml"
+command = "cargo build --target wasm32-wasi --release --manifest-path goodbye-rust/Cargo.toml"
+
