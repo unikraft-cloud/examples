@@ -2,7 +2,7 @@
 
 [MariaDB](https://mariadb.org/) is one of the most popular open source relational databases.
 
-To run MariaDB on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run MariaDB on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -30,5 +30,5 @@ kill -9 <PID>
 ## Learn more
 
 - [MariaDB's Documentation](https://mariadb.org/documentation/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

@@ -2,7 +2,7 @@
 
 [Express](https://expressjs.com/) is a fast, unopinionated, minimalist web framework for Node.js.
 
-To run Express on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Express on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -16,5 +16,5 @@ After deploying, you can query the service using the provided URL.
 ## Learn more
 
 - [Express's Documentation](https://expressjs.com/en/5x/api.html)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

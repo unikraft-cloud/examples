@@ -2,7 +2,7 @@
 
 [Tyk](https://tyk.io/) is an API gateway and management platform.
 
-To run Tyk on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Tyk on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -22,5 +22,5 @@ curl https://<NAME>.<METRO>.kraft.host/hello
 ## Learn more
 
 - [Tyk's Documentation](https://tyk.io/docs/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

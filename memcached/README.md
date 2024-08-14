@@ -2,7 +2,7 @@
 
 [Memcached](https://memcached.org) is an in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering.
 
-To run Memcached on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Memcached on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -36,5 +36,5 @@ kill -9 <PID>
 ## Learn more
 
 - [Memcached's Documentation](https://github.com/memcached/memcached/wiki)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

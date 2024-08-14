@@ -2,7 +2,7 @@
 
 [Puppeteer](https://pptr.dev/) is a Node.js library which provides a high-level API to control browsers, including the option to run them headless (no UI).
 
-To run Puppeteer on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Puppeteer on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -20,5 +20,5 @@ And then use the interface to generate PDF files.
 ## Learn more
 
 - [Puppeteer's Documentation](is a Node.js library which provides a high-level API to control)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

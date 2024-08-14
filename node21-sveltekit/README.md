@@ -2,9 +2,9 @@
 
 [SvelteKit](https://kit.svelte.dev/) is built on Svelte, a UI framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser.
 
-This project was generated using [`npm create svelte@latest`](https://kit.svelte.dev/docs/creating-a-project), uses the [`@sveltejs/adapter-node`](https://kit.svelte.dev/docs/adapter-node) adapter and includes a `Kraftfile` and `Dockerfile` to run on KraftCloud.
+This project was generated using [`npm create svelte@latest`](https://kit.svelte.dev/docs/creating-a-project), uses the [`@sveltejs/adapter-node`](https://kit.svelte.dev/docs/adapter-node) adapter and includes a `Kraftfile` and `Dockerfile` to run on Unikraft Cloud.
 
-To run SvelteKit on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run SvelteKit on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -18,5 +18,5 @@ After deploying, you can query the service using the provided URL.
 ## Learn more
 
 - [SvelteKit's Documentation](https://kit.svelte.dev/docs/introduction)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

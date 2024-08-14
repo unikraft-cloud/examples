@@ -2,7 +2,7 @@
 
 [FerretDB](https://www.ferretdb.com/) is an open-source proxy that translates MongoDB wire protocol queries to SQL.
 
-To run FerretDB on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run FerretDB on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 
 To deploy it, you need to deploy a [PostgreSQL instance](https://github.com/kraftcloud/examples/tree/main/postgres16.2) using the `examples` repository:
 
@@ -42,5 +42,5 @@ kill -9 <PID>
 ## Learn more
 
 - [FerretDB's Documentation](https://docs.ferretdb.io/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

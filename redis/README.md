@@ -2,7 +2,7 @@
 
 [Redis](https://redis.io) is an open-source in-memory storage, used as a distributed, in-memory key–value database, cache and message broker, with optional durability.
 
-To run Redis on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Redis on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -30,5 +30,5 @@ kill -9 <PID>
 ## Learn more
 
 - [Redis's Documentation](https://redis.io/docs/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

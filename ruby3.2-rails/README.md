@@ -2,7 +2,7 @@
 
 [Rails](https://rubyonrails.org/) is a server-side web application framework written in Ruby.
 
-To run Rails on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Rails on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -17,5 +17,5 @@ Use the `/hello` path for the provided URL.
 ## Learn more
 
 - [Rails's Documentation](https://guides.rubyonrails.org/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
