@@ -2,7 +2,7 @@
 
 [Grafana](https://grafana.com) is the open source analytics & monitoring solution for every database.
 
-To run Grafana on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Grafana on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -14,5 +14,5 @@ After deploying, you can query the service using the provided URL.
 ## Learn more
 
 - [Grafana's Documentation](https://grafana.com/docs/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

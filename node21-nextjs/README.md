@@ -2,7 +2,7 @@
 
 [NextJS](https://nextjs.org/) enables you to create high-quality web applications with the power of React components.
 
-To run NextJS on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run NextJS on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -16,5 +16,5 @@ After deploying, you can query the service using the provided URL.
 ## Learn more
 
 - [NextJS's Documentation](https://nextjs.org/docs)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

@@ -2,7 +2,7 @@
 
 [PostgreSQL](https://www.postgresql.org/) is a powerful, open source object-relational database system.
 
-To run PostgreSQL on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run PostgreSQL on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -58,5 +58,5 @@ See an example on that in the [FerretDB documentation](../ferretdb/README.md).
 ## Learn more
 
 - [PostgreSQL's Documentation](https://www.postgresql.org/docs/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

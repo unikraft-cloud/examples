@@ -2,7 +2,7 @@
 
 [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) offers a vendor-agnostic implementation of how to receive, process and export telemetry data.
 
-To run OpenTelemetry Collector on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run OpenTelemetry Collector on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -25,5 +25,5 @@ service:
 ## Learn more
 
 - [OpenTelemetry Collectors Documentation](https://opentelemetry.io/docs/collector/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

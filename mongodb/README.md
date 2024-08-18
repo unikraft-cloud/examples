@@ -2,7 +2,7 @@
 
 [MongoDB](https://www.mongodb.com) is a source-available, cross-platform, document-oriented database program.
 
-To run MongoDB on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run MongoDB on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -30,5 +30,5 @@ kill -9 <PID>
 ## Learn more
 
 - [MongoDB's Documentation](https://www.mongodb.com/docs/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

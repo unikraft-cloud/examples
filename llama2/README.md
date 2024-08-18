@@ -2,7 +2,7 @@
 
 [Llama2.c](https://github.com/karpathy/llama2.c) is Llama2 inference in one file of pure C.
 
-To run LLama2.c on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run LLama2.c on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -18,5 +18,5 @@ After deploying, you can query the service using the provided URL.
 ## Learn more
 
 - [Llama2.c's Documentation](https://github.com/karpathy/llama2.c/blob/master/README.md)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

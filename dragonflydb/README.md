@@ -2,7 +2,7 @@
 
 [DragonflyDB](https://www.dragonflydb.io/) is a simple, performant, and cost-efficient in-memory data store.
 
-To run DragonflyDB on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run DragonflyDB on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -14,5 +14,5 @@ After deploying, you can use `redis-cli` to query the service using the provided
 ## Learn more
 
 - [DragonflyDBS's Documentation](https://www.dragonflydb.io/docs)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

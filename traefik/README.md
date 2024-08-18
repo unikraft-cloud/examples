@@ -1,8 +1,8 @@
-# Traefik on KraftCloud
+# Traefik on Unikraft Cloud
 
 [Traefik](https://traefik.io/traefik/) is the leading open-source reverse proxy and load balancer for HTTP and TCP-based applications.
 
-To run Traefik on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Traefik on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
@@ -19,5 +19,5 @@ Use the `/dashboard` path for the URL.
 ## Learn more
 
 - [Traefik's Documentation](https://doc.traefik.io/traefik/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)

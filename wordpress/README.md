@@ -2,9 +2,9 @@
 
 [Wordpress](https://wordpress.com/) is a web content management system.
 
-To run Wordpress on KraftCloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+To run Wordpress on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
 
-Wordpress requires connecting three KraftCloud instances:
+Wordpress requires connecting three Unikraft Cloud instances:
 
 * A MariaDB database instance
 * A Wordress instance, using PHP FPM (*FastCGI Process Manager*)
@@ -19,7 +19,7 @@ Create a MariaDB instance and assign it the `mariadb` name:
 kraft cloud deploy --metro fra0 --name mariadb -p 3306:3306/tls -M 1024 mariadb:latest
 ```
 
-The MariaDB instance can be referenced by other KraftCloud instances as `mariadb.internal`.
+The MariaDB instance can be referenced by other Unikraft Cloud instances as `mariadb.internal`.
 
 After deploying, you can query the service using the provided URL.
 For that, first use `socat` to open a TLS connection to port `3306` (MariaDB's listening port):
@@ -58,7 +58,7 @@ kraft cloud deploy -e WORDPRESS_DB_HOST="mariadb.internal" -e WORDPRESS_DB_NAME=
 
 This will create a Wordress instance using PHP FPM (*FastCGI Process Manager*).
 We use the `mariadb.internal` name to connect to the MariaDB instance started above.
-The Wordpress instance can be referenced by other KraftCloud instances as `wordpress.internal`.
+The Wordpress instance can be referenced by other Unikraft Cloud instances as `wordpress.internal`.
 
 ## Set Up Nginx
 
@@ -171,5 +171,5 @@ It will show you an install screen for Wordpress.
 ## Learn more
 
 - [Wordpress's Documentation](https://wordpress.org/documentation/)
-- [KraftCloud's Documentation](https://docs.kraft.cloud)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
 - [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
