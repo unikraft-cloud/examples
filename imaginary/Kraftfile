@@ -2,4 +2,9 @@ spec: v0.6
 
 runtime: imaginary:1.2
 
+labels:
+  cloud.unikraft.v1.instances/scale_to_zero.policy: "on"
+  cloud.unikraft.v1.instances/scale_to_zero.stateful: "false"
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
+
 cmd: ["/usr/bin/imaginary", "-p", "8080"]
