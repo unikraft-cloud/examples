@@ -1,27 +1,15 @@
-# syntax=docker/dockerfile:1.4
-FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
+FROM python:3.12-bookworm AS build
 
-WORKDIR /code
+WORKDIR /app
 
-COPY requirements.txt /code
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip3 install -r requirements.txt
+COPY requirements.txt /app
+RUN pip3 install -r requirements.txt --no-cache-dir
 
-COPY . /code
+COPY . /app
 
-ENTRYPOINT ["python3"]
-CMD ["app.py"]
+FROM scratch
 
-FROM builder as dev-envs
-
-RUN <<EOF
-apk update
-apk add git bash
-EOF
-
-RUN <<EOF
-addgroup -S docker
-adduser -S --shell /bin/bash --ingroup docker vscode
-EOF
-# install Docker tools (cli, buildx, compose)
-COPY --from=gloursdocker/docker / /
+COPY --from=build /lib/x86_64-linux-gnu/libssl.so.3 /lib/x86_64-linux-gnu/libssl.so.3
+COPY --from=build /lib/x86_64-linux-gnu/libffi.so.8 /lib/x86_64-linux-gnu/libffi.so.8
+COPY --from=build /usr/local/lib/python3.12 /usr/local/lib/python3.12
+COPY --from=build /app /app
