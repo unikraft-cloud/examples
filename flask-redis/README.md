@@ -1,81 +1,26 @@
-## Compose sample application
-### Python/Flask application using a Redis database
+# Compose: Flask and Redis
 
-Project structure:
+This is a [Compose](https://unikraft.cloud/docs/guides/features/compose/)-based example of [Flask](https://flask.palletsprojects.com/en/3.0.x/) and [Redis](https://redis.io/).
+It is imported from the [`awesome-compose` repository](https://github.com/docker/awesome-compose).
 
-```
-.
-├── Dockerfile
-├── README.md
-├── app.py
-├── compose.yaml
-└── requirements.txt
+To run Flask and Redis with Compose on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
+
+```console
+kraft cloud compose up
 ```
 
-[_compose.yaml_](compose.yaml)
+The command will deploy files in the current directory.
 
-```
-services:
-   redis: 
-     image: redislabs/redismod
-     ports:
-       - '6379:6379' 
-   web:
-        build: .
-        ports:
-            - "8000:8000"
-        volumes:
-            - .:/code
-        depends_on:
-            - redis
+After deploying, you can query the service using the provided URL.
+Find out the provided URL by using:
+
+```console
+kraft cloud instance list
 ```
 
-## Deploy with docker compose
+## Learn more
 
-```
-$ docker compose up -d
-[+] Running 24/24
- ⠿ redis Pulled   
- ...                                                                                                                                                                                                                                                                                                                                                                                                             
-   ⠿ 565225d89260 Pull complete                                                                                                                                                                                                      
-[+] Building 12.7s (10/10) FINISHED
- => [internal] load build definition from Dockerfile                                                                                                                                                                                  ...
-[+] Running 3/3
- ⠿ Network flask-redis_default    Created                                                                                                                                                                                             
- ⠿ Container flask-redis-redis-1  Started                                                                                                                                                                                             
- ⠿ Container flask-redis-web-1    Started
-```
-
-## Expected result
-
-Listing containers must show one container running and the port mapping as below:
-```
-
-$ docker compose ps
-NAME                  COMMAND                  SERVICE             STATUS              PORTS
-flask-redis-redis-1   "redis-server --load…"   redis               running             0.0.0.0:6379->6379/tcp
-flask-redis-web-1     "/bin/sh -c 'python …"   web                 running             0.0.0.0:8000->8000/tcp
-```
-
-After the application starts, navigate to `http://localhost:8000` in your web browser or run:
-```
-$ curl localhost:8000
-This webpage has been viewed 2 time(s)
-```
-
-## Monitoring Redis keys
-
-Connect to redis database by using ```redis-cli``` command and monitor the keys.
-```
-redis-cli -p 6379
-127.0.0.1:6379> monitor
-OK
-1646634062.732496 [0 172.21.0.3:33106] "INCRBY" "hits" "1"
-1646634062.735669 [0 172.21.0.3:33106] "GET" "hits"
-```
-
-
-Stop and remove the containers
-```
-$ docker compose down
-```
+- [The Compose Specification](https://github.com/compose-spec/compose-spec/blob/main/spec.md)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
