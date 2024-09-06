@@ -1,0 +1,89 @@
+name: examples/ferretdb (staging)
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [main]
+    paths:
+    - '.github/workflows/example-ferretdb-staging.yaml'
+    - 'ferretdb/**'
+    - '!ferretdb/README.md'
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+    - '.github/workflows/example-ferretdb-staging.yaml'
+    - 'ferretdb/**'
+    - '!ferretdb/README.md'
+
+  schedule:
+  - cron: '0 4 * * 1-6' # Every work day at 4AM
+
+# Automatically cancel in-progress actions on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  UKC_METRO: ${{ vars.UKC_METRO }}
+  UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
+  KRAFTKIT_NO_CHECK_UPDATES: true
+  KRAFTKIT_LOG_LEVEL: debug
+
+jobs:
+  integration:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Test
+      uses: ./.github/test-actions/ferretdb
+      continue-on-error: true
+      id: test
+      with:
+        name: ferretdb-${GITHUB_RUN_ID}
+        image: ./ferretdb
+        metro: ${{ env.UKC_METRO }}
+        memory: 512
+        port: 27017
+        args: -e FERRETDB_HANDLER=sqlite -e FERRETDB_LISTEN_ADDR=0.0.0.0:27017 --runtime index.unikraft.io/official-staging/ferretdb:1.2
+
+    - name: Cleanup
+      uses: unikraft/kraftkit@staging
+      if: always()
+      with:
+        run: |
+          set -xe;
+
+          kraft cloud vm stop ferretdb-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs ferretdb-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm ferretdb-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/ferretdb-${GITHUB_RUN_ID} || true;
+
+    - name: Re-test with debug info
+      id: re-test
+      if: ${{ success() && steps.test.outcome == 'failure' }}
+      uses: ./.github/test-actions/ferretdb
+      with:
+        name: ferretdb-${GITHUB_RUN_ID}-dbg
+        image: ./ferretdb
+        metro: ${{ env.UKC_METRO }}
+        memory: 512
+        port: 27017
+        args: -e FERRETDB_HANDLER=sqlite -e FERRETDB_LISTEN_ADDR=0.0.0.0:27017 --runtime index.unikraft.io/official-staging/ferretdb:1.2-dbg
+
+    - name: Cleanup Debug
+      uses: unikraft/kraftkit@staging
+      if: always()
+      with:
+        run: |
+          set -xe;
+
+          kraft cloud vm stop ferretdb-${GITHUB_RUN_ID}-dbg || true;
+          kraft cloud vm logs ferretdb-${GITHUB_RUN_ID}-dbg || true;
+          kraft cloud vm rm ferretdb-${GITHUB_RUN_ID}-dbg || true;
+          kraft cloud img rm index.unikraft.io/test/ferretdb-${GITHUB_RUN_ID}-dbg || true;
