@@ -12,7 +12,7 @@ kraft cloud deploy --metro fra0 -p 11211:11211/tls -M 256 .
 Get the results of the deployment by first forwarding the port (save the returned PID):
 
 ```console
-socat tcp-listen:11211,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.cloud:11211 &
+socat tcp-listen:11211,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.host:11211 &
 ```
 
 Then, run the following commands to test that it works (you should see output when incrementing):

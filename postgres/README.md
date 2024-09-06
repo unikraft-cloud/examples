@@ -13,10 +13,10 @@ After deploying, you can query the service using the provided URL.
 For that, first use `socat` to open a TLS connection (save the returned PID):
 
 ```console
-socat tcp-listen:5432,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.cloud:5432 &
+socat tcp-listen:5432,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.host:5432 &
 ```
 
-where `<NAME>.<METRO>.kraft.cloud` is the name of the instance created above.
+where `<NAME>.<METRO>.kraft.host` is the name of the instance created above.
 
 Now you can query PostgreSQL using [`psql`](https://www.postgresql.org/docs/current/app-psql.html).
 We assume the username is `postgres` and the password is `unikraft`:

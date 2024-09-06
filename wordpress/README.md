@@ -25,7 +25,7 @@ After deploying, you can query the service using the provided URL.
 For that, first use `socat` to open a TLS connection to port `3306` (MariaDB's listening port):
 
 ```console
-socat tcp-listen:3306,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.cloud:3306 &
+socat tcp-listen:3306,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.host:3306 &
 ```
 
 Create the Wordpress database, user and password on MariaDB.

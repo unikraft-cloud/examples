@@ -23,7 +23,7 @@ After deploying, you can query the service using the provided URL.
 For that, first use `socat` to open a TLS connection (save the returned PID):
 
 ```console
-socat tcp-listen:27017,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.cloud:27017 &
+socat tcp-listen:27017,bind=127.0.0.1,fork,reuseaddr openssl:<NAME>.<METRO>.kraft.host:27017 &
 ```
 
 Now you can query FerretDB using `mongosh`.
