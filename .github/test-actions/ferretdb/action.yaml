@@ -1,0 +1,89 @@
+name: ferretdb
+
+description: |
+  Instantiate the given application image and perform a simple mongosh-based test.
+
+inputs:
+  name:
+    required: true
+    description: Name of the instance.
+  image:
+    required: true
+    description: Image.
+  metro:
+    required: true
+    description: Unikraft Cloud Metro.
+  memory:
+    required: true
+    description: The set amount of memory.
+  port:
+    required: true
+    description: The internal port of the application.
+  args:
+    required: false
+    description: Optional arguments you pass to 'kraft cloud deploy'.
+
+runs:
+  using: composite
+  steps:
+  - name: Test
+    uses: unikraft/kraftkit@staging
+    with:
+      run: |
+        set -xe;
+
+        # wait for image to propagate
+        sleep 15;
+
+        kraft cloud --metro ${{ inputs.metro }} deploy \
+          ${{ inputs.args }} \
+          -M ${{ inputs.memory }} \
+          --subdomain ${{ inputs.name }} \
+          --name ${{ inputs.name }} \
+          -p 27017:${{ inputs.port }}/tls \
+          ${{ inputs.image }};
+
+        # wait for instance to start
+        kraft cloud --metro ${{ inputs.metro }} vm start -w 60s ${{ inputs.name }};
+        sleep 5;
+
+        # use the a older mongosh binary, the newer ones hang
+        # for a while with older mongodb versions.
+        wget https://downloads.mongodb.com/compass/mongosh-1.10.6-linux-x64.tgz
+        tar xvf mongosh-1.10.6-linux-x64.tgz
+
+        cat <<ENDOFDOC > /tmp/script
+        db = connect('mongodb://localhost/films');
+        db.movies.insertMany([
+          {
+              title: 'Titanic',
+              year: 1997,
+              genres: [ 'Drama', 'Romance' ]
+          },
+          {
+              title: 'Spirited Away',
+              year: 2001,
+              genres: [ 'Animation', 'Adventure', 'Family' ]
+          },
+          {
+              title: 'Casablanca',
+              genres: [ 'Drama', 'Romance', 'War' ]
+          }
+        ])
+        titanic = db.movies.findOne( { title: "Titanic" } )
+        assert(titanic.year == 1997)
+        ENDOFDOC
+
+        socat tcp-listen:27017,bind=127.0.0.1,fork,reuseaddr openssl:${{ inputs.name }}.${{ inputs.metro }}.kraft.host:27017 &
+        sleep 1
+        mongosh-1.10.6-linux-x64/bin/mongosh mongodb://localhost --file /tmp/script
+  - name: Cleanup
+    uses: unikraft/kraftkit@staging
+    if: always()
+    with:
+      run: |
+        set -xe;
+
+        kraft cloud vm stop ${{ inputs.name }} || true;
+        kraft cloud vm logs ${{ inputs.name }} || true;
+        kraft cloud vm rm ${{ inputs.name }} || true;
