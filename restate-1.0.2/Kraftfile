@@ -1,0 +1,9 @@
+spec: v0.6
+
+name: restate
+
+runtime: base:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/local/bin/restate-server"]
