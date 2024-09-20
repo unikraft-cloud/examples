@@ -1,0 +1,8 @@
+spec: v0.6
+
+runtime: base-compat:latest
+#runtime: base:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/sbin/nginx", "-c", "/etc/nginx/nginx.conf"]
