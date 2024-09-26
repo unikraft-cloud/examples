@@ -1,85 +1,27 @@
-## Compose sample application
-### NGINX proxy with Go backend
+# Compose: Nginx and Golang
 
-Project structure:
-```
-.
-├── backend
-│   ├── Dockerfile
-│   └── main.go
-├── compose.yaml
-├── proxy
-│   └── nginx.conf
-└── README.md
+This is a [Compose](https://unikraft.cloud/docs/guides/features/compose/)-based example of a [Go]() HTTP server and an [Nginx](https://nginx.org/en/) proxy.
+It is imported from the [`awesome-compose` repository](https://github.com/docker/awesome-compose).
+
+To run Nginx and Golang with Compose on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
+Then clone this examples repository and `cd` into this directory, and invoke:
+
+```console
+kraft cloud compose up
 ```
 
-[`compose.yaml`](compose.yaml)
-```
-services:
-  proxy:
-    image: nginx
-    volumes:
-      - type: bind
-        source: ./proxy/nginx.conf
-        target: /etc/nginx/conf.d/default.conf
-        read_only: true
-    ports:
-      - 80:80
-    depends_on:
-      - backend
+The command will deploy files in the current directory.
 
-  backend:
-    build:
-      context: backend
-      target: builder
-```
-The compose file defines an application with two services `proxy` and `backend`.
-When deploying the application, docker compose maps port 80 of the frontend service container to the same port of the host as specified in the file.
-Make sure port 80 on the host is not already in use.
+After deploying, you can query the service using the provided URL for Nginx.
+Golang is only running in the backend with a public URL.
+Find out the Nginx provided URL by using:
 
-## Deploy with docker compose
-
-```
-$ docker compose up -d
-Creating network "nginx-golang_default" with the default driver
-Building backend
-Step 1/7 : FROM golang:1.13 AS build
-1.13: Pulling from library/golang
-...
-Successfully built 4b24f27138cc
-Successfully tagged nginx-golang_proxy:latest
-Creating nginx-golang_backend_1 ... done
-Creating nginx-golang_proxy_1 ... done
+```console
+kraft cloud instance list
 ```
 
-## Expected result
+## Learn more
 
-Listing containers must show two containers running and the port mapping as below:
-```
-$ docker compose ps
-NAME                     COMMAND                  SERVICE             STATUS              PORTS
-nginx-golang-backend-1   "/code/bin/backend"      backend             running
-nginx-golang-proxy-1     "/docker-entrypoint.…"   proxy               running             0.0.0.0:80->80/tcp
-```
-
-After the application starts, navigate to `http://localhost:80` in your web browser or run:
-```
-$ curl localhost:80
-
-          ##         .
-    ## ## ##        ==
- ## ## ## ## ##    ===
-/"""""""""""""""""\___/ ===
-{                       /  ===-
-\______ O           __/
- \    \         __/
-  \____\_______/
-
-	
-Hello from Docker!
-```
-
-Stop and remove the containers
-```
-$ docker compose down
-```
+- [The Compose Specification](https://github.com/compose-spec/compose-spec/blob/main/spec.md)
+- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
+- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
