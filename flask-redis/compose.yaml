@@ -1,0 +1,13 @@
+services:
+  redis:
+    image: redis:latest
+    mem_reservation: 512M
+
+  web:
+    build: .
+    mem_reservation: 512M
+    ports:
+      - 443:8000
+    environment:
+      - REDIS_HOST=flask-redis-redis.internal
+      - REDIS_PORT=6379
