@@ -12,17 +12,14 @@ import (
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(
 		w, `
-          ##         .
-    ## ## ##        ==
- ## ## ## ## ##    ===
-/"""""""""""""""""\___/ ===
-{                       /  ===-
-\______ O           __/
- \    \         __/
-  \____\_______/
+o.   .o       _ _               __ _
+Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
+oO   oO ' _ '| | |/ /  _)' _' | |_|  _)
+oOo oOO| | | | |   (| | | (_) |  _) :_
+ OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
 
 	
-Hello from Docker!
+Hello from Unikraft!
 
 `,
 	)
