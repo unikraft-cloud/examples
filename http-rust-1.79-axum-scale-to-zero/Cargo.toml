@@ -1,0 +1,11 @@
+[package]
+name = "unikraft-scale-to-zero-demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = { version = "0.7" }
+tokio = { version = "1.38.0", features = ["macros", "rt-multi-thread", "fs"] }
+futures-util = "0.3"
+tokio-stream = "0.1"
+
