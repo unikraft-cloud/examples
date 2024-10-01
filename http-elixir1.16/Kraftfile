@@ -7,7 +7,7 @@ runtime: base-compat:latest
 labels:
   cloud.unikraft.v1.instances/scale_to_zero.policy: "idle"
   cloud.unikraft.v1.instances/scale_to_zero.stateful: "true"
-  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 3000
 
 rootfs: ./Dockerfile
 
