@@ -3,7 +3,7 @@ FROM spark:3.5.2-scala2.12-java17-ubuntu AS build
 RUN mkdir /tmp/work
 RUN mkdir -p /tmp/work/etc
 RUN echo "apache-spark" > /tmp/work/etc/hostname
-RUN echo "127.0.0.1 apache-spark.kraft.host apache-spark" > /tmp/work/etc/hosts
+RUN echo "172.16.3.1 apache-spark.kraft.host apache-spark" > /tmp/work/etc/hosts
 RUN echo "127.0.0.1 localhost.localdomain localhost" >> /tmp/work/etc/hosts
 RUN mkdir -p /tmp/work/tmp
 RUN mkdir -p /tmp/work/opt/spark/logs
