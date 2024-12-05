@@ -1,0 +1,11 @@
+services:
+
+  tyk:
+    build: .
+    ports:
+      - 443:8080
+    #mem_reservation: 512M
+
+  redis:
+    image: redis:latest
+    mem_reservation: 512M
