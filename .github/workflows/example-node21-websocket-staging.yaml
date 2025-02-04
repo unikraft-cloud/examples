@@ -1,0 +1,123 @@
+name: examples/node21-websocket (staging)
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [main]
+    paths:
+    - '.github/workflows/example-node21-websocket-staging.yaml'
+    - 'node21-websocket/**'
+    - '!node21-websocket/README.md'
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+    - '.github/workflows/example-node21-websocket-staging.yaml'
+    - 'node21-websocket/**'
+    - '!node21-websocket/README.md'
+
+  schedule:
+  - cron: '0 4 * * 1-6' # Every work day at 4AM
+
+# Automatically cancel in-progress actions on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  UKC_METRO: ${{ vars.UKC_METRO }}
+  UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
+  KRAFTKIT_NO_CHECK_UPDATES: true
+  KRAFTKIT_LOG_LEVEL: debug
+
+jobs:
+  integration:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Test
+      id: test
+      uses: unikraft/kraftkit@staging
+      continue-on-error: true
+      with:
+        run: |
+          set -xe;
+
+          sudo apt-get -yqq update;
+          sudo apt-get install -y --no-install-recommends nodejs npm grep;
+          npm install wscat;
+
+          cd node21-websocket;
+
+          kraft cloud deploy \
+            --no-start \
+            --memory 1Gi \
+            --name node21-websocket-staging-${GITHUB_RUN_ID} \
+            --runtime index.unikraft.io/official-staging/node:21 \
+            --subdomain node21-websocket-staging-${GITHUB_RUN_ID} \
+            -p 443:8080 \
+            .;
+
+          # wait for the instance to start
+          kraft cloud vm start -w 60s node21-websocket-staging-${GITHUB_RUN_ID};
+          sleep 5;
+
+          echo "hello" | wscat --connect wss://node21-websocket-staging-${GITHUB_RUN_ID}.${UKC_METRO}.kraft.host | grep "hello" > /dev/null
+
+    - name: Cleanup
+      uses: unikraft/kraftkit@staging
+      if: always()
+      with:
+        run: |
+          set -xe;
+
+          kraft cloud vm stop node21-websocket-staging-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs node21-websocket-staging-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm node21-websocket-staging-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/node21-websocket-staging-${GITHUB_RUN_ID} || true;
+
+    - name: Re-test with debug info
+      id: re-test
+      if: ${{ success() && steps.test.outcome == 'failure' }}
+      uses: unikraft/kraftkit@staging
+      with:
+        run: |
+          set -xe;
+
+          sudo apt-get -yqq update;
+          sudo apt-get install -y --no-install-recommends nodejs npm grep;
+          npm install wscat;
+
+          cd node21-websocket;
+
+          kraft cloud deploy \
+            --no-start \
+            --memory 1Gi \
+            --name node21-websocket-staging-${GITHUB_RUN_ID}-dbg \
+            --runtime index.unikraft.io/official-staging/node:21-dbg \
+            --subdomain node21-websocket-staging-${GITHUB_RUN_ID}-dbg \
+            -p 443:8080 \
+            .;
+
+          # wait for the instance to start
+          kraft cloud vm start -w 60s node21-websocket-staging-${GITHUB_RUN_ID}-dbg;
+          sleep 5;
+
+          echo "hello" | wscat --connect wss://node21-websocket-staging-${GITHUB_RUN_ID}-dbg.${UKC_METRO}.kraft.host | grep "hello" > /dev/null
+
+    - name: Cleanup Debug
+      uses: unikraft/kraftkit@staging
+      if: always()
+      with:
+        run: |
+          set -xe;
+
+          kraft cloud vm stop node21-websocket-staging-${GITHUB_RUN_ID}-dbg || true;
+          kraft cloud vm logs node21-websocket-staging-${GITHUB_RUN_ID}-dbg || true;
+          kraft cloud vm rm node21-websocket-staging-${GITHUB_RUN_ID}-dbg || true;
+          kraft cloud img rm index.unikraft.io/test/node21-websocket-staging-${GITHUB_RUN_ID}-dbg || true;
