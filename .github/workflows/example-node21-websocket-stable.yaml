@@ -48,11 +48,9 @@ jobs:
         run: |
           set -xe;
 
-          sudo apt-get -yqq update;
-          sudo apt-get install -y --no-install-recommends nodejs npm;
-          sudo npm install -g wscat;
-
           cd node21-websocket;
+          wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl;
+          chmod a+x websocat.x86_64-unknown-linux-musl;
 
           kraft cloud deploy \
             --no-start \
@@ -67,7 +65,7 @@ jobs:
           kraft cloud vm start -w 60s node21-websocket-stable-${GITHUB_RUN_ID};
           sleep 5;
 
-          echo "hello" | wscat --connect wss://node21-websocket-stable-${GITHUB_RUN_ID}.${UKC_METRO}.kraft.host | grep "hello" > /dev/null
+          echo "hello" | ./websocat.x86_64-unknown-linux-musl wss://node21-websocket-stable-${GITHUB_RUN_ID}.${UKC_METRO}.kraft.host | grep "hello" > /dev/null
 
     - name: Cleanup
       uses: unikraft/kraftkit@staging
@@ -89,11 +87,9 @@ jobs:
         run: |
           set -xe;
 
-          sudo apt-get -yqq update;
-          sudo apt-get install -y --no-install-recommends nodejs npm;
-          sudo npm install -g wscat;
-
           cd node21-websocket;
+          wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl;
+          chmod a+x websocat.x86_64-unknown-linux-musl;
 
           kraft cloud deploy \
             --no-start \
@@ -108,7 +104,7 @@ jobs:
           kraft cloud vm start -w 60s node21-websocket-stable-${GITHUB_RUN_ID}-dbg
           sleep 5;
 
-          echo "hello" | wscat --connect wss://node21-websocket-stable-${GITHUB_RUN_ID}-dbg.${UKC_METRO}.kraft.host | grep "hello" > /dev/null
+          echo "hello" | ./websocat.x86_64-unknown-linux-musl wss://node21-websocket-stable-${GITHUB_RUN_ID}.${UKC_METRO}.kraft.host | grep "hello" > /dev/null
 
     - name: Cleanup Debug
       uses: unikraft/kraftkit@staging
