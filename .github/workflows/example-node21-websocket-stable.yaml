@@ -50,7 +50,7 @@ jobs:
 
           sudo apt-get -yqq update;
           sudo apt-get install -y --no-install-recommends nodejs npm;
-          npm install wscat;
+          sudo npm install -g wscat;
 
           cd node21-websocket;
 
@@ -91,7 +91,7 @@ jobs:
 
           sudo apt-get -yqq update;
           sudo apt-get install -y --no-install-recommends nodejs npm;
-          npm install wscat;
+          sudo npm install -g wscat;
 
           cd node21-websocket;
 
