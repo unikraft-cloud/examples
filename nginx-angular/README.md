@@ -19,7 +19,14 @@ Then clone this examples repository and `cd` into this directory, and invoke:
 kraft cloud compose up
 ```
 
-After deploying, you can access the Angular application using the provided URL. The application will be accessible on port `443`.
+This will create an instance with the name of the service defined in [`compose.yaml`](compose.yaml) (`web`), prefixed by the current working directory [`nginx-angular`](./).
+You can retrieve the FQDN (Fully Qualified Domain Name) of the instance using:
+
+```console
+kraft cloud instance get nginx-angular-web
+```
+
+You can then access it at port 443 using HTTPS.
 
 ## Learn more
 
