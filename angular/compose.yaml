@@ -1,0 +1,7 @@
+services:
+  web:
+    build:
+      context: sample
+    ports:
+      - 443:8080
+    mem_reservation: 512M
