@@ -1,0 +1,12 @@
+spec: v0.6
+
+name: gitea
+
+runtime: base-compat:latest
+
+labels:
+  cloud.unikraft.v1.instances/scale_to_zero.policy: "idle"
+  cloud.unikraft.v1.instances/scale_to_zero.stateful: "true"
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
+
+rootfs: docker.io/gitea/gitea:1.24.2

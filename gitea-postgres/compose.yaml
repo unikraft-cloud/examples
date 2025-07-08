@@ -1,0 +1,36 @@
+services:
+  gitea:
+    build:
+      context: ./gitea
+    environment:
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=gitea-postgres-db.internal:5432
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=gitea
+      - GITEA__database__PASSWD=gitea
+      - USER=git
+    volumes:
+      - git_data:/data
+    ports:
+      - 443:3000
+    # domainname: <your-domain-name>
+    mem_reservation: 1G
+    depends_on:
+      - db
+  db:
+    build:
+      context: ./postgres
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    mem_reservation: 1G
+volumes:
+  db_data:
+    driver_opts:
+      size: 512M
+  git_data:
+    driver_opts:
+      size: 512M
