@@ -1,0 +1,29 @@
+services:
+  prometheus:
+    build:
+      context: ./prometheus
+    container_name: prometheus
+    mem_reservation: 2G
+    ports:
+      - 443:9090
+    volumes:
+      - prom_data:/prometheus
+  grafana:
+    build:
+      context: ./grafana
+    container_name: grafana
+    mem_reservation: 2G
+    ports:
+      - 443:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+volumes:
+  prom_data:
+    driver_opts:
+      size: 1G
+  grafana_data:
+    driver_opts:
+      size: 1G
