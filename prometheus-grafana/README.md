@@ -5,6 +5,8 @@ Prometheus is a powerful time-series database and monitoring system, while Grafa
 that allows you to create beautiful dashboards and graphs from your data. They are often used together to provide
 a complete monitoring solution.
 
+**Credits**: This example is based on this [Prometheus & Grafana Compose example](https://github.com/docker/awesome-compose/tree/master/prometheus-grafana).
+
 ## Building
 
 Because of quota limitations, you might not be able to instantiate VMs with more than 2G of RAM. Grafana's image is pretty
