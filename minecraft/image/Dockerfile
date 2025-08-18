@@ -1,7 +1,8 @@
 FROM itzg/minecraft-server:latest
 
-COPY minecraft_env.txt /minecraft_env.txt
+COPY env.txt /env.txt
 
-COPY wrapper.sh /wrapper.sh
+# Uncomment below if you want to use a custom world
+# COPY --chown=minecraft:minecraft world/ /worlds/world/
 
-RUN chmod +x /wrapper.sh
+COPY --chown=minecraft:minecraft --chmod=755 wrapper.sh /wrapper.sh

@@ -2,12 +2,12 @@ services:
   minecraft:
     container_name: minecraft
     build:
-      context: .
+      context: image
     ports:
-      - "25565:25565"
-    environment:
-      EULA: "TRUE"
-    mem_limit: 2G
+      - protocol: tcp
+        target: 25565
+        published: 25565
+    mem_limit: 4G
     volumes:
       - data:/data
 volumes:

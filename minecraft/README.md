@@ -23,7 +23,7 @@ This approach will be automated in the near future, but for now, you can follow 
     ./extract-env.sh
     ```
 
-    This will create a `minecraft_env.txt` file containing the environment variables from the original Docker image.
+    This will create a `env.txt` file containing the environment variables from the original Docker image.
 
 3. **Build the Docker image**
 
@@ -35,7 +35,7 @@ This approach will be automated in the near future, but for now, you can follow 
 
 4. **Export the container filesystem**
 
-   ```bash
+   ```bash$$
    docker create --name temp-minecraft minecraft-with-wrapper
    docker export -o rootfs.tar temp-minecraft
    docker rm temp-minecraft
@@ -91,6 +91,11 @@ Connect to `localhost:25565` (assuming you created a tunnel)
 
 You can then start playing
 ![ready to play](screenshots/ready-to-play.png)
+
+## Custom World
+
+If you want to use a custom world, you can uncomment the relevant lines in the `wrapper.sh` script and `Dockerfile` and rebuild the Docker image.
+The custom world should be placed in the `image/world/` directory before building the image.
 
 ## Volume
 
