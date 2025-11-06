@@ -1,39 +1,97 @@
 # noVNC
 
-[noVNC](https://novnc.com/info.html) is an open-source [VNC](https://en.wikipedia.org/wiki/VNC) client that runs in the browser,
-allowing you to access remote desktops through a web interface, using your favorite modern web browser.
+This guide explains how to create and deploy a [noVNC](https://novnc.com/info.html) app, allowing you to access remote desktops through
+a web interface inside a modern browser.
 
-This sample deployment shows how to set up a VNC server on UKC, which enables you to access the VM remotely, with a graphical interface.
-The VM is an Ubuntu 22.04 machine with Firefox and other apps preinstalled.
+**Note**: This example is inspired from Anthropic's [Computer Use Demo](https://github.com/anthropics/claude-quickstarts/tree/main/computer-use-demo).
 
-**Note**: This example is inspired from Anthropic's [Computer Use Demo](https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo).
+To run this example, follow these steps:
 
-## Deployment
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
-To run this example on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli). Make sure you have an active account on Unikraft Cloud (UKC) and that you have authenticated your CLI with your UKC account.
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/vnc-browser` directory:
 
 ```bash
-export UKC_TOKEN=<your-unikraft-cloud-access-token>
+git clone https://github.com/unikraft-cloud/examples
+cd examples/vnc-browser/
+```
+
+Make sure to log into Unikraft Cloud by setting your token and a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
+
+```bash
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
 export UKC_METRO=fra
 ```
 
-Then `cd` into [this](.) directory, and invoke:
+When done, invoke the following command to deploy the app on Unikraft Cloud:
 
 ```bash
 kraft cloud deploy \
     --scale-to-zero on \
     --scale-to-zero-stateful \
     --scale-to-zero-cooldown 4s \
-    -M 4096 \
+    -M 2048 \
     -p 443:6080 \
     -n vnc-browser \
     .
 ```
 
-Now, you can access the `vnc-browser` instance at the provided URL.
+The output shows the instance address and other details:
+
+```ansi
+[●] Deployed successfully!
+ │
+ ├─────── name: vnc-browser
+ ├─────── uuid: 90a59b05-0ae1-4ca6-8383-79c5115355ee
+ ├────── metro: https://api.fra.unikraft.cloud/v1
+ ├────── state: starting
+ ├───── domain: https://weathered-fog-y5jjmwfd.fra.unikraft.app
+ ├────── image: vnc-browser@sha256:fdb4887e84362ebbaf54c713e0d85f547e8ee173fe63a6ab39e94b7e612a9892 
+ ├───── memory: 2048 MiB
+ ├──── service: weathered-fog-y5jjmwfd
+ ├─ private ip: 10.0.0.49
+ └─────── args: /wrapper.sh
+```
+
+In this case, the instance name is `vnc-browser` and the address is `https://weathered-fog-y5jjmwfd.fra.unikraft.app`.
+The name was preset, but the address is different for each run. Enter the provided URL into your browser of choice to access
+remote desktop interface.
+
+Use `curl` to query the Unikraft Cloud instance:
+
+```bash
+curl https://weathered-fog-y5jjmwfd.fra.unikraft.app
+```
+
+```text
+Hello, World!
+```
+
+You can list information about the instance by running:
+
+```bash
+kraft cloud instance list
+```
+
+```ansi
+NAME         FQDN                                     STATE    STATUS   IMAGE                                      MEMORY   VCPUS  ARGS         BOOT TIME
+vnc-browser  weathered-fog-y5jjmwfd.fra.unikraft.app  standby  standby  vnc-browser@sha256:fdb4887e84362ebbaf5...  4.0 GiB  1      /wrapper.sh  7.17 ms
+```
+
+When done, you can remove the instance:
+
+```bash
+kraft cloud instance remove vnc-browser
+```
 
 ## Learn more
 
-- [noVNC source code](https://github.com/novnc/noVNC)
-- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
-- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
+Use the `--help` option for detailed information on using Unikraft Cloud:
+
+```bash
+kraft cloud --help
+```
+
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/overview).

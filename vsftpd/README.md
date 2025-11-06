@@ -1,18 +1,27 @@
 # Very Secure FTP Daemon
 
-[Very Secure FTP Daemon (vsftpd)](https://security.appspot.com/vsftpd.html) is a secure and fast FTP server for Unix-like systems. It is designed to be secure and efficient, with a focus on performance and ease of use.
-It allows you to run a secure FTP server on a remote machine and access it through a web browser or a local FTP client.
+This guide explains how to create and deploy a [vsftpd](https://security.appspot.com/vsftpd.html) app, to secure access to the files of your VM.
+To run this example, follow these steps:
 
-## Deployment
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
-To run this example on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli). Make sure you have an active account on Unikraft Cloud (UKC) and that you have authenticated your CLI with your UKC account.
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/vsftpd` directory:
 
 ```bash
-export UKC_TOKEN=<your-unikraft-cloud-access-token>
+git clone https://github.com/unikraft-cloud/examples
+cd examples/vsftpd/
+```
+
+Make sure to log into Unikraft Cloud by setting your token and a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
+
+```bash
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
 export UKC_METRO=fra
 ```
 
-Then `cd` into [this](.) directory, and invoke:
+When done, invoke the following commands to deploy the app on Unikraft Cloud:
 
 ```bash
 kraft cloud volume create \
@@ -30,29 +39,81 @@ kraft cloud deploy \
     -p 222:22/tls \
     -p 990:990/tls \
     -p 10100:10100/tls \
-    -v "vsftpd-workspace":/home/ftpuser \
+    -v "vsftpd-workspace":/root \
     .
 ```
 
-Now, you can access the `vsftpd` instance at the provided URL. You can test using an FTP client like `lftp`:
+The output shows the instance address and other details:
 
-```bash
-$ lftp -u ftpuser,ftpuserpass ftps://<URL>:21
-lftp ftpuser@damp-grass-awnbbv20.fra.unikraft.app:~> ls
+```ansi
+[●] Deployed successfully!
+ │
+ ├─────── name: vsftpd
+ ├─────── uuid: 186a46a0-7c89-4bfd-83a8-649bcc60a96e
+ ├────── metro: https://api.fra.unikraft.cloud/v1
+ ├────── state: starting
+ ├───── domain: broken-orangutan-jypu2z53.fra.unikraft.app
+ ├────── image: vsftpd@sha256:31aad1619c31f499b11f1bef8fead6e6df76f235a57add011e5e414a3f51ee64 
+ ├───── memory: 1024 MiB
+ ├──── service: broken-orangutan-jypu2z53
+ ├─ private ip: 10.0.0.109
+ └─────── args: /wrapper.sh
 ```
 
-## Volume
+This will create a volume for data persistence, and mount it at `/root` inside the VM.
 
-This deployment creates a volume for the user's data persistence: `vsftpd-workspace`.
-Upon deleting the instance (e.g., `kraft cloud instance rm vsftpd`), this volume will persist, allowing you to create another instance without losing data.
-To remove the volume, you can use:
+In this case, the instance name is `vsftpd` and the address is `https://broken-orangutan-jypu2z53.fra.unikraft.app`.
+The name was preset, but the address is different for each run.
+
+**Note**: The password for the `root` user is set to `rootpass`. Do not forget to change it inside the `Dockerfile` and update the commands below.
+
+You can access the FTP server using a client like `lftp`:
 
 ```bash
-kraft cloud volume rm vsftpd-workspace
+lftp -u root,rootpass ftps://broken-orangutan-jypu2z53.fra.unikraft.app:21
+lftp root@broken-orangutan-jypu2z53.fra.unikraft.app:~> ls
+```
+
+You can list information about the volume by running:
+
+```bash
+kraft cloud volume list
+```
+
+```text
+NAME              CREATED AT     SIZE     ATTACHED TO  MOUNTED BY  STATE    PERSISTENT
+vsftpd-workspace  9 minutes ago  1.0 GiB  vsftpd       vsftpd      mounted  true
+```
+
+You can list information about the instance by running:
+
+```bash
+kraft cloud instance list
+```
+
+```ansi
+NAME    FQDN                                        STATE    STATUS   IMAGE                                        MEMORY   VCPUS  ARGS         BOOT TIME
+vsftpd  broken-orangutan-jypu2z53.fra.unikraft.app  standby  standby  vsftpd@sha256:3c448f1e1596a2f017871aa9a7...  1.0 GiB  1      /wrapper.sh  7.19 ms
+```
+
+When done, you can remove the instance:
+
+```bash
+kraft cloud instance remove vsftpd
+```
+
+The volume is not removed by default, so you can recreate the instance and still have access to your old data. Remove it using:
+
+```bash
+kraft cloud volume remove vsftpd-workspace
 ```
 
 ## Learn more
 
-- [vsftpd documentation](https://security.appspot.com/vsftpd/vsftpd_conf.html)
-- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
-- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
+Use the `--help` option for detailed information on using Unikraft Cloud:
+
+```bash
+kraft cloud --help
+```
+
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/overview).

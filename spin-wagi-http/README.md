@@ -6,7 +6,7 @@ It shows how to run a Spin app serving routes from two programs written in diffe
 Both the Spin executor and the Wagi executor on Unikraft Cloud.
 To run it, follow these steps:
 
-1. Install the [`kraft` CLI tool](https://unikraft.com/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/spin-wagi-http/` directory:
 

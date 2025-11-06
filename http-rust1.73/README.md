@@ -1,20 +1,86 @@
-# Simple Rust 1.73 HTTP Server
+# Rust
 
-This is a simple HTTP server written in the [Rust](https://www.rust-lang.org/) programming language.
+This guide explains how to create and deploy a Rust app.
+To run this example, follow these steps:
 
-To run this example on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
-Then clone this examples repository and `cd` into this directory, and invoke:
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
-```console
-kraft cloud deploy --metro fra -p 443:8080 .
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/http-rust1.73` directory:
+
+```bash
+git clone https://github.com/unikraft-cloud/examples
+cd examples/http-rust1.73/
 ```
 
-The command will build and deploy the `server.rs` source code file.
+Make sure to log into Unikraft Cloud by setting your token and a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
 
-After deploying, you can query the service using the provided URL.
+```bash
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
+export UKC_METRO=fra
+```
+
+When done, invoke the following command to deploy the app on Unikraft Cloud:
+
+```bash
+kraft cloud deploy -p 443:8080 .
+```
+
+The output shows the instance address and other details:
+
+```ansi
+[●] Deployed successfully!
+ │
+ ├────── name: http-rust173-8gsmk
+ ├────── uuid: 27b47a6d-ab44-4f84-8931-90013467aa1a
+ ├───── metro: https://api.fra.unikraft.cloud/v1
+ ├───── state: running
+ ├──── domain: https://hidden-sky-c1tp5r6e.fra.unikraft.app
+ ├───── image: http-rust173@sha256:451277edb27c1201929d2da12898d910cca2f0a2ca71b8f8fa7da22c23a10bba 
+ ├─ boot time: 17.49 ms
+ ├──── memory: 128 MiB
+ ├─── service: hidden-sky-c1tp5r6e
+ ├ private ip: 10.0.0.109
+ └────── args: /server
+```
+
+In this case, the instance name is `http-rust173-8gsmk` and the address is `hidden-sky-c1tp5r6e.fra.unikraft.app`.
+They're different for each run.
+
+Use `curl` to query the Unikraft Cloud instance:
+
+```bash
+curl hidden-sky-c1tp5r6e.fra.unikraft.app
+```
+
+```text
+Hello, World!
+```
+
+You can list information about the instance by running:
+
+```bash
+kraft cloud instance list
+```
+
+```ansi
+NAME                FQDN                                  STATE    STATUS   IMAGE                                    MEMORY   VCPUS  ARGS     BOOT TIME
+http-rust173-8gsmk  hidden-sky-c1tp5r6e.fra.unikraft.app  standby  standby  http-rust173@sha256:451277edb27c1201...  128 MiB  1      /server  17.49 ms
+```
+
+When done, you can remove the instance:
+
+```bash
+kraft cloud instance remove http-rust173-8gsmk
+```
 
 ## Learn more
 
-- [Rust's Documentation](https://www.rust-lang.org/learn)
-- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
-- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
+Use the `--help` option for detailed information on using Unikraft Cloud:
+
+```bash
+kraft cloud --help
+```
+
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/overview).

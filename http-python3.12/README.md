@@ -3,7 +3,7 @@
 This guide explains how to create and deploy a simple Python-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the [`kraft` CLI tool](https://unikraft.com/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/http-python3.12/` directory:
 
@@ -112,7 +112,7 @@ The following options are available for customizing the app:
 It's used to install dependencies for Python apps.
 `pip` uses the `requirements.txt` file to list required dependencies (with versions).
 
-The [`http-python3.12-flask3.0`](/docs/guides/flask-sqlite/) guide details the use of `pip` to deploy an app using the [`Flask`](https://flask.palletsprojects.com/en/3.0.x/) framework on Unikraft Cloud.
+The [`http-python3.12-flask3.0`](https://github.com/unikraft-cloud/examples/tree/main/http-python3.12-flask3.0) guide details the use of `pip` to deploy an app using the [`Flask`](https://flask.palletsprojects.com/en/3.0.x/) framework on Unikraft Cloud.
 
 Run the command below to deploy the app on Unikraft Cloud:
 

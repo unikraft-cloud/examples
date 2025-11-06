@@ -4,7 +4,7 @@ This guide shows you how to use [PostgreSQL](https://www.postgresql.org/), a pow
 
 To run it, follow these steps:
 
-1. Install the [`kraft` CLI tool](https://unikraft.com/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/postgres/` directory:
 
@@ -70,7 +70,7 @@ postgres=#
 Use SQL and `psql` commands for your work.
 
 > **Tip:**
-> This example uses the [`idle` scale-to-zero policy](/docs/api/v1/instances#scaletozero_policy) by default (see the `labels` section in the `Kraftfile`).
+> This example uses the [`idle` scale-to-zero policy](https://unikraft.com/docs/api/platform/v1/instances#scaletozero_policy) by default (see the `labels` section in the `Kraftfile`).
 > It means that the instance will scale-to-zero even in the presence of `psql` connections.
 > To ensure that the instance isn't put into standby even for long running queries
 > (during which the connections are also idle).
@@ -80,7 +80,7 @@ Use SQL and `psql` commands for your work.
 
 > **Note:**
 > If you'd like to use a port other than `5432/tls` you'll need to use the `kraft cloud tunnel` command to connect to PostgreSQL.
-> See [the tunneling guide](/docs/guides/features/tunnel) for more information.
+> See [the tunneling guide](https://unikraft.com/docs/cli/tunnel) for more information.
 > Additionally, you need to explicitly disable scale-to-zero by either changing the label in the `Kraftfile` or use `--scale-to-zero off` in the deploy command.
 
 You can list information about the instance by running:
@@ -102,7 +102,7 @@ kraft cloud instance remove postgres-saan9
 
 ## Using volumes
 
-You can use [volumes](/docs/guides/features/volumes) for data persistence for you PostgreSQL instance.
+You can use [volumes](https://unikraft.com/docs/platform/volumes) for data persistence for you PostgreSQL instance.
 
 For that you would first create a volume:
 
@@ -126,7 +126,7 @@ For that you use a different `POSTGRES_PASSWORD` environment variable when start
 
 You could also a different location to mount your volume or set extra configuration options.
 
-You can use the PostgreSQL instance in conjunction with a frontend service, [see the guide here](/docs/guides/features/idns).
+You can use the PostgreSQL instance in conjunction with a frontend service, [see the guide here](https://unikraft.com/docs/platform/services).
 But in that case make sure to disable scale-to-zero if you plan to use the DB internally.
 
 > **Note:**

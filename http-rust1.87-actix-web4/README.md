@@ -3,7 +3,7 @@
 This example uses [`actix-web`](https://actix.rs), a popular Rust web framework.
 To run this example, follow these steps:
 
-1. Install the [`kraft` CLI tool](https://unikraft.com/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/http-rust1.87-actix-web4/` directory:
 

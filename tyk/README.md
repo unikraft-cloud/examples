@@ -5,7 +5,7 @@ Tyk is used together with Redis to store API tokens and OAuth clients.
 
 To run this example, follow these steps:
 
-1. Install the [`kraft` CLI tool](https://unikraft.com/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/tyk/` directory:
 
@@ -14,7 +14,7 @@ git clone https://github.com/unikraft-cloud/examples
 cd examples/tyk/
 ```
 
-Make sure to log into KraftCloud by setting your token and a [metro](/docs/metros#available) close to you.
+Make sure to log into Unikraft Cloud by setting your token and a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
 ```bash
@@ -23,7 +23,7 @@ export UKC_TOKEN=token
 export UKC_METRO=fra
 ```
 
-When done, invoke the following command to deploy this app on KraftCloud:
+When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash
 kraft cloud compose up
@@ -60,7 +60,7 @@ Only the Tyk instance is available as a public service.
 Its address is `https://funky-pond-45usfkxx.fra.unikraft.app`.
 It's different for each run.
 
-Use `curl` to query the Tyk instance on KraftCloud on the available address:
+Use `curl` to query the Tyk instance on Unikraft Cloud on the available address:
 
 ```bash
 curl https://funky-pond-45usfkxx.fra-test.unikraft.app/hello
@@ -79,7 +79,7 @@ kraft cloud compose down
 
 To customize the Tyk app, you can update:
 
-* `Kraftfile`: the KraftCloud specification
+* `Kraftfile`: the Unikraft Cloud specification
 * `Dockerfile` / `rootfs/`: the Tyk filesystem (in this case the configuration file `/etc/tyk.conf`)
 * `compose.yaml`: the Compose specification
 
@@ -93,7 +93,7 @@ The `compose.yaml` file can be update to assign different names, ports, network 
 
 ## Learn more
 
-Use the `--help` option for detailed information on using KraftCloud:
+Use the `--help` option for detailed information on using Unikraft Cloud:
 
 ```bash
 kraft cloud --help

@@ -4,7 +4,7 @@ This example comes from [Wazero's "import go" example](https://github.com/tetrat
 and shows how to define, import and call a wasm blob from Go and run it on Unikraft Cloud.
 To run this it, follow these steps:
 
-1. Install the [`kraft` CLI tool](https://unikraft.com/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/wazero-import-go/` directory:
 

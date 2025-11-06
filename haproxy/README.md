@@ -1,11 +1,11 @@
 # HAProxy
 
-This guides shows you how to use [HAProxy](https://www.haproxy.org).
+This guide shows you how to use [HAProxy](https://www.haproxy.org).
 HAProxy is a free and open source software that provides a high availability load balancer and reverse proxy for TCP and HTTP-based apps that spreads requests across many servers.
 
 To run this example, follow these steps:
 
-1. Install the [`kraft` CLI tool](https://unikraft.com/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/haproxy/` directory:
 

@@ -1,19 +1,27 @@
 # Wordpress with Nginx and MariaDB
 
-[Wordpress](https://wordpress.com/) is a web content management system. It is often used to create blogs and websites. It needs a web server like [Nginx](https://nginx.org/) and a database to store user content.
+This guide explains how to create and deploy a Wordpress app with Nginx and MariaDB.
+To run this example, follow these steps:
 
-## Deployment
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
-This example uses a [`compose.yaml`](compose.yaml) file to define the Wordpress and MariaDB services. Nginx is run in the same instance as `php-fpm`, which is the backend for Wordpress.
-
-To run it on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli). Make sure you have an active account on Unikraft Cloud (UKC) and that you have authenticated your CLI with your UKC account.
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/wordpress-compose` directory:
 
 ```bash
-export UKC_TOKEN=<your-unikraft-cloud-access-token>
+git clone https://github.com/unikraft-cloud/examples
+cd examples/wordpress-compose/
+```
+
+Make sure to log into Unikraft Cloud by setting your token and a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
+
+```bash
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
 export UKC_METRO=fra
 ```
 
-Then `cd` into [this](.) directory, and invoke:
+When done, invoke the following command to deploy the app on Unikraft Cloud:
 
 ```bash
 kraft cloud compose up -d
@@ -29,8 +37,10 @@ and look for the `fqdn` field in the output.
 
 ## Learn more
 
-- [Wordpress's Documentation](https://wordpress.org/documentation/)
-- [Nginx Documentation](https://nginx.org/en/docs/)
-- [MariaDB Documentation](https://mariadb.com/docs/)
-- [Unikraft Cloud's Documentation](https://unikraft.com/docs/introduction)
-- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
+Use the `--help` option for detailed information on using Unikraft Cloud:
+
+```bash
+kraft cloud --help
+```
+
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/overview).
