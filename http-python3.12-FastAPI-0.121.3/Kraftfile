@@ -1,0 +1,12 @@
+spec: v0.6
+
+runtime: base-compat:latest
+
+labels:
+  cloud.unikraft.v1.instances/scale_to_zero.policy: "on"
+  cloud.unikraft.v1.instances/scale_to_zero.stateful: "false"
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/python3", "-m", "uvicorn", "src.server:app", "--host", "0.0.0.0", "--port", "8080"]
