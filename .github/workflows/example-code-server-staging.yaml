@@ -1,0 +1,90 @@
+name: examples/code-server (staging)
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [mariaciobanoiu8/code-server]
+    paths:
+    - '.github/workflows/example-code-server-staging.yaml'
+    - 'code-server/**'
+    - '!code-server/README.md'
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+    - '.github/workflows/example-code-server-staging.yaml'
+    - 'code-server/**'
+    - '!code-server/README.md'
+
+  schedule:
+  - cron: '0 15 * * 1-5'
+
+# Automatically cancel in-progress actions on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  UKC_METRO: "https://api.${{ vars.UKC_METRO_STAGING }}.unikraft.cloud/v1"
+  UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
+  KRAFTKIT_NO_CHECK_UPDATES: true
+  KRAFTKIT_LOG_LEVEL: debug
+
+jobs:
+  integration:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Test
+      id: test
+      uses: unikraft/kraftkit@staging
+      with:
+        run: |
+          set -xe;
+
+          cd code-server;
+
+          kraft cloud volume create \
+          --name code-workspace \
+          --size 1Gi
+
+          kraft cloud deploy \
+            --no-start \
+            --scale-to-zero on \
+            --scale-to-zero-stateful \
+            --scale-to-zero-cooldown 4s \
+            --memory 2048 \
+            --name code-server-${GITHUB_RUN_ID} \
+            --runtime index.unikraft.io/official-staging/base-compat:latest \
+            --subdomain code-server-${GITHUB_RUN_ID} \
+            -p 443:8443 \
+            -v code-workspace:/workspace \
+            -e PGUID=0 \
+            -e PGID=0 \
+            -e PASSWORD=unikraft \
+            -e SUDO_PASSWORD=unikraft \
+            -e DEFAULT_WORKSPACE="/workspace" \
+            .;
+
+          # wait for the instance to start
+          kraft cloud vm start -w 5s code-server-${GITHUB_RUN_ID};
+          sleep 5;
+
+          curl -Lv --fail-with-body --max-time 10 https://code-server-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app
+
+    - name: Cleanup
+      uses: unikraft/kraftkit@staging
+      if: always()
+      with:
+        run: |
+          set -xe;
+
+          kraft cloud vm stop code-server-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs code-server-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm code-server-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/code-server-${GITHUB_RUN_ID} || true;
