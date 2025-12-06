@@ -1,5 +1,5 @@
 name: examples/caddy (staging)
-
+# temporary
 on:
   workflow_dispatch:
 
