@@ -1,4 +1,4 @@
-name: examples/http-node21 (staging)
+name: examples/httpserver-g++13.2 (staging)
 
 on:
   workflow_dispatch:
@@ -6,20 +6,20 @@ on:
   push:
     branches: [main]
     paths:
-    - '.github/workflows/example-http-node21-staging.yaml'
-    - 'http-node21/**'
-    - '!http-node21/README.md'
+    - '.github/workflows/example-httpserver-g++13.2-staging.yaml'
+    - 'httpserver-g++13.2/**'
+    - '!httpserver-g++13.2/README.md'
 
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
     paths:
-    - '.github/workflows/example-http-node21-staging.yaml'
-    - 'http-node21/**'
-    - '!http-node21/README.md'
+    - '.github/workflows/example-httpserver-g++13.2-staging.yaml'
+    - 'httpserver-g++13.2/**'
+    - '!httpserver-g++13.2/README.md'
 
   schedule:
-  - cron: '15 15 * * 1-5'
+  - cron: '0 15 * * 1-5'
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:
@@ -47,22 +47,22 @@ jobs:
         run: |
           set -xe;
 
-          cd http-node21;
+          cd httpserver-g++13.2;
 
           kraft cloud deploy \
             --no-start \
-            --memory 512 \
-            --name http-node21-staging-${GITHUB_RUN_ID} \
+            --memory 256 \
+            --name httpserver-g++132-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-staging/base-compat:latest \
-            --subdomain http-node21-staging-${GITHUB_RUN_ID} \
+            --subdomain httpserver-g++132-${GITHUB_RUN_ID} \
             -p 443:8080 \
             .;
 
           # wait for the instance to start
-          kraft cloud vm start -w 5s http-node21-staging-${GITHUB_RUN_ID};
+          kraft cloud vm start -w 5s httpserver-g++132-${GITHUB_RUN_ID};
           sleep 5;
 
-          curl -Lv --fail-with-body --max-time 10 https://http-node21-staging-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app
+          curl -Lv --fail-with-body --max-time 10 https://httpserver-g++132-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app
 
     - name: Cleanup
       uses: unikraft/kraftkit@staging
@@ -71,7 +71,7 @@ jobs:
         run: |
           set -xe;
 
-          kraft cloud vm stop http-node21-staging-${GITHUB_RUN_ID} || true;
-          kraft cloud vm logs http-node21-staging-${GITHUB_RUN_ID} || true;
-          kraft cloud vm rm http-node21-staging-${GITHUB_RUN_ID} || true;
-          kraft cloud img rm index.unikraft.io/test/http-node21-staging-${GITHUB_RUN_ID} || true;
+          kraft cloud vm stop httpserver-g++132-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs httpserver-g++132-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm httpserver-g++132-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/httpserver-g++132-${GITHUB_RUN_ID} || true;

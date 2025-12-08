@@ -1,4 +1,4 @@
-name: examples/http-c (stable)
+name: examples/httpserver-gcc13.2 (stable)
 
 on:
   workflow_dispatch:
@@ -6,17 +6,17 @@ on:
   push:
     branches: [main]
     paths:
-    - '.github/workflows/example-http-c-stable.yaml'
-    - 'http-c/**'
-    - '!http-c/README.md'
+    - '.github/workflows/example-httpserver-gcc13.2-stable.yaml'
+    - 'httpserver-gcc13.2/**'
+    - '!httpserver-gcc13.2/README.md'
 
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
     paths:
-    - '.github/workflows/example-http-c-stable.yaml'
-    - 'http-c/**'
-    - '!http-c/README.md'
+    - '.github/workflows/example-httpserver-gcc13.2-stable.yaml'
+    - 'httpserver-gcc13.2/**'
+    - '!httpserver-gcc13.2/README.md'
 
   schedule:
   - cron: '0 15 * * 1-5'
@@ -47,22 +47,22 @@ jobs:
         run: |
           set -xe;
 
-          cd http-c;
+          cd httpserver-gcc13.2;
 
           kraft cloud deploy \
             --no-start \
             --memory 256 \
-            --name http-c-${GITHUB_RUN_ID} \
+            --name httpserver-gcc132-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-testing/base-compat:latest \
-            --subdomain http-c-${GITHUB_RUN_ID} \
+            --subdomain httpserver-gcc132-${GITHUB_RUN_ID} \
             -p 443:8080 \
             .;
 
           # wait for the instance to start
-          kraft cloud vm start -w 5s http-c-${GITHUB_RUN_ID};
+          kraft cloud vm start -w 5s httpserver-gcc132-${GITHUB_RUN_ID};
           sleep 5;
 
-          curl -Lv --fail-with-body --max-time 10 https://http-c-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STABLE }}.unikraft.app
+          curl -Lv --fail-with-body --max-time 10 https://httpserver-gcc132-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STABLE }}.unikraft.app
 
     - name: Cleanup
       uses: unikraft/kraftkit@staging
@@ -71,7 +71,7 @@ jobs:
         run: |
           set -xe;
 
-          kraft cloud vm stop http-c-${GITHUB_RUN_ID} || true;
-          kraft cloud vm logs http-c-${GITHUB_RUN_ID} || true;
-          kraft cloud vm rm http-c-${GITHUB_RUN_ID} || true;
-          kraft cloud img rm index.unikraft.io/test/http-c-${GITHUB_RUN_ID} || true;
+          kraft cloud vm stop httpserver-gcc132-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs httpserver-gcc132-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm httpserver-gcc132-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/httpserver-gcc132-${GITHUB_RUN_ID} || true;

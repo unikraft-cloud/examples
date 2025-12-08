@@ -1,4 +1,4 @@
-name: examples/caddy (staging)
+name: examples/httpserver-perl5.38 (staging)
 
 on:
   workflow_dispatch:
@@ -6,20 +6,20 @@ on:
   push:
     branches: [main]
     paths:
-    - '.github/workflows/example-caddy-staging.yaml'
-    - 'caddy/**'
-    - '!caddy/README.md'
+    - '.github/workflows/example-httpserver-perl5.38-staging.yaml'
+    - 'httpserver-perl5.38/**'
+    - '!httpserver-perl5.38/README.md'
 
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
     paths:
-    - '.github/workflows/example-caddy-staging.yaml'
-    - 'caddy/**'
-    - '!caddy/README.md'
+    - '.github/workflows/example-httpserver-perl5.38-staging.yaml'
+    - 'httpserver-perl5.38/**'
+    - '!httpserver-perl5.38/README.md'
 
   schedule:
-  - cron: '0 15 * * 1-5'
+  - cron: '15 15 * * 1-5'
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:
@@ -47,22 +47,22 @@ jobs:
         run: |
           set -xe;
 
-          cd caddy;
+          cd httpserver-perl5.38;
 
           kraft cloud deploy \
             --no-start \
-            --memory 256 \
-            --name caddy-${GITHUB_RUN_ID} \
+            --memory 512 \
+            --name httpserver-perl538-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-staging/base-compat:latest \
-            --subdomain caddy-${GITHUB_RUN_ID} \
-            -p 443:2015 \
+            --subdomain httpserver-perl538-${GITHUB_RUN_ID} \
+            -p 443:8080 \
             .;
 
           # wait for the instance to start
-          kraft cloud vm start -w 5s caddy-${GITHUB_RUN_ID};
+          kraft cloud vm start -w 5s httpserver-perl538-${GITHUB_RUN_ID};
           sleep 5;
 
-          curl -Lv --fail-with-body --max-time 10 https://caddy-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app
+          curl -Lv --fail-with-body --max-time 10 https://httpserver-perl538-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app
 
     - name: Cleanup
       uses: unikraft/kraftkit@staging
@@ -71,7 +71,7 @@ jobs:
         run: |
           set -xe;
 
-          kraft cloud vm stop caddy-${GITHUB_RUN_ID} || true;
-          kraft cloud vm logs caddy-${GITHUB_RUN_ID} || true;
-          kraft cloud vm rm caddy-${GITHUB_RUN_ID} || true;
-          kraft cloud img rm index.unikraft.io/test/caddy-${GITHUB_RUN_ID} || true;
+          kraft cloud vm stop httpserver-perl538-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs httpserver-perl538-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm httpserver-perl538-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/httpserver-perl538-${GITHUB_RUN_ID} || true;
