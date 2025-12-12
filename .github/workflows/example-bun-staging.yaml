@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
 
   push:
+<<<<<<< HEAD
     branches: [main]
+=======
+    branches: [bun]
+>>>>>>> upstream/main
     paths:
     - '.github/workflows/example-bun-staging.yaml'
     - 'bun/**'
@@ -51,7 +55,11 @@ jobs:
 
           kraft cloud deploy \
             --no-start \
+<<<<<<< HEAD
             --memory 256 \
+=======
+            --memory 512 \
+>>>>>>> upstream/main
             --name bun-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-staging/base-compat:latest \
             --subdomain bun-${GITHUB_RUN_ID} \

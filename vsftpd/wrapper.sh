@@ -2,9 +2,9 @@
 
 set -e
 
-mkdir -p /home/ftpuser && \
-    echo "Hello from UKP!" > /home/ftpuser/hello.txt
-chown -R ftpuser:ftpuser /home/ftpuser
+mkdir -p /root && \
+    echo "Hello from UKP!" > /root/hello.txt
+chown -R root:root /root
 
 /usr/sbin/vsftpd /etc/vsftpd/vsftpd.conf &
 

@@ -51,7 +51,7 @@ jobs:
 
           kraft cloud deploy \
             --no-start \
-            --memory 756 \
+            --memory 768 \
             --name node21-nextjs-staging-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-staging/base-compat:latest \
             --subdomain node21-nextjs-staging-${GITHUB_RUN_ID} \

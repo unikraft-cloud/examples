@@ -6,7 +6,7 @@ To run Playwright (Firefox) with Node.js on Unikraft Cloud, first [install the `
 Then clone this repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy -M 2048 -p 443:8080 .
+kraft cloud deploy -M 4096 -p 443:8080 .
 ```
 
 The command will deploy the files in the current directory.
