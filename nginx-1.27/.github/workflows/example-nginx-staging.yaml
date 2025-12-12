@@ -1,0 +1,27 @@
+name: Build and Test Nginx Example - Staging
+
+on:
+  push:
+    branches: [staging]
+  pull_request:
+    branches: [staging]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install KraftKit
+        run: |
+          curl -sSf https://get.kraftkit.sh | sh
+
+      - name: Build Nginx Example
+        run: |
+          cd nginx
+          kraft build
+
+      - name: Test Nginx
+        run: |
+          curl http://localhost:8080
