@@ -27,7 +27,7 @@ const generatePdf = async (type, payload) => {
 };
 
 /******************** WARNING ********************* WARNING ********************* WARNING *********************
- 
+
  If you absolutely trust the content you open in Chrome, you can launch Chrome with the --no-sandbox argument...
  Running without a sandbox is strongly discouraged. Consider configuring a sandbox instead!!!
 

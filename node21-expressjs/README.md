@@ -6,7 +6,7 @@ To run Express on Unikraft Cloud, first [install the `kraft` CLI tool](https://u
 Then clone this examples repository and `cd` into this directory, and invoke:
 
 ```console
-kraft cloud deploy --metro fra -p 443:3000 -M 256 .
+kraft cloud deploy --metro fra -p 443:3000 -M 512 .
 ```
 
 The command will deploy the files under `app/`.

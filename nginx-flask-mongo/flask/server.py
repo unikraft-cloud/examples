@@ -10,12 +10,13 @@ client_host = os.environ.get("MONGO_SERVER_URL", "mongodb-nginx-flask-mongo-mong
 print(f"Connecting to MongoDB at {client_host}")
 
 try:
-    client = MongoClient(host=client_host, 
-                       directConnection=True,
-                       serverSelectionTimeoutMS=2000, 
-                       appname="unikraft")
+    client = MongoClient(host=client_host,
+                         directConnection=True,
+                         serverSelectionTimeoutMS=2000,
+                         appname="unikraft")
 except Exception as e:
     print(f"Error creating MongoDB client: {e}")
+
 
 @app.route('/')
 def todo():

@@ -1,0 +1,70 @@
+name: examples/http-dotnet8.0 (staging)
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/example-http-dotnet8.0-staging.yaml'
+      - 'http-dotnet8.0/**'
+      - '!http-dotnet8.0/README.md'
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - '.github/workflows/example-http-dotnet8.0-staging.yaml'
+      - 'http-dotnet8.0/**'
+      - '!http-dotnet8.0/README.md'
+
+  schedule:
+    - cron: '0 15 * * 1-5'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  UKC_METRO: "https://api.${{ vars.UKC_METRO_STAGING }}.unikraft.cloud/v1"
+  UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
+  KRAFTKIT_NO_CHECK_UPDATES: true
+  KRAFTKIT_LOG_LEVEL: debug
+
+jobs:
+  integration:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        id: test
+        uses: unikraft/kraftkit@staging
+        with:
+          run: |
+            set -xe
+            cd http-dotnet8.0
+            kraft cloud deploy \
+              --no-start \
+              --memory 512 \
+              --name http-dotnet8-${GITHUB_RUN_ID} \
+              --runtime index.unikraft.io/official-staging/base-compat:latest \
+              --subdomain http-dotnet8-${GITHUB_RUN_ID} \
+              -p 443:8080 \
+              .
+            kraft cloud vm start -w 5s http-dotnet8-${GITHUB_RUN_ID}
+            sleep 5
+            curl -Lv --fail-with-body --max-time 10 https://http-dotnet8-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app
+
+      - name: Cleanup
+        uses: unikraft/kraftkit@staging
+        if: always()
+        with:
+          run: |
+            set -xe
+            kraft cloud vm stop http-dotnet8-${GITHUB_RUN_ID} || true
+            kraft cloud vm logs http-dotnet8-${GITHUB_RUN_ID} || true
+            kraft cloud vm rm http-dotnet8-${GITHUB_RUN_ID} || true
+            kraft cloud img rm index.unikraft.io/test/http-dotnet8-${GITHUB_RUN_ID} || true

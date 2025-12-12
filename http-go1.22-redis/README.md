@@ -1,37 +1,51 @@
-# Go 1.21 with Redis deployed with a `Composefile` on Unikraft Cloud
+# Go with Redis
 
-This is a simple HTTP server written in the [Go](https://go.dev/) programming language and uses Redis via the [Go redis module](github.com/redis/go-redis) to share keys and their values.
-The project can be instantiated using the accompanying `Composefile`.
+This guide explains how to create and deploy a Go app with a Redis database.
+To run this example, follow these steps:
 
-To run this example on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
-Then clone this examples repository and `cd` into this directory, and invoke:
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
 
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/http-go1.22-redis` directory:
+
+```bash
+git clone https://github.com/unikraft-cloud/examples
+cd examples/http-go1.22-redis/
 ```
+
+Make sure to log into Unikraft Cloud by setting your token and a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
+
+```bash
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
+export UKC_METRO=fra
+```
+
+When done, invoke the following command to deploy the app on Unikraft Cloud:
+
+```bash
 kraft cloud compose up
 ```
 
-Then, retrieve the domain which has been provisioned with:
-
-```
-kraft cloud service ls -o list
-```
-
-Find the FQDN.
-
+The output shows the instance address and other details.
 To set a value in Redis via the Go server, invoke:
 
-```
+```bash
 curl -X POST -d "key=my-key" -d "value=my-value" https://<FQDN>
 ```
 
 You can then retrieve the value by accessing the path:
 
-```
-curl https://<FQDN>/\?key\=my-key
+```bash
+curl https://<FQDN>/?key=my-key
 ```
 
 ## Learn more
 
-- [Go's Documentation](https://go.dev/doc/)
-- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
-- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
+Use the `--help` option for detailed information on using Unikraft Cloud:
+
+```bash
+kraft cloud --help
+```
+
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/overview).

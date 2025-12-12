@@ -1,18 +1,87 @@
-# MinIO
+# Minio
 
-[MinIO](https://min.io/) is a High-Performance Object Storage system.
+This guide shows you how to use [MinIO](https://min.io), a High Performance Object Storage which is
+Open Source, Amazon S3 compatible, Kubernetes Native and works for cloud native workloads like AI.
 
-To run MinIO on Unikraft Cloud, first [install the `kraft` CLI tool](https://unikraft.org/docs/cli).
-Then clone this examples repository and `cd` into this directory, and invoke:
+To run it, follow these steps:
 
-```console
-kraft cloud deploy --metro fra -p 443:9001/http+tls -p 9000:9000/tls -M 512 .
+1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/minio/` directory:
+
+```bash
+git clone https://github.com/unikraft-cloud/examples
+cd examples/minio/
 ```
 
-After deploying, you can query the service using the provided URL.
+Make sure to log into Unikraft Cloud by setting your token and a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
+
+```bash
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
+export UKC_METRO=fra
+```
+
+When done, invoke the following command to deploy this app on Unikraft Cloud:
+
+```bash
+kraft cloud deploy -p 443:9001/http+tls -p 9000:9000/tls -M 512 .
+```
+
+The output shows the instance address and other details:
+
+```ansi
+[●] Deployed successfully!
+ │
+ ├────────── name: minio-w2my8
+ ├────────── uuid: 31e691ad-05a0-48b6-ad49-7f79da8e1754
+ ├───────── state: running
+ ├─────────── url: https://icy-bird-tregaga9.fra.unikraft.app
+ ├───────── image: minio@sha256:ba4657c607495326b0e29b512fb33a4179cd1b2a15fbfdd3ccc6e66209a701dd
+ ├───── boot time: 73.65 ms
+ ├──────── memory: 512 MiB
+ ├─────── service: icy-bird-tregaga9
+ ├── private fqdn: minio-w2my8.internal
+ ├──── private ip: 172.16.6.4
+ └────────── args: /usr/bin/minio server --address 0.0.0.0:9000 --console-address 0.0.0.0:9001 /data
+```
+
+In this case, the instance name is `minio-w2my8` and the address is `https://icy-bird-tregaga9.fra.unikraft.app`.
+They're different for each run.
+
+To test, point your browser at the address.
+The default account/password are `minioadmin/minioadmin`.
+
+You can list information about the instance by running:
+
+```bash
+kraft cloud instance list
+```
+```ansi
+NAME         FQDN                                STATE    STATUS        IMAGE                                     MEMORY   VCPUS  ARGS                               BOOT TIME
+minio-w2my8  icy-bird-tregaga9.fra.unikraft.app  running  1 minute ago  minio@sha256:ba4657c607495326b0e29b51...  512 MiB  1      /usr/bin/minio server --addres...  73651us
+```
+
+When done, you can remove the instance:
+
+```bash
+kraft cloud instance remove minio-w2my8
+```
+
+## Customize your app
+
+To customize the app, update the files in the repository, listed below:
+
+* `Kraftfile`: the Unikraft Cloud specification, including command-line arguments
+* `Dockerfile`: In case you need to add files to your instance's rootfs
 
 ## Learn more
 
-- [MinIO's Documentation](https://min.io/docs/minio/kubernetes/upstream/)
-- [Unikraft Cloud's Documentation](https://unikraft.cloud/docs/)
-- [Building `Dockerfile` Images with `Buildkit`](https://unikraft.org/guides/building-dockerfile-images-with-buildkit)
+Use the `--help` option for detailed information on using Unikraft Cloud:
+
+```bash
+kraft cloud --help
+```
+
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/overview).

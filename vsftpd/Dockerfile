@@ -7,12 +7,13 @@ RUN set -xe; \
     ;
 
 # Create FTP user
-RUN useradd -d /home/ftpuser -p "$(openssl passwd -6 ftpuserpass)" ftpuser
+RUN echo "root:rootpass" | chpasswd
 
 # Configure vsftpd.
 RUN mkdir -p /var/run/vsftpd/empty && \
     touch /var/log/vsftpd.log
-RUN echo "ftpuser" > /etc/vsftpd.userlist 
+RUN echo "root" > /etc/vsftpd.userlist
+RUN sed -i '/^root/d' /etc/ftpusers || true
 
 COPY ./vsftpd.conf /etc/vsftpd/vsftpd.conf
 
