@@ -51,7 +51,7 @@ In this case, the instance name is `redis-alb4r` which is different for every ru
 To test the deployment, first forward the port with the `kraft cloud tunnel` command:
 
 ```bash
-kraft cloud tunnel 6379:memcached-arkv7:6379
+kraft cloud tunnel 6379:redis-alb4r:6379
 ```
 
 Then, from another console, you can now use the `redis-benchmark` client to connect to Redis, for example:
