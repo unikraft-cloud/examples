@@ -19,7 +19,7 @@ on:
     - '!expressjs4.18-node21/README.md'
 
   schedule:
-  - cron: '0 16 * * 1-5'
+  - cron: '0 16 * * 1'
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:

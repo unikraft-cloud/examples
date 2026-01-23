@@ -19,7 +19,7 @@ on:
     - '!httpserver-python3.12-flask3.0/README.md'
 
   schedule:
-  - cron: '30 15 * * 1-5'
+  - cron: '30 15 * * 1'
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:

@@ -19,7 +19,7 @@ on:
     - '!skipper0.18/README.md'
 
   schedule:
-  - cron: '0 17 * * 1-5'
+  - cron: '0 17 * * 1'
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:

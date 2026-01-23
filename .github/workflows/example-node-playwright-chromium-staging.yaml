@@ -19,7 +19,7 @@ on:
     - '!node-playwright-chromium/README.md'
 
   schedule:
-  - cron: '30 16 * * 1-5'
+  - cron: '30 16 * * 1'
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:

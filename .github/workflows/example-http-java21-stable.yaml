@@ -19,7 +19,7 @@ on:
     - '!http-java21/README.md'
 
   schedule:
-  - cron: '0 15 * * 1-5'
+  - cron: '0 15 * * 1'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}

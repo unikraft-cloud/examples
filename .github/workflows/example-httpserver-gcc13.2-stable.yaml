@@ -19,7 +19,7 @@ on:
     - '!httpserver-gcc13.2/README.md'
 
   schedule:
-  - cron: '0 15 * * 1-5'
+  - cron: '0 15 * * 1'
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:
