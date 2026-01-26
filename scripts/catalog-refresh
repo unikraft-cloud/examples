@@ -1,0 +1,93 @@
+#!/bin/bash
+CATALOG_GIT=${CATALOG_GIT:-$( dirname $( readlink -f "$0" ))/..}
+if [ "$(uname)" = "Darwin" ]; then
+	CMD_GREP="ggrep"
+else
+	CMD_GREP="grep"
+fi
+
+sleep_anim()
+{
+	local SECS=${1:-5}
+	local PROMPT=${2:-"Waiting for ${SECS} seconds"}
+
+	printf '%s' "${PROMPT}"
+	while [ "${SECS}" -gt "0" ]; do
+		sleep 1
+		((SECS--))
+		printf '%s' "."
+	done
+	printf '\n'
+}
+
+gh-run-workflows()
+{
+
+	local CLASS=${1:-example}
+	local BRANCH=${2:-stable} # stable, staging
+	local GH_FIELD_INPUTS=${3:-""} # additional inputs
+	local POSTTO=${4:-60} # post-timeout in seconds
+	local PRETO=${5:-0} # pre-timeout in seconds
+	local REF_BRANCH=${6:-"unikraft-base"} # branch to run the workflow on
+
+	cd "${CATALOG_GIT}/.github/workflows"
+
+	#WF_IDS=($( gh workflow list --json "id" --jq ".[].id" ))
+	#for WF_ID in "${WF_IDS[@]}"; do
+
+	## Use yaml files in repo
+	for WF in *.yaml; do
+		printf '%s' "${WF}" | "${CMD_GREP}" -qe '^'"${CLASS}"'-.*-'"${BRANCH}"'\.yaml$'
+		[ $? -ne 0 ] && continue
+
+		echo -e '\x1b[44;33m>> '"${WF}"'\x1b[K\x1b[0m'
+		if [ "${PRETO}" -gt "0" ]; then
+			sleep_anim "${PRETO}"
+			printf '\n'
+		fi
+
+		if [ "${GH_FIELD_INPUTS}" != "" ]; then
+			gh workflow run "${WF}" --ref "${REF_BRANCH}" --field args="${GH_FIELD_INPUTS}"
+		else
+			gh workflow run "${WF}" --ref "${REF_BRANCH}"
+		fi
+		[ $? -ne 0 ] && exit 1
+
+		if [[ ${POSTTO} -gt 0 ]]; then
+			printf '\n'
+			sleep_anim "${POSTTO}"
+		fi
+		printf '\n\n'
+	done
+}
+
+usage()
+{
+	echo "Usage: $0 [OPTION]..."
+	echo "Triggers re-runs of examples workflows"
+	echo ""
+	echo "  -h                         Display help and exit"
+	echo "  -b [BRANCH]                Branch to use stable, *staging"
+}
+
+while getopts "bh" OPT; do
+	case ${OPT} in
+	b)
+		ARG_BRANCH="${OPTARG}"
+		;;
+	h)
+		usage
+		exit 0
+		;;
+	\?)
+		echo "Unrecognized option -${OPTARG}" 1>&2
+		usage 1>&2
+		exit 1
+		;;
+	esac
+done
+shift $((OPTIND - 1))
+
+gh-run-workflows example "${ARG_BRANCH}" "" 60 0 "unikraft-base"
+
+exit 0
