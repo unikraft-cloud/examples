@@ -4,7 +4,7 @@ on:
     workflow_dispatch:
 
     push:
-      branches: [main]
+      branches: [unikraft-base]
       paths:
       - '.github/workflows/example-postgres-stable.yaml'
       - 'postgres/**'
@@ -12,14 +12,11 @@ on:
 
     pull_request:
       types: [opened, synchronize, reopened]
-      branches: [main]
+      branches: [unikraft-base]
       paths:
       - '.github/workflows/example-postgres-stable.yaml'
       - 'postgres/**'
       - '!postgres/README.md'
-
-    schedule:
-      - cron: '45 16 * * 1-5'
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:

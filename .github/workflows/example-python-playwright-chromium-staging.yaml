@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
   push:
-    branches: [main]
+    branches: [unikraft-base]
     paths:
     - '.github/workflows/example-python-playwright-chromium-staging.yaml'
     - 'python-playwright-chromium/**'
@@ -12,15 +12,13 @@ on:
 
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [main]
+    branches: [unikraft-base]
     paths:
     - '.github/workflows/example-python-playwright-chromium-staging.yaml'
     - 'python-playwright-chromium/**'
     - '!python-playwright-chromium/README.md'
 
-  schedule:
-  - cron: '45 16 * * 1-5'
-
+  
 # Automatically cancel in-progress actions on the same branch
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
   push:
-    branches: [main]
+    branches: [unikraft-base]
     paths:
     - '.github/workflows/example-opentelemetry-collector-stable.yaml'
     - 'opentelemetry-collector/**'
@@ -12,15 +12,13 @@ on:
 
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [main]
+    branches: [unikraft-base]
     paths:
     - '.github/workflows/example-opentelemetry-collector-stable.yaml'
     - 'opentelemetry-collector/**'
     - '!opentelemetry-collector/README.md'
 
-  schedule:
-  - cron: '0 17 * * 1-5'
-
+  
 # Automatically cancel in-progress actions on the same branch
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}
