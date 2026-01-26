@@ -1,4 +1,4 @@
-FROM rust:1.87.0-bookworm AS build
+FROM rust:1.88.0-bookworm AS build
 
 RUN cargo new --bin app
 WORKDIR /app
