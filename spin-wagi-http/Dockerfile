@@ -1,6 +1,6 @@
-FROM rust:1.75.0-bookworm AS spin-devenv
+FROM rust:1.87.0-bookworm AS spin-devenv
 
-ARG SPIN_VERSION=2.1.0
+ARG SPIN_VERSION=2.4.3
 
 WORKDIR /spin
 
@@ -16,7 +16,7 @@ RUN set -xe; \
     tar xzvf ./spin.tar.gz; \
     mv ./spin /usr/bin/spin; \
     rm -rf spin.tar.gz; \
-    rustup target add wasm32-wasi
+    rustup target add wasm32-wasip1
 
 ARG WASI_SDK_VERSION=21
 
@@ -36,7 +36,7 @@ COPY ./spin.toml /app/spin.toml
 
 WORKDIR /app
 
-RUN spin build
+RUN SPIN_TELEMETRY_DISABLED=1 spin build
 
 FROM scratch
 
@@ -55,4 +55,4 @@ COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
 
 COPY ./spin.toml /app/spin.toml
 COPY --from=build /app/hello-cpp/hello.wasm /app/hello-cpp/hello.wasm
-COPY --from=build /app/goodbye-rust/target/wasm32-wasi/release/goodbye.wasm /app/goodbye-rust/target/wasm32-wasi/release/goodbye.wasm
+COPY --from=build /app/goodbye-rust/target/wasm32-wasip1/release/goodbye.wasm /app/goodbye-rust/target/wasm32-wasip1/release/goodbye.wasm

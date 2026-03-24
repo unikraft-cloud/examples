@@ -22,8 +22,8 @@ source = "hello-cpp/hello.wasm"
 command = "make build -C hello-cpp"
 
 [component.goodbye]
-source = "goodbye-rust/target/wasm32-wasi/release/goodbye.wasm"
+source = "goodbye-rust/target/wasm32-wasip1/release/goodbye.wasm"
 
 [component.goodbye.build]
-command = "cargo build --target wasm32-wasi --release --manifest-path goodbye-rust/Cargo.toml"
+command = "cargo build --target wasm32-wasip1 --release --manifest-path goodbye-rust/Cargo.toml"
 
