@@ -24,7 +24,7 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy the app on Unikraft Cloud:
 
 ```bash
-kraft cloud deploy -M 1Gi -e PUBKEY="...." .
+kraft cloud deploy -p 2222:2222/tls -M 1Gi -e PUBKEY="...." .
 ```
 
 The output shows the instance address and other details:

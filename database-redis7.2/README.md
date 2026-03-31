@@ -10,7 +10,7 @@ To run it example, follow these steps:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/redis/
+cd examples/database-redis7.2/
 ```
 
 Make sure to log into Unikraft Cloud by setting your token and a [metro](https://unikraft.com/docs/platform/metros) close to you.
@@ -37,7 +37,7 @@ The output shows the instance address and other details:
  ├────────── uuid: d3c3141b-97b2-4e1d-87ae-39e4f14ab49e
  ├───────── state: running
  ├────────── fqdn: rough-wind-8vxrd1ms.fra.unikraft.app
- ├───────── image: redis@sha256:9665c51faf7deb538cf7907b012b55700cad08cd391f5ba099d95d018c8da7d
+ ├───────── image: database-redis72@sha256:9665c51faf7deb538cf7907b012b55700cad08cd391f5ba099d95d018c8da7d
  ├───── boot time: 26.13 ms
  ├──────── memory: 512 MiB
  ├─────── service: rough-wind-8vxrd1ms
@@ -46,12 +46,12 @@ The output shows the instance address and other details:
  └────────── args: /usr/bin/redis-server /etc/redis/redis.conf
 ```
 
-In this case, the instance name is `redis-alb4r` which is different for every run.
+In this case, the instance name is `redis-alb4r` and the address is `rough-wind-8vxrd1ms.fra.unikraft.app`. They are different for every run.
 
-To test the deployment, first forward the port with the `kraft cloud tunnel` command:
+To test the deployment, first setup a tunnel that handles a TLS connection to the `redis-alb4r` instance:
 
 ```bash
-kraft cloud tunnel 6379:memcached-arkv7:6379
+socat TCP-LISTEN:6379,reuseaddr,fork OPENSSL:rough-wind-8vxrd1ms.fra.unikraft.app:6379,verify=0
 ```
 
 Then, from another console, you can now use the `redis-benchmark` client to connect to Redis, for example:
@@ -83,11 +83,11 @@ You should see output like:
 ...
 ```
 
-To disconnect, kill the `tunnel` command with ctrl-C.
+To disconnect, kill the `socat` command with ctrl-C.
 
 > **Note:**
-> This guide uses `kraft cloud tunnel` only when a service doesn't support TLS and isn't HTTP-based (TLS/SNI determines the correct instance to send traffic to).
-> Also note that the `tunnel` command isn't needed when connecting via an instance's private IP/FQDN.
+> This guide uses `socat` only when a service doesn't support TLS and isn't HTTP-based (TLS/SNI determines the correct instance to send traffic to).
+> Also note that the `socat` command isn't needed when connecting via an instance's private IP/FQDN.
 > For example, when a Redis instance serves as a cache server to
 > another instance that acts as a frontend and which **does** support TLS.
 
