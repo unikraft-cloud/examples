@@ -10,7 +10,7 @@ To run this example, follow these steps:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-python3.12-flask3.0-sqlite/
+cd examples/httpserver-python3.12-flask3.1-sqlite/
 ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.

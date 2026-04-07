@@ -1,4 +1,4 @@
-name: examples/httpserver-prisma-expressjs4.19-node18 (stable)
+name: examples/httpserver-prisma-expressjs4.20-node18 (stable)
 
 on:
   workflow_dispatch:
@@ -6,17 +6,17 @@ on:
   push:
     branches: [ main ]
     paths:
-    - '.github/workflows/example-httpserver-prisma-expressjs4.19-node18-stable.yaml'
-    - 'httpserver-prisma-expressjs4.19-node18/**'
-    - '!httpserver-prisma-expressjs4.19-node18/README.md'
+    - '.github/workflows/example-httpserver-prisma-expressjs4.20-node18-stable.yaml'
+    - 'httpserver-prisma-expressjs4.20-node18/**'
+    - '!httpserver-prisma-expressjs4.20-node18/README.md'
 
   pull_request:
     types: [ opened, synchronize, reopened ]
     branches: [ main ]
     paths:
-    - '.github/workflows/example-httpserver-prisma-expressjs4.19-node18-stable.yaml'
-    - 'httpserver-prisma-expressjs4.19-node18/**'
-    - '!httpserver-prisma-expressjs4.19-node18/README.md'
+    - '.github/workflows/example-httpserver-prisma-expressjs4.20-node18-stable.yaml'
+    - 'httpserver-prisma-expressjs4.20-node18/**'
+    - '!httpserver-prisma-expressjs4.20-node18/README.md'
 
   schedule:
   - cron: '30 16 * * 1-5'
@@ -50,22 +50,22 @@ jobs:
         run: |
           set -xe;
 
-          cd httpserver-prisma-expressjs4.19-node18;
+          cd httpserver-prisma-expressjs4.20-node18;
 
           kraft cloud deploy \
             --no-start \
-            --name prisma-expressjs419-node18-${GITHUB_RUN_ID} \
+            --name prisma-expressjs420-node18-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-testing/base-compat:latest \
-            --subdomain prisma-expressjs419-node18-${GITHUB_RUN_ID} \
+            --subdomain prisma-expressjs420-node18-${GITHUB_RUN_ID} \
             -p 443:3000 \
             -M 512 \
             .;
 
           # wait for the instance to start
-          kraft cloud vm start -w 5s prisma-expressjs419-node18-${GITHUB_RUN_ID};
+          kraft cloud vm start -w 5s prisma-expressjs420-node18-${GITHUB_RUN_ID};
           sleep 5;
 
-          curl -Lv --fail-with-body --max-time 10 https://prisma-expressjs419-node18-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STABLE }}.unikraft.app/feed
+          curl -Lv --fail-with-body --max-time 10 https://prisma-expressjs420-node18-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STABLE }}.unikraft.app/feed
 
     - name: Cleanup
       uses: unikraft/kraftkit@staging
@@ -74,7 +74,7 @@ jobs:
         run: |
           set -xe;
 
-          kraft cloud vm stop prisma-expressjs419-node18-${GITHUB_RUN_ID} || true;
-          kraft cloud vm logs prisma-expressjs419-node18-${GITHUB_RUN_ID} || true;
-          kraft cloud vm rm prisma-expressjs419-node18-${GITHUB_RUN_ID} || true;
-          kraft cloud img rm index.unikraft.io/test/prisma-expressjs419-node18-${GITHUB_RUN_ID} || true;
+          kraft cloud vm stop prisma-expressjs420-node18-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs prisma-expressjs420-node18-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm prisma-expressjs420-node18-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/prisma-expressjs420-node18-${GITHUB_RUN_ID} || true;

@@ -1,4 +1,4 @@
-name: examples/httpserver-rust1.81-rocket0.5 (staging)
+name: examples/httpserver-rust1.88-rocket0.5 (staging)
 
 on:
   workflow_dispatch:
@@ -6,17 +6,17 @@ on:
   push:
     branches: [ main ]
     paths:
-    - '.github/workflows/example-httpserver-rust1.81-rocket0.5-staging.yaml'
-    - 'httpserver-rust1.81-rocket0.5/**'
-    - '!httpserver-rust1.81-rocket0.5/README.md'
+    - '.github/workflows/example-httpserver-rust1.88-rocket0.5-staging.yaml'
+    - 'httpserver-rust1.88-rocket0.5/**'
+    - '!httpserver-rust1.88-rocket0.5/README.md'
 
   pull_request:
     types: [ opened, synchronize, reopened ]
     branches: [ main ]
     paths:
-    - '.github/workflows/example-httpserver-rust1.81-rocket0.5-staging.yaml'
-    - 'httpserver-rust1.81-rocket0.5/**'
-    - '!httpserver-rust1.81-rocket0.5/README.md'
+    - '.github/workflows/example-httpserver-rust1.88-rocket0.5-staging.yaml'
+    - 'httpserver-rust1.88-rocket0.5/**'
+    - '!httpserver-rust1.88-rocket0.5/README.md'
 
   schedule:
   - cron: '45 15 * * 1-5'
@@ -50,22 +50,22 @@ jobs:
         run: |
           set -xe;
 
-          cd httpserver-rust1.81-rocket0.5;
+          cd httpserver-rust1.88-rocket0.5;
 
           kraft cloud deploy \
             --no-start \
-            --name httpserver-rust181-rocket05-${GITHUB_RUN_ID} \
+            --name httpserver-rust188-rocket05-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-staging/base-compat:latest \
-            --subdomain httpserver-rust181-rocket05-${GITHUB_RUN_ID} \
+            --subdomain httpserver-rust188-rocket05-${GITHUB_RUN_ID} \
             -p 443:8080 \
             -M 256 \
             .;
 
           # wait for the instance to start
-          kraft cloud vm start -w 5s httpserver-rust181-rocket05-${GITHUB_RUN_ID};
+          kraft cloud vm start -w 5s httpserver-rust188-rocket05-${GITHUB_RUN_ID};
           sleep 5;
 
-          curl -Lv --fail-with-body --max-time 10 https://httpserver-rust181-rocket05-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app
+          curl -Lv --fail-with-body --max-time 10 https://httpserver-rust188-rocket05-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app
 
     - name: Cleanup
       uses: unikraft/kraftkit@staging
@@ -74,7 +74,7 @@ jobs:
         run: |
           set -xe;
 
-          kraft cloud vm stop httpserver-rust181-rocket05-${GITHUB_RUN_ID} || true;
-          kraft cloud vm logs httpserver-rust181-rocket05-${GITHUB_RUN_ID} || true;
-          kraft cloud vm rm httpserver-rust181-rocket05-${GITHUB_RUN_ID} || true;
-          kraft cloud img rm index.unikraft.io/test/httpserver-rust181-rocket05-${GITHUB_RUN_ID} || true;
+          kraft cloud vm stop httpserver-rust188-rocket05-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs httpserver-rust188-rocket05-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm httpserver-rust188-rocket05-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/httpserver-rust188-rocket05-${GITHUB_RUN_ID} || true;

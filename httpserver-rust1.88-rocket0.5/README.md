@@ -10,7 +10,7 @@ To run this example, follow these steps:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-rust1.81-rocket0.5
+cd examples/httpserver-rust1.88-rocket0.5
 ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
@@ -93,13 +93,13 @@ httpserver-rust181-rocket05-tuwq3  empty-bobo-n3htmpye.fra.unikraft.app  running
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-rust181-rocket05-tuwq3 
+unikraft instances delete httpserver-rust181-rocket05-tuwq3
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-rust181-rocket05-tuwq3 
+kraft cloud instance remove httpserver-rust181-rocket05-tuwq3
 ```
 
 ## Customize your app

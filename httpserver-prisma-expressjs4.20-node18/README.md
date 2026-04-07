@@ -11,7 +11,7 @@ To run it, follow these steps:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-node18-prisma-rest-express/
+cd examples/httpserver-prisma-expressjs4.20-node18/
 ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
