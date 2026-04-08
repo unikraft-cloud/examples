@@ -23,6 +23,9 @@ install_erofs_utils() {
     elif command -v yum &>/dev/null; then
         echo "Detected CentOS/RHEL-based system. Installing erofs-utils..."
         sudo yum install -y erofs-utils
+    elif command -v brew &>/dev/null; then
+        echo "Detected macOS system. Installing erofs-utils..."
+        brew install erofs-utils
     else
         echo "Unsupported package manager. Please install erofs-utils manually."
         exit 1
@@ -32,10 +35,7 @@ install_erofs_utils() {
 # Stop execution on errors
 set -e
 
-check_mkfs_erofs
-if [ $? -ne 0 ]; then
-    install_erofs_utils
-fi
+check_mkfs_erofs || install_erofs_utils
 
 cd chromium-cdp/
 
@@ -48,7 +48,7 @@ docker create --name cnt-chromium-cdp chromium-cdp /bin/sh
 docker cp cnt-chromium-cdp:/ ./.rootfs
 
 rm initrd || true
-mkfs.erofs --all-root -d2 -E noinline_data initrd ./.rootfs
+mkfs.erofs -b 4096 --all-root -d2 -E noinline_data initrd ./.rootfs
 
 # Deploy an instance
 kraft cloud deploy -M 4096 -p 443:8080 . --rootfs-type erofs

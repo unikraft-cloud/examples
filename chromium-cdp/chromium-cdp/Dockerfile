@@ -1,4 +1,4 @@
-FROM debian:bookworm AS build
+FROM --platform=linux/amd64 debian:bookworm AS build
 
 ARG NODE_VERSION=22.8.0
 
