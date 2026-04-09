@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM debian:bookworm AS build
+FROM --platform=linux/x86_64 debian:bookworm AS build
 
 RUN set -xe ; \
     apt -yqq update ; \
@@ -18,6 +18,9 @@ RUN git checkout -b build ${BUILD_COMMIT}
 
 RUN --mount=type=cache,target=/root/.m2 ./mvnw package
 
+RUN rm -f /usr/lib/jvm/java-17-openjdk-amd64/lib/src.zip && \
+    cp -rL /usr/lib/jvm/java-17-openjdk-amd64/ /jvm-resolved/
+
 FROM scratch
 
 COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
@@ -28,7 +31,7 @@ COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libg
 COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
 COPY --from=build /etc/ld.so.cache /etc/ld.so.cache
 
-COPY --from=build /usr/lib/jvm/java-17-openjdk-amd64/ /usr/lib/jvm/java-17-openjdk-amd64/
+COPY --from=build /jvm-resolved/ /usr/lib/jvm/java-17-openjdk-amd64/
 COPY --from=build /etc/ssl/certs/java/cacerts /etc/ssl/certs/java/cacerts
 
 COPY --from=build /etc/java-17-openjdk/security/ /etc/java-17-openjdk/security/
