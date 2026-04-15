@@ -152,8 +152,7 @@ Migrations are idempotent; already-applied migrations are skipped.
 
 ## Notes
 
-- **No GeoIP location data**: The GeoLite2 database is removed from the image to reduce size (~54 MB). Umami will still track visits but won't resolve visitor locations. To re-enable, remove the `rm -rf /app/.next/standalone/geo` line from the `Dockerfile`.
-- **Image size**: The `FROM scratch` image is ~320 MB. Umami requires at least 1024 MiB of memory to unpack the initramfs and run.
+- **Image size**: The `FROM scratch` image is ~370 MB. Umami requires at least 1024 MiB of memory to unpack the initramfs and run. To reduce the image by ~54 MB, add `rm -rf /app/.next/standalone/geo` to the `Dockerfile` build stage (this disables visitor location tracking).
 - **pgcrypto**: The Unikraft Cloud postgres example does not include the `pgcrypto` extension. This is not a problem because PostgreSQL 16+ provides `gen_random_uuid()` as a built-in function. The migration patch in Step 2 and in the `Dockerfile` comments out the `CREATE EXTENSION` statement.
 
 ## Cleanup

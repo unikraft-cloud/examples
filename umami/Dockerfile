@@ -26,8 +26,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Build: prisma client + tracker + geo database + Next.js app
 RUN pnpm build-docker
 
-# Strip node binary (~20 MB savings) and remove GeoIP data (~54 MB savings)
-RUN strip /usr/local/bin/node && rm -rf /app/.next/standalone/geo
+# Strip node binary (~20 MB savings)
+RUN strip /usr/local/bin/node
 
 FROM scratch
 
