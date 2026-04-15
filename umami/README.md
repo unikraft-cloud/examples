@@ -40,7 +40,7 @@ First, deploy a PostgreSQL instance using the [postgres](../postgres/) example:
 ```bash title="unikraft"
 cd ../postgres/
 unikraft build . --output <my-org>/postgres:latest
-unikraft run --metro=fra -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=<password> -e POSTGRES_DB=umami --scale-to-zero=off <my-org>/postgres:latest
+unikraft run --metro=fra -p 5432:5432/tls -m 1536M -e POSTGRES_PASSWORD=<password> -e POSTGRES_DB=umami --scale-to-zero=off <my-org>/postgres:latest
 ```
 
 or
@@ -86,7 +86,7 @@ cd ../umami/
 unikraft build . --output <my-org>/umami:latest
 unikraft run --metro=fra \
   -p 443:3000/tls+http \
-  -m 1G \
+  -m 1536M \
   -e DATABASE_URL="postgresql://postgres:<password>@<postgres-fqdn>:5432/umami?sslmode=require" \
   -e APP_SECRET="$(openssl rand -hex 32)" \
   -e DISABLE_TELEMETRY=1 \
@@ -99,7 +99,7 @@ or
 cd ../umami/
 kraft cloud deploy \
   -p 443:3000 \
-  -M 1024 \
+  -M 1536 \
   -e DATABASE_URL="postgresql://postgres:<password>@<postgres-fqdn>:5432/umami?sslmode=require" \
   -e APP_SECRET="$(openssl rand -hex 32)" \
   -e DISABLE_TELEMETRY=1 \
@@ -116,7 +116,7 @@ The output shows the instance address and other details:
  ├───────── state: starting
  ├──────── domain: https://blue-bush-59v2y072.fra.unikraft.app
  ├───────── image: umami@sha256:d7f3221eee2ecbd8d90fcebe97eb7dc7f5989ee95c4cedd4a9fe728a709890b0
- ├──────── memory: 1024 MiB
+ ├──────── memory: 1536 MiB
  ├─────── service: blue-bush-59v2y072
  ├── private fqdn: umami-f7k2x.internal
  ├──── private ip: 10.0.8.193
@@ -152,7 +152,7 @@ Migrations are idempotent; already-applied migrations are skipped.
 
 ## Notes
 
-- **Image size**: The `FROM scratch` image is ~370 MB. Umami requires at least 1024 MiB of memory to unpack the initramfs and run. To reduce the image by ~54 MB, add `rm -rf /app/.next/standalone/geo` to the `Dockerfile` build stage (this disables visitor location tracking).
+- **Image size**: The `FROM scratch` image is ~386 MB (including GeoIP data for visitor location tracking). Umami requires at least 1536 MiB of memory to unpack the initramfs and run. To reduce the image by ~54 MB (and lower the minimum memory to 1024 MiB), add `rm -rf /app/.next/standalone/geo` to the `Dockerfile` build stage. This disables visitor location tracking.
 - **pgcrypto**: The Unikraft Cloud postgres example does not include the `pgcrypto` extension. This is not a problem because PostgreSQL 16+ provides `gen_random_uuid()` as a built-in function. The migration patch in Step 2 and in the `Dockerfile` comments out the `CREATE EXTENSION` statement.
 
 ## Cleanup
