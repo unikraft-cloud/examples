@@ -66,6 +66,7 @@ cd /tmp/umami-migrate
 npm install -g pnpm && pnpm install --frozen-lockfile
 
 # Patch pgcrypto (not available in the Unikraft postgres image, not needed on PG16+)
+# On macOS, use: sed -i '' 's/...' instead
 sed -i 's/CREATE EXTENSION IF NOT EXISTS "pgcrypto";/-- pgcrypto: not needed on PG16+/' \
     prisma/migrations/01_init/migration.sql
 
@@ -81,7 +82,7 @@ DATABASE_URL="postgresql://postgres:<password>@<postgres-fqdn>:5432/umami?sslmod
 Return to the `umami/` example directory and deploy:
 
 ```bash title="unikraft"
-cd examples/umami/
+cd ../umami/
 unikraft build . --output <my-org>/umami:latest
 unikraft run --metro=fra \
   -p 443:3000/tls+http \
@@ -95,6 +96,7 @@ unikraft run --metro=fra \
 or
 
 ```bash title="kraft"
+cd ../umami/
 kraft cloud deploy \
   -p 443:3000 \
   -M 1024 \
