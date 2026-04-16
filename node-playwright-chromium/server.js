@@ -19,8 +19,13 @@ const requestListener = function (request, response) {
                 const browser = await chromium.launch({
                     headless: true,
                     args: [
-                        '--single-process',
-                    ],
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-gpu',
+                        '--disable-dev-shm-usage',
+                        '--no-zygote',
+                        '--single-process'
+                    ]
                 });
                 const page = await browser.newPage();
                 await page.goto(remote);
