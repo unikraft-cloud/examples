@@ -127,7 +127,9 @@ Lines in the `Kraftfile` have the following roles:
 
 * `runtime: base-compat:latest`: The runtime kernel to use is the base compatibility kernel.
 
-* `rootfs: ./Dockerfile`: Build the app root filesystem using the `Dockerfile`.
+* `rootfs`: Build the app root filesystem.
+  `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
+  `type: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
 * `cmd: ["/usr/bin/spin", "up", "--from", "/app/spin.toml", "--listen", "0.0.0.0:3000"]`: Use `spin` as the command to start the app, with the given parameters.
 

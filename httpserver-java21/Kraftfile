@@ -7,7 +7,9 @@ labels:
   cloud.unikraft.v1.instances/scale_to_zero.stateful: "true"
   cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
 
-rootfs: ./Dockerfile
+rootfs:
+  source: ./Dockerfile
+  type: erofs
 
 # Path updated from Java 17 to Java 21
 cmd: ["/usr/lib/jvm/java-21-openjdk-amd64/bin/java", "-classpath", "/usr/src/", "SimpleHttpServer"]

@@ -4,6 +4,8 @@ name: httpserver-c
 
 runtime: base-compat:latest
 
-rootfs: ./Dockerfile
+rootfs:
+  source: ./Dockerfile
+  type: erofs
 
 cmd: ["/http_server"]

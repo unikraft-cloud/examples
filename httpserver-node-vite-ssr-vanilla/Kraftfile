@@ -9,6 +9,8 @@ labels:
   cloud.unikraft.v1.instances/scale_to_zero.stateful: "true"
   cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 2000
 
-rootfs: ./Dockerfile
+rootfs:
+  source: ./Dockerfile
+  type: erofs
 
 cmd: ["node", "/app/server.js"]

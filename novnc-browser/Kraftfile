@@ -4,6 +4,8 @@ name: vnc-browser
 
 runtime: base-compat:latest
 
-rootfs: ./Dockerfile
+rootfs:
+  source: ./Dockerfile
+  type: erofs
 
 cmd: [ "/wrapper.sh" ]

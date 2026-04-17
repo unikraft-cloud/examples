@@ -116,7 +116,9 @@ Lines in the `Kraftfile` have the following roles:
 
 * `runtime: base-compat:latest`: The kernel to use.
 
-* `rootfs: ./Dockerfile`: Build the app root filesystem using the `Dockerfile`.
+* `rootfs`: Build the app root filesystem.
+  `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
+  `type: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
 * `cmd: ["/usr/bin/node", "/usr/src/server.js"]`: Use `/usr/bin/node /usr/src/server.js` as the starting command of the instance.
 
