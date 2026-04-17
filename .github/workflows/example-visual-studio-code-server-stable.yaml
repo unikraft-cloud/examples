@@ -53,8 +53,8 @@ jobs:
           cd visual-studio-code-server;
 
           kraft cloud volume create \
-          --name code-workspace \
-          --size 500Mi
+          --name code-workspace-${GITHUB_RUN_ID} \
+          --size 256Mi
 
           kraft cloud deploy \
             --no-start \
