@@ -54,7 +54,7 @@ jobs:
 
           kraft cloud volume create \
           --name code-workspace \
-          --size 1Gi
+          --size 500Mi
 
           kraft cloud deploy \
             --no-start \
