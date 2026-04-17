@@ -90,5 +90,5 @@ jobs:
           kraft cloud vm stop visual-studio-code-server-${GITHUB_RUN_ID} || true;
           kraft cloud vm logs visual-studio-code-server-${GITHUB_RUN_ID} || true;
           kraft cloud vm rm visual-studio-code-server-${GITHUB_RUN_ID} || true;
-	  kraft cloud volume rm code-workspace-${GITHUB_RUN_ID} || true;
+          kraft cloud volume rm code-workspace-${GITHUB_RUN_ID} || true;
           kraft cloud img rm index.unikraft.io/test/visual-studio-code-server-${GITHUB_RUN_ID} || true;
