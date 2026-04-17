@@ -66,7 +66,7 @@ jobs:
             --subdomain visual-studio-code-server-${GITHUB_RUN_ID} \
             -p 443:8443 \
             -M 2Gi \
-            -v code-workspace:/workspace \
+            -v code-workspace-${GITHUB_RUN_ID}:/workspace \
             -e PGUID=0 \
             -e PGID=0 \
             -e PASSWORD=unikraft \
@@ -90,5 +90,5 @@ jobs:
           kraft cloud vm stop visual-studio-code-server-${GITHUB_RUN_ID} || true;
           kraft cloud vm logs visual-studio-code-server-${GITHUB_RUN_ID} || true;
           kraft cloud vm rm visual-studio-code-server-${GITHUB_RUN_ID} || true;
-	  kraft cloud volume rm code-workspace-${GITHUB_RUN_ID} || true;
+          kraft cloud volume rm code-workspace-${GITHUB_RUN_ID} || true;
           kraft cloud img rm index.unikraft.io/test/visual-studio-code-server-${GITHUB_RUN_ID} || true;
