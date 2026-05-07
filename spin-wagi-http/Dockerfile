@@ -1,6 +1,6 @@
 FROM rust:1.75.0-bookworm AS spin-devenv
 
-ARG SPIN_VERSION=2.1.0
+ARG SPIN_VERSION=2.7.0
 
 WORKDIR /spin
 
