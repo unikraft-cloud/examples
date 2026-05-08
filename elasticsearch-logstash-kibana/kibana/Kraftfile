@@ -1,0 +1,14 @@
+spec: v0.6
+
+name: kibana
+
+runtime: base-compat:latest
+
+labels:
+  cloud.unikraft.v1.instances/scale_to_zero.policy: "off"
+  cloud.unikraft.v1.instances/scale_to_zero.stateful: "true"
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1000
+
+rootfs: docker.elastic.co/kibana/kibana:8.17.0
+
+cmd: [ "/usr/local/bin/kibana-docker", "--allow-root" ]

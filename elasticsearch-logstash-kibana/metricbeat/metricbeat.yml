@@ -1,0 +1,35 @@
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+metricbeat.modules:
+- module: elasticsearch
+  xpack.enabled: true
+  period: 10s
+  hosts: http://elasticsearch.internal:9200
+  username: elastic
+  password: elastic_password123
+  ssl.enabled: false
+
+- module: logstash
+  xpack.enabled: true
+  period: 10s
+  hosts: http://logstash.internal:9600
+
+- module: kibana
+  metricsets:
+  - stats
+  period: 10s
+  hosts: http://kibana.internal:5601
+  username: kibana_system
+  password: elastic_password123
+  xpack.enabled: true
+
+processors:
+- add_host_metadata: ~
+- add_docker_metadata: ~
+
+output.elasticsearch:
+  hosts: http://elasticsearch.internal:9200
+  username: elastic
+  password: elastic_password123

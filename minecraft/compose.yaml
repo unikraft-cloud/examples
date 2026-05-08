@@ -1,0 +1,16 @@
+services:
+  minecraft:
+    container_name: minecraft
+    build:
+      context: image
+    ports:
+      - protocol: tcp
+        target: 25565
+        published: 25565
+    mem_limit: 4G
+    volumes:
+      - data:/data
+volumes:
+  data:
+    driver_opts:
+      size: 5G  # this may be increased

@@ -1,0 +1,87 @@
+services:
+  elasticsearch:
+    build: ./elasticsearch
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - discovery.type=single-node
+      # - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.audit.enabled=true
+      - ELASTIC_PASSWORD=elastic_password123 # Change this password
+      - USER=elasticsearch
+      # Dockerfile env
+      - PATH=/usr/share/elasticsearch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - ELASTIC_CONTAINER=true
+      - SHELL=/bin/bash
+    mem_reservation: 5G
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
+  kibana:
+    build: ./kibana
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch.internal:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=elastic_password123 # Same as above
+      # Dockerfile env
+      - PATH=/usr/share/kibana/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - ELASTIC_CONTAINER=true
+    mem_reservation: 4G
+    ports:
+      - "443:5601"
+    volumes:
+      - kibana-data:/usr/share/kibana/data
+
+  logstash:
+    build: ./logstash
+    container_name: logstash
+    environment:
+      - xpack.monitoring.enabled=false
+      - LS_JAVA_OPTS=-Xms512m -Xmx512m
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=elastic_password123 # Same as above
+      - ELASTIC_HOSTS=http://elasticsearch.internal:9200
+      # Dockerfile env
+      - PATH=/usr/share/logstash/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - ELASTIC_CONTAINER=true
+      - LANG=en_US.UTF-8
+      - LC_ALL=en_US.UTF-8
+    mem_reservation: 3G
+    volumes:
+      - logstash-data:/usr/share/logstash/data
+
+  metricbeat:
+    build: ./metricbeat
+    container_name: metricbeat
+    environment:
+      - HOME=/usr/share/metricbeat
+      - USER=metricbeat
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=elastic_password123 # Same as above
+      - ELASTIC_HOSTS=http://elasticsearch.internal:9200
+      - KIBANA_HOSTS=http://kibana.internal:5601
+      - LOGSTASH_HOSTS=http://logstash.internal:9600
+      # Dockerfile env
+      - PATH=/usr/share/metricbeat:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/share/metricbeat
+      - ELASTIC_CONTAINER=true
+      - GODEBUG=madvdontneed=1
+      - LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
+    mem_reservation: 2G
+    volumes:
+      - metricbeat-data:/usr/share/metricbeat/data
+
+volumes:
+  elasticsearch-data:
+    driver_opts:
+      size: 8G # Adjust size as needed
+  kibana-data:
+    driver_opts:
+      size: 5G # Adjust size as needed
+  logstash-data:
+    driver_opts:
+      size: 5G # Adjust size as needed
+  metricbeat-data:
+    driver_opts:
+      size: 5G # Adjust size as needed
