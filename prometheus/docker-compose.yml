@@ -1,0 +1,19 @@
+services:
+  prometheus:
+    build: .
+    runtime: base-compat:latest
+    mem_limit: 2048M
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+volumes:
+  prometheus_data:
+
+networks:
+  default:
+    external: true
+    name: prometheus-network

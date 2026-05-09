@@ -1,0 +1,77 @@
+# prometheus.yml — Basic Prometheus Configuration
+
+global:
+# How often to scrape targets
+scrape_interval: 15s
+
+# How long before a scrape request times out
+scrape_timeout: 10s
+
+# How often to evaluate alerting/recording rules
+evaluation_interval: 15s
+
+# Labels added to all time series and alerts sent to external systems
+external_labels:
+env: production
+region: us-east-1
+
+# Load rule files (alerting and recording rules)
+rule_files:
+- "rules/*.yml"
+
+# Alertmanager configuration
+alerting:
+alertmanagers:
+- static_configs:
+- targets:
+- "alertmanager:9093"
+
+# Scrape configurations
+scrape_configs:
+
+# Prometheus scrapes itself
+- job_name: "prometheus"
+static_configs:
+- targets:
+- "localhost:9090"
+
+# Node Exporter — host-level metrics (CPU, memory, disk, network)
+- job_name: "node"
+static_configs:
+- targets:
+- "node-exporter:9100"
+# Optional: override global scrape interval for this job
+scrape_interval: 30s
+
+# Example: scraping a custom application
+- job_name: "my-app"
+metrics_path: /metrics # default, shown for clarity
+scheme: http # default, use https if TLS is enabled
+static_configs:
+- targets:
+- "my-app-1:8080"
+- "my-app-2:8080"
+labels:
+service: my-app
+team: backend
+
+# Example: scraping with basic auth
+# - job_name: "secured-service"
+# static_configs:
+# - targets:
+# - "secure-host:9090"
+# basic_auth:
+# username: "prometheus"
+# password_file: "/etc/prometheus/secrets/password"
+
+# Example: scraping over HTTPS with custom TLS settings
+# - job_name: "tls-service"
+# scheme: https
+# static_configs:
+# - targets:
+# - "secure-host:9090"
+# tls_config:
+# ca_file: /etc/prometheus/certs/ca.crt
+# cert_file: /etc/prometheus/certs/client.crt
+# key_file: /etc/prometheus/certs/client.key
+# insecure_skip_verify: false
