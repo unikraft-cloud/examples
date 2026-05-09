@@ -1,4 +1,4 @@
-FROM node:25-alpine AS node
+FROM node:26-alpine AS node
 
 FROM scratch
 

@@ -7,11 +7,11 @@ To run this example, follow these steps:
 1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
 
-2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node25` directory:
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node26` directory:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-node25/
+cd examples/httpserver-node26/
 ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
@@ -33,8 +33,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-node25:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-node25:latest
+unikraft build . --output <my-org>/httpserver-node26:latest
+unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-node26:latest
 ```
 
 or
@@ -48,25 +48,25 @@ The output shows the instance address and other details:
 ```ansi
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-node25-v8mp4
- ├────────── uuid: c3d4e5f6-a7b8-9012-cdef-123456789012
- ├───────── state: starting
- ├──────── domain: https://bright-star-k3m7pqnx.fra.unikraft.app
- ├───────── image: httpserver-node25@sha256:7b3e1f9d5a2c8e4b0f6d3a7c5e2b9f4d1a8c6e3b0f7d4a1c8e5b2f9d6a3c0
- ├──────── memory: 512 MiB
- ├─────── service: bright-star-k3m7pqnx
- ├── private fqdn: httpserver-node25-v8mp4.internal
- ├──── private ip: 172.16.3.6
- └────────── args: /usr/bin/node /usr/src/server.js
+ ├────── name: httpserver-node26-ofwwl
+ ├────── uuid: fa9d59d4-a935-41a6-bf29-9762fc0674f7
+ ├───── metro: fra
+ ├───── state: running
+ ├──── domain: https://twilight-grass-hrjthti0.fra.unikraft.app
+ ├───── image: httpserver-node26@sha256:942c611a1bcbc7d90812cfc830657aed82caf5f64ae4846ceaa982433ed32182
+ ├─ boot time: 87.33 ms
+ ├──── memory: 488 MiB
+ ├─── service: twilight-grass-hrjthti0
+ └ private ip: 10.0.10.9
 ```
 
-In this case, the instance name is `httpserver-node25-v8mp4` and the address is `https://bright-star-k3m7pqnx.fra.unikraft.app`.
+In this case, the instance name is `httpserver-node26-ofwwl` and the address is `https://twilight-grass-hrjthti0.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance of the Node.js HTTP server:
 
 ```bash
-curl https://bright-star-k3m7pqnx.fra.unikraft.app
+curl https://twilight-grass-hrjthti0.fra.unikraft.app
 ```
 
 ```text
@@ -86,20 +86,20 @@ kraft cloud instance list
 ```
 
 ```ansi
-NAME                     FQDN                                   STATE    STATUS       IMAGE                                 MEMORY   VCPUS  ARGS                              BOOT TIME
-httpserver-node25-v8mp4  bright-star-k3m7pqnx.fra.unikraft.app  running  since 3mins  httpserver-node25@sha256:7b3e1f9d...  512 MiB  1      /usr/bin/node /usr/src/server.js  276.18 ms
+NAME                     FQDN         STAT  STAT  IMAG  MEMO  VCPU  ARGS  BOOT
+httpserver-node26-ofwwl  twilight...  stan  stan  andr  488   1           87.9
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-node25-v8mp4
+unikraft instances delete httpserver-node26-ofwwl
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-node25-v8mp4
+kraft cloud instance remove httpserver-node26-ofwwl
 ```
 
 ## Customize your app
@@ -124,7 +124,7 @@ Lines in the `Kraftfile` have the following roles:
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM node:25-alpine AS node`: Use the Node.js 25 Alpine image as the source for the `node` binary and libraries.
+* `FROM node:26-alpine AS node`: Use the Node.js 26 Alpine image as the source for the `node` binary and libraries.
 
 * `FROM scratch`: Build the runtime filesystem from a minimal base image.
 
