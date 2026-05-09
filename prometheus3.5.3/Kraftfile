@@ -1,0 +1,25 @@
+spec: v0.7
+
+name: prometheus
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+targets:
+  - kraftcloud/x86_64
+
+volumes:
+  - identifier: prometheus-data
+    destination: /data
+
+networks:
+  - ports:
+      - "443:9090"
+cmd:
+  - /bin/prometheus
+  - --config.file=/etc/prometheus/prometheus.yml
+  - --storage.tsdb.path=/data
+  - --web.listen-address=0.0.0.0:9090
+  - --web.enable-lifecycle
+  - --query.max-concurrency=0
