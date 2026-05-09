@@ -1,8 +1,8 @@
-"""End-to-end test for the ``httpserver-node25`` example.
+"""End-to-end test for the ``httpserver-node26`` example.
 
-Mirrors the manual steps from ``httpserver-node25/README.md``:
+Mirrors the manual steps from ``httpserver-node26/README.md``:
 
-1. ``unikraft build . --output <prefix>/httpserver-node25:<tag>``
+1. ``unikraft build . --output <prefix>/httpserver-node26:<tag>``
 2. ``unikraft run --metro <metro> -p 443:8080/tls+http -m 512M --image ...``
 3. ``curl https://<instance-url>`` and assert "Hello, World!".
 """
@@ -13,7 +13,7 @@ from _testlib.unikraft import extract_instance_url
 
 
 def test_httpserver_node_serves_hello(build_image, run_instance, http):
-    image = build_image("httpserver-node25", "httpserver-node25")
+    image = build_image("httpserver-node26", "httpserver-node26")
 
     instance = run_instance(
         image,
