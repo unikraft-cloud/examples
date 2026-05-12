@@ -1,7 +1,17 @@
 const express = require("express");
 const crypto = require("crypto");
+const rateLimit = require("express-rate-limit");
 const router = express.Router();
 const generatePdf = require("../controller/generatePdf");
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20, // limit each IP to 20 requests per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+router.use(limiter);
 
 router.get("/", (_, res) => {
   res.sendFile("index.html");
