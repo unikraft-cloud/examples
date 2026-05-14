@@ -36,6 +36,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 # Automatically cancel in-progress actions on the same branch
 concurrency:
@@ -180,4 +181,19 @@ jobs:
         TEST_DIRS: ${{ needs.detect-changes.outputs.test_dirs }}
       run: |
         read -ra DIRS <<< "$TEST_DIRS"
-        pytest --log-cli-level=INFO "${DIRS[@]}"
+        pytest --log-cli-level=INFO --junitxml=report.xml "${DIRS[@]}"
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: junit-results
+        path: report.xml
+
+    - name: Test Report
+      if: always()
+      uses: dorny/test-reporter@v1
+      with:
+        name: Pytest Results
+        path: report.xml
+        reporter: java-junit
