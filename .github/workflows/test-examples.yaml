@@ -203,4 +203,11 @@ jobs:
         PY
 
     - name: Run tests
-      run: pytest --log-cli-level=INFO "${{ matrix.example }}"
+      run: pytest --log-cli-level=INFO --junitxml=junit-${{ matrix.example }}.xml "${{ matrix.example }}"
+
+    - name: Upload JUnit XML
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: junit-${{ matrix.example }}
+        path: junit-${{ matrix.example }}.xml
