@@ -38,7 +38,17 @@ WORKDIR /app
 
 RUN spin build
 
+FROM golang:1.22-bookworm AS launcher-build
+
+WORKDIR /src
+COPY ./launcher/launcher.go ./launcher.go
+RUN CGO_ENABLED=0 go build -ldflags='-s -w' -o /launcher ./launcher.go
+
 FROM scratch
+
+# Launcher: waits for spin to bind, then writes /uk/libukp/template_instance
+# when TEMPLATE=1 so UKC can snapshot for template-based warm restores.
+COPY --from=launcher-build /launcher /launcher
 
 # Binary executable
 COPY --from=build /usr/bin/spin /usr/bin/spin

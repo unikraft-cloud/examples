@@ -6,4 +6,4 @@ rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: ["/usr/bin/spin", "up", "--from", "/app/spin.toml", "--listen", "0.0.0.0:3000"]
+cmd: ["/launcher", "up", "--from", "/app/spin.toml", "--listen", "0.0.0.0:3000"]

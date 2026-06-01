@@ -1,0 +1,4 @@
+IMAGE_NAME="spin-wagi-http"
+BASE_IMAGE="<your-org>/spin-wagi-http"
+INSTANCE_NAME="spin-wagi-http-1"
+MEMORY_MB="4096"

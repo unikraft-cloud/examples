@@ -155,6 +155,96 @@ or
 kraft cloud instance remove spin-wagi-http-is72r
 ```
 
+## Compare boot times (cold vs warm)
+
+The `compare-boot.sh` script benchmarks cold boot (Spin starts from a published
+image and instantiates both wasm components) against warm restore (a snapshot
+template, where Spin is already running and the wasm modules are pre-loaded).
+
+Edit `config` once to point at your registry org:
+
+```sh
+IMAGE_NAME="spin-wagi-http"
+BASE_IMAGE="<your-org>/spin-wagi-http"
+INSTANCE_NAME="spin-wagi-http-1"
+MEMORY_MB="4096"
+```
+
+Then `source ./config` so the variables are exported for the commands below.
+
+### How the snapshot is triggered
+
+This image's entrypoint is a tiny static Go binary at `/launcher` (see
+[`launcher/launcher.go`](./launcher/launcher.go)) that:
+
+1. Execs `spin up ...` with the args from the Kraftfile.
+2. Polls `127.0.0.1:3000` until Spin's HTTP listener is bound.
+3. If `TEMPLATE=1` is set, writes `1` to `/uk/libukp/template_instance`.
+   That write is what tells Unikraft Cloud to snapshot the running instance
+   and promote it to a template — Spin and both wasm components are part of
+   the snapshot.
+
+Spin itself has no concept of the UKC magic file, so the wrapper is what
+bridges the two.
+
+### 1. Build & push
+
+```sh
+unikraft build . --output "index.unikraft.io/${BASE_IMAGE}:latest"
+```
+
+### 2. Create the template
+
+```sh
+unikraft run \
+    --name "${INSTANCE_NAME}-tpl" \
+    --image "index.unikraft.io/${BASE_IMAGE}:latest" \
+    --memory "${MEMORY_MB}MiB" \
+    --autostart \
+    --restart never \
+    --scale-to-zero policy=off \
+    -e TEMPLATE=1 \
+    -p 443:3000/tls+http
+```
+
+### 3. Run the benchmark
+
+```sh
+./compare-boot.sh        # 3 cold + 3 warm (default)
+./compare-boot.sh 5      # 5 of each
+./compare-boot.sh 50     # 50 of each
+```
+
+The script spawns N instances from the image and N from the template, then
+prints summary statistics (count/min/max/mean/median) of `timing.boot-time`
+for each group before cleaning up. Warm instances are spawned with
+scale-to-zero on so the demo also exercises the network-triggered wake path.
+
+Example run with 50 of each:
+
+```text
+==> Booting 50 cold + 50 warm instances...
+==> Waiting for instances to finish booting...
+
+==> Cold-boot (from image) — 50 instances
+  count : 50
+  min   : 244.817 ms
+  max   : 329.338 ms
+  mean  : 277.214 ms
+  median: 266.058 ms
+
+==> Warm-boot (from template) — 50 instances
+  count : 50
+  min   : 5.724 ms
+  max   : 10.059 ms
+  mean  : 6.400 ms
+  median: 6.282 ms
+```
+
+Warm restore from a template is roughly **40× faster** than a cold boot here
+(~6 ms vs ~277 ms mean), since Spin and both wasm components are already
+resident in the snapshot.
+
 ## Customize your app
 
 To customize the app, update the files in the repository, listed below:
