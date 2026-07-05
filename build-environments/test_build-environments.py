@@ -61,7 +61,6 @@ def _template_and_roms(request, unikraft, repo_root, ukc_image_prefix, test_run_
 
     # 1. Build the base image.
     unikraft.build(context, base_tag)
-    time.sleep(3)
 
     # 2. Run the base image; it auto-converts into a template.
     unikraft.run_instance(
@@ -85,7 +84,6 @@ def _template_and_roms(request, unikraft, repo_root, ukc_image_prefix, test_run_
     # 4. Build ROM images.
     unikraft.build(context / "rom1", rom1_tag)
     unikraft.build(context / "rom2", rom2_tag)
-    time.sleep(3)
 
     return template_name, rom1_tag, rom2_tag
 

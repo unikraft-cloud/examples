@@ -136,7 +136,6 @@ def _minecraft_template(request, unikraft, repo_root, ukc_image_prefix, test_run
 
     # 1. Build the base image.
     unikraft.build(context, base_tag)
-    time.sleep(3)
 
     # 2. Run the base image with the base ROM; it auto-converts into a template.
     unikraft.run_instance(

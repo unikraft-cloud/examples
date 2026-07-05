@@ -138,10 +138,6 @@ def build_image(
 
         unikraft.build(context, tag)
 
-        # TODO: drop this once the platform exposes a way to wait until a
-        # freshly-built image is fully available for `unikraft run`.
-        time.sleep(3)
-
         return tag
 
     return _build
