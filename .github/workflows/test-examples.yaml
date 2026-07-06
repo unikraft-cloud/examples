@@ -49,7 +49,7 @@ env:
 
 jobs:
   detect-changes:
-    runs-on: ubuntu-latest
+    runs-on: arc-ubuntu24.04-big
     outputs:
       matrix: ${{ steps.changes.outputs.matrix }}
     steps:
@@ -147,7 +147,7 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.matrix != ''
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: arc-ubuntu24.04-big
 
     strategy:
       fail-fast: false
