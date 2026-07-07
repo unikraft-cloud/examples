@@ -175,7 +175,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Install Unikraft CLI
-      uses: unikraft/setup-action@v1
+      uses: danielvallance/setup-action@danielvallance/update_cli_location
       with:
         version: ${{ inputs.unikraft_version || 'latest' }}
 
