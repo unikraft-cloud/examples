@@ -147,14 +147,15 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.matrix != ''
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ ubuntu-latest, macos-latest ]
         example: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
-    name: pytest (${{ matrix.example }})
+    name: pytest (${{ matrix.example }}, ${{ matrix.os }})
 
     steps:
     - uses: actions/checkout@v5
@@ -166,8 +167,15 @@ jobs:
         cache: 'pip'
         cache-dependency-path: requirements.txt
 
-    - name: Install system dependencies
+    - name: Install system dependencies (Linux)
+      if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install -y --no-install-recommends socat lftp
+
+    - name: Install system dependencies (macOS)
+      if: runner.os == 'macOS'
+      env:
+        HOMEBREW_NO_AUTO_UPDATE: '1'
+      run: brew install socat lftp
 
     - name: Install Python dependencies
       run: |
@@ -185,9 +193,16 @@ jobs:
     - name: Override metros in CLI config
       run: |
         python3 - <<'PY'
-        import yaml, os
+        import yaml, os, platform
 
-        config_path = os.path.expanduser('~/.config/unikraft/config.yaml')
+        # The CLI locates its config via Go's os.UserConfigDir():
+        # ~/Library/Application Support on macOS, $XDG_CONFIG_HOME or
+        # ~/.config on Linux. Mirror that here.
+        if platform.system() == 'Darwin':
+            config_dir = os.path.expanduser('~/Library/Application Support')
+        else:
+            config_dir = os.environ.get('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
+        config_path = os.path.join(config_dir, 'unikraft', 'config.yaml')
         with open(config_path) as f:
             config = yaml.safe_load(f)
 
