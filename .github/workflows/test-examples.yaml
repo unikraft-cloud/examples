@@ -183,7 +183,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Install Unikraft CLI
-      uses: unikraft/setup-action@main
+      uses: danielvallance/setup-action@danielvallance/posix_perms
       with:
         version: ${{ inputs.unikraft_version || 'latest' }}
 
