@@ -20,7 +20,7 @@ Namely, the guide presents:
 The guide explains how to do the above both using the kraft CLI tool and directly using the underlying Unikraft Cloud platform API.
 The target application used in this guide is a simple Python HTTP server.
 
-#Contents
+# Contents
 
 - `server.py`: the simple Python HTTP server app to be deployed on Unikraft Cloud
 - `Dockerfile`: the Dockerfile to build the OCI image running the HTTP server app
@@ -30,16 +30,16 @@ The target application used in this guide is a simple Python HTTP server.
 - `api/`: scripts used to directly interact with the Unikraft Cloud platform API
 - `README.md`: this file
 
-#Prerequisites
+# Prerequisites
 1. Install the `kraft` CLI tool [kraft](https://unikraft.org/docs/cli/install).
 2. Install and configure [Docker](https://github.com/unikraft-cloud/examples/tree/main/basic-ops).
 3. (Optional, but recommended) Configure BuildKit [build](https://unikraft.com/docs/platform/troubleshooting#how-can-you-cache-the-apps-filesystem-for-faster-builds).
 
-#Set Up
+# Set Up
 
 Create a `ukc.config` file as a copy of the `ukc.config.template`. Replace the `TODO` entries in the `ukc.config` file with your corresponding Unikraft Cloud configuration values: user, token and metro.
 
-#TLDR: Deploy and Operate an Instance
+# TLDR: Deploy and Operate an Instance
 
 Below are the commands used to deploy and operate an instance with the `kraft` CLI.
 
