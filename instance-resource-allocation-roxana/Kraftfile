@@ -1,0 +1,11 @@
+spec: v0.7
+
+name: resource-server
+
+runtime: base-compat:latest
+
+rootfs:
+  source: ./Dockerfile
+  format: erofs
+
+cmd: ["python3", "/app/server.py"]

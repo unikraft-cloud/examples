@@ -32,7 +32,7 @@ The target application used in this guide is a simple Python HTTP server.
 
 #Prerequisites
 1. Install the `kraft` CLI tool [kraft](https://unikraft.org/docs/cli/install).
-2. Install and configure [Doker](https://github.com/unikraft-cloud/examples/tree/main/basic-ops).
+2. Install and configure [Docker](https://github.com/unikraft-cloud/examples/tree/main/basic-ops).
 3. (Optional, but recommended) Configure BuildKit [build](https://unikraft.com/docs/platform/troubleshooting#how-can-you-cache-the-apps-filesystem-for-faster-builds).
 
 #Set Up
