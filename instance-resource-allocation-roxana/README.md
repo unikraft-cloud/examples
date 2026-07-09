@@ -50,7 +50,7 @@ kraft cloud image list
 kraft cloud instance list
 kraft cloud instance get resource-server
 kraft cloud instance get resource-server -o table
-fqdn=https://$(kraft cloud instance get resource-server -o json | jq -r '.[] | select(.name == "resource-server") | .fqdn')
+fqdn=https://$(kraft cloud instance get resource-server -o json 2>/dev/null | jq -r '.data.instances[] | select(.name == "resource-server") | .service_group.domains[0].fqdn')
 curl "$fqdn"
 python3 test_resources.py "$fqdn"
 kraft cloud instance logs resource-server
@@ -75,7 +75,7 @@ kraft cloud instance start resource-server
 kraft cloud instance list
 kraft cloud instance get resource-server
 kraft cloud instance get resource-server -o table
-fqdn=https://$(kraft cloud instance get resource-server -o json | jq -r '.[] | select(.name == "resource-server") | .fqdn')
+fqdn=https://$(kraft cloud instance get resource-server -o json 2>/dev/null | jq -r '.data.instances[] | select(.name == "resource-server") | .service_group.domains[0].fqdn')
 curl "$fqdn"
 python3 test_resources.py "$fqdn"
 kraft cloud instance logs resource-server
@@ -179,7 +179,7 @@ kraft cloud instance get resource-server -o table
 ## Query Instance
 
 ```
-fqdn=https://$(kraft cloud instance get resource-server -o json | jq -r '.[] | select(.name == "resource-server") | .fqdn')
+fqdn=https://$(kraft cloud instance get resource-server -o json 2>/dev/null | jq -r '.data.instances[] | select(.name == "resource-server") | .service_group.domains[0].fqdn')
 curl "$fqdn"
 python3 test_resources.py "$fqdn"
 ```
