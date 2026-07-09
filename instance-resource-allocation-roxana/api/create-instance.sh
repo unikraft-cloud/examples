@@ -11,7 +11,7 @@ curl \
     -X POST \
     -H "Authorization: Bearer ${UKC_TOKEN}" \
     -H "Content-Type: application/json" \
-    "${UKC_METRO}/instances" \
+    "${UKC_API}/instances" \
     -d "{
         'name': '${INSTANCE_NAME}',
         'image': '${UKC_USER}/${IMAGE_NAME}:latest',

@@ -8,7 +8,7 @@ curl \
     -X GET \
     -H "Authorization: Bearer ${UKC_TOKEN}" \
     -H "Content-Type: application/json" \
-    "${UKC_METRO}/instances/log" \
+    "${UKC_API}/instances/log" \
     -d "
 [
     {
