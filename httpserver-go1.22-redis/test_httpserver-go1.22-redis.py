@@ -28,6 +28,7 @@ def test_go_redis_set_get(build_image, run_instance, http, http_post, wait_insta
         domain=redis_domain,
         scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
         env={"REDIS_PASSWORD": REDIS_PASSWORD},
+        name=f"redis-{test_run_id}"
     )
 
     # 2. Build and deploy the Go HTTP server.
@@ -38,6 +39,7 @@ def test_go_redis_set_get(build_image, run_instance, http, http_post, wait_insta
         publish=["443:8080/tls+http"],
         memory="256M",
         env={"REDIS_ADDR": f"{redis_domain}:6379", "REDIS_PASS": REDIS_PASSWORD},
+        name=f"app-{test_run_id}"
     )
 
     url = extract_instance_url(app_instance)

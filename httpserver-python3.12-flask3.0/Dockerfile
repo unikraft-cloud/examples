@@ -1,4 +1,4 @@
-FROM python:3.12-bookworm AS build
+FROM --platform=$BUILDPLATFORM python:3.12-bookworm AS build
 
 RUN set -xe; \
     /usr/sbin/ldconfig /usr/local/lib
@@ -9,7 +9,7 @@ COPY requirements.txt /app
 
 RUN pip3 install -r requirements.txt --no-cache-dir
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /usr/local/lib /usr/local/lib
 COPY --from=build /usr/local/bin/python3 /usr/bin/python3

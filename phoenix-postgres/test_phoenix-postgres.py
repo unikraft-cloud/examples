@@ -23,7 +23,7 @@ PG_DB = "myapp_prod"
 
 
 def test_phoenix_postgres(build_image, run_instance, http, unikraft, request, test_run_id, wait_instance):
-    volume_name = f"phoenix-pytest-db-data-{test_run_id}"
+    volume_name = f"db-{test_run_id}"
 
     def _cleanup_volume():
         try:
@@ -59,6 +59,7 @@ def test_phoenix_postgres(build_image, run_instance, http, unikraft, request, te
             "POSTGRES_DB": PG_DB,
             "PGDATA": "/var/lib/postgresql/data/pgdata",
         },
+        name=f"postgres-{test_run_id}"
     )
 
     # 3. Build and deploy the Phoenix app.
@@ -76,6 +77,7 @@ def test_phoenix_postgres(build_image, run_instance, http, unikraft, request, te
             "SECRET_KEY_BASE": secret_key,
             "DATABASE_URL": database_url,
         },
+        name=f"phoenix-{test_run_id}"
     )
 
     url = extract_instance_url(phoenix_instance)

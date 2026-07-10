@@ -1,4 +1,4 @@
-FROM debian:bookworm AS base
+FROM --platform=$BUILDPLATFORM debian:bookworm AS base
 
 RUN set -xe; \
     apt-get -yqq update; \

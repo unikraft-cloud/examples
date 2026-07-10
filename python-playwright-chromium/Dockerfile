@@ -1,4 +1,4 @@
-FROM debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build
 
 RUN set -xe; \
     apt-get -yqq update; \
@@ -38,7 +38,7 @@ RUN set -xe; \
 
 RUN mkdir /home/tmp
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Create required directories.
 COPY --from=build /home/tmp /tmp

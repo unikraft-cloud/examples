@@ -1,4 +1,4 @@
-FROM ruby:3.2.2-bookworm AS build
+FROM --platform=$BUILDPLATFORM ruby:3.2.2-bookworm AS build
 
 RUN gem install rails
 RUN rails new app
@@ -8,7 +8,7 @@ RUN rails generate controller hello
 
 COPY . /app/
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Ruby binary
 COPY --from=build /usr/local/bin/ruby /usr/bin/ruby

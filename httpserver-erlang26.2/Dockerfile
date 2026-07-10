@@ -1,4 +1,4 @@
-FROM erlang:26.2.3.0-slim as build
+FROM --platform=$BUILDPLATFORM erlang:26.2.3.0-slim as build
 
 WORKDIR /src
 
@@ -7,7 +7,7 @@ COPY ./http_server.erl .
 
 RUN /usr/local/bin/erl -compile http_server
 
-FROM alpine:3 AS sys
+FROM --platform=$BUILDPLATFORM alpine:3 AS sys
 
 RUN set -xe; \
     mkdir -p /target/etc; \
@@ -20,7 +20,7 @@ RUN set -xe; \
     ln -sf /usr/share/zoneinfo/Etc/UTC /target/etc/localtime; \
     echo "Etc/UTC" > /target/etc/timezone;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=sys /target/etc /etc
 COPY --from=sys /usr/share/zoneinfo/UTC /usr/share/zoneinfo/UTC

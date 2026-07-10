@@ -1,6 +1,6 @@
-FROM memcached:1.6.23-bookworm AS build
+FROM --platform=$BUILDPLATFORM memcached:1.6.23-bookworm AS build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Binary executable
 COPY --from=build /usr/local/bin/memcached /usr/bin/memcached

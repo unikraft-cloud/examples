@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM --platform=$BUILDPLATFORM node:18-alpine AS build
 
 RUN set -xe; \
     apk --no-cache add openssl3;
@@ -21,7 +21,7 @@ RUN set -xe; \
     npm run build \
     ;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Node binary
 COPY --from=build /usr/local/bin/node /usr/bin/node

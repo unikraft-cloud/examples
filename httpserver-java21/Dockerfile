@@ -1,6 +1,6 @@
 # --- Build Stage ---
 # Use Ubuntu 24.04 as the base image (includes Java 21 in official repos)
-FROM --platform=linux/x86_64 ubuntu:24.04 AS build
+FROM --platform=$BUILDPLATFORM ubuntu:24.04 AS build
 
 # 1. Install OpenJDK 21
 RUN set -xe ; \
@@ -19,7 +19,7 @@ COPY ./SimpleHttpServer.java /src/SimpleHttpServer.java
 RUN javac SimpleHttpServer.java
 
 # --- Runtime Stage (minimal) ---
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # --- Copy system libraries (glibc, libz, etc.) ---
 # These paths are standard for Ubuntu/Debian x86_64

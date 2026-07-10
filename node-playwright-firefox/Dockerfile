@@ -1,4 +1,4 @@
-FROM debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build
 
 ARG NODE_VERSION=22.8.0
 
@@ -45,7 +45,7 @@ RUN set -xe; \
 
 RUN mkdir /home/tmp
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 ARG NODE_VERSION=22.8.0
 

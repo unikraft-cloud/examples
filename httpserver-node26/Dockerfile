@@ -1,6 +1,6 @@
-FROM node:26-alpine AS node
+FROM --platform=$BUILDPLATFORM node:26-alpine AS node
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Node binary
 COPY --from=node /usr/local/bin/node /usr/bin/node

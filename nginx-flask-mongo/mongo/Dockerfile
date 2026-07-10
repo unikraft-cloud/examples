@@ -1,8 +1,8 @@
-FROM mongo:6.0.13 as build
+FROM --platform=$BUILDPLATFORM mongo:6.0.13 as build
 
 RUN mkdir /blank
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Binary executable
 COPY --from=build /usr/bin/mongod /usr/bin/mongod

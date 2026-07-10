@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 debian:bookworm-slim AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm-slim AS build
 
 ARG HUGO_VERSION=0.160.0
 
@@ -9,7 +9,7 @@ RUN set -xe; \
       | tar -xz -C /usr/local/bin hugo; \
     rm -rf /var/lib/apt/lists/*
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Binary executable
 COPY --from=build /usr/local/bin/hugo /usr/bin/hugo

@@ -1,4 +1,4 @@
-FROM nginx:1.25.3-bookworm AS build
+FROM --platform=$BUILDPLATFORM nginx:1.25.3-bookworm AS build
 
 RUN set -xe; \
     rm -f /var/log/nginx/access.log; \
@@ -7,7 +7,7 @@ RUN set -xe; \
     touch /var/log/nginx/error.log \
     ;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Nginx binaries, modules, configuration, log and runtime files
 COPY --from=build /usr/sbin/nginx /usr/bin/nginx

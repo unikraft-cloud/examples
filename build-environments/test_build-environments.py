@@ -33,10 +33,10 @@ def _template_and_roms(request, unikraft, repo_root, ukc_image_prefix, test_run_
     Returns a tuple of (template_name, rom1_tag, rom2_tag).
     """
     context = repo_root / "build-environments"
-    base_tag = f"{ukc_image_prefix}/go-build-env:examples-pytest-{test_run_id}"
-    template_name = f"examples-pytest-go-build-env-{test_run_id}"
-    rom1_tag = f"{ukc_image_prefix}/go-rom1:examples-pytest-{test_run_id}"
-    rom2_tag = f"{ukc_image_prefix}/go-rom2:examples-pytest-{test_run_id}"
+    base_tag = f"{ukc_image_prefix}/go:{test_run_id}"
+    template_name = f"go-{test_run_id}"
+    rom1_tag = f"{ukc_image_prefix}/go-rom1:{test_run_id}"
+    rom2_tag = f"{ukc_image_prefix}/go-rom2:{test_run_id}"
 
     # Register cleanup in reverse order (LIFO).
     def _cleanup_rom2():
@@ -94,7 +94,7 @@ def test_build_environments_rom1(
     """Run an instance from the template with ROM1 and verify response."""
     template_name, rom1_tag, _ = _template_and_roms
 
-    instance_name = f"examples-pytest-rom1-{test_run_id}-{uuid.uuid4().hex[:6]}"
+    instance_name = f"rom1-{test_run_id}"
     request.addfinalizer(lambda: unikraft.delete_instance(instance_name))
 
     instance = unikraft.run_instance(
@@ -120,7 +120,7 @@ def test_build_environments_rom2(
     """Run an instance from the template with ROM2 and verify response."""
     template_name, _, rom2_tag = _template_and_roms
 
-    instance_name = f"examples-pytest-rom2-{test_run_id}-{uuid.uuid4().hex[:6]}"
+    instance_name = f"rom2-{test_run_id}"
     request.addfinalizer(lambda: unikraft.delete_instance(instance_name))
 
     instance = unikraft.run_instance(

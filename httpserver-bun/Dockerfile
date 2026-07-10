@@ -1,6 +1,6 @@
-FROM oven/bun:alpine AS bun
+FROM --platform=$BUILDPLATFORM oven/bun:alpine AS bun
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=bun /usr/local/bin/bun /usr/bin/bun
 

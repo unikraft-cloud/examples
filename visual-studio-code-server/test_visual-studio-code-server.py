@@ -24,7 +24,7 @@ def test_visual_studio_code_server(
 ):
     """Build, deploy, and verify the VS Code Server login page loads."""
     # Create a volume for workspace persistence, matching the old workflow.
-    vol_name = f"code-workspace-pytest-{test_run_id}"
+    vol_name = f"code-{test_run_id}"
     unikraft.run([
         "volume", "create",
         "--set", f"name={vol_name}",

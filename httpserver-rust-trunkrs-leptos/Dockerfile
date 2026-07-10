@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 rust:1.88.0-slim-bullseye AS builder
+FROM --platform=$BUILDPLATFORM rust:1.88.0-slim-bullseye AS builder
 
 # Install trunk from pre-built binary instead of compiling from source (~10min saved)
 ARG TRUNK_VERSION=0.21.14
@@ -23,7 +23,7 @@ RUN trunk build --config ./frontend/Trunk.toml --release
 
 EXPOSE 8080
 
-FROM nginx:1.25.3-bookworm AS nginx
+FROM --platform=$BUILDPLATFORM nginx:1.25.3-bookworm AS nginx
 
 RUN set -xe; \
     rm -f /var/log/nginx/access.log; \
@@ -34,7 +34,7 @@ RUN set -xe; \
 
 # Use a smaller base image for the final runtime
 # FROM nginx:1.27.4-alpine
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Nginx binaries, modules, configuration, log and runtime files
 COPY --from=nginx /usr/sbin/nginx /usr/bin/nginx

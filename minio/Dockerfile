@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 golang:1.21.4-alpine3.17 AS build
+FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.17 AS build
 
 RUN set -xe; \
     apk --no-cache add \
@@ -27,6 +27,6 @@ RUN set -xe; \
         -o /usr/bin/minio \
         .
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /usr/bin/minio /usr/bin/minio

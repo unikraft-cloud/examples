@@ -30,6 +30,7 @@ def test_tyk_hello(build_image, run_instance, http, wait_instance):
         domain=REDIS_DOMAIN,
         scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
         env={"REDIS_PASSWORD": REDIS_PASSWORD},
+        name=f"redis-{test_run_id}"
     )
 
     # 2. Build and deploy the Tyk gateway.
@@ -45,6 +46,7 @@ def test_tyk_hello(build_image, run_instance, http, wait_instance):
             "TYK_GW_STORAGE_PASSWORD": REDIS_PASSWORD,
             "TYK_GW_STORAGE_HOST": REDIS_DOMAIN,
         },
+        name=f"tyk-{test_run_id}"
     )
 
     url = extract_instance_url(tyk_instance)

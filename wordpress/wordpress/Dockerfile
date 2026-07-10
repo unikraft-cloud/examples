@@ -1,4 +1,4 @@
-FROM debian:bookworm AS base
+FROM --platform=$BUILDPLATFORM debian:bookworm AS base
 
 ARG WORDPRESS_DB_NAME=wordpress
 ARG WORDPRESS_DB_USER=wordpress

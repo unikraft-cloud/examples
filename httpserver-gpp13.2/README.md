@@ -168,7 +168,7 @@ Lines in the `Kraftfile` have the following roles:
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM --platform=linux/x86_64 gcc:13.2.0-bookworm AS build`: Build the filesystem from the `bookworm gcc` container image, to [create a base image](https://docs.docker.com/build/building/base-images/).
+* `FROM gcc:13.2.0-bookworm AS build`: Build the filesystem from the `bookworm gcc` container image, to [create a base image](https://docs.docker.com/build/building/base-images/).
 
 * `COPY ./http_server.cpp /src/http_server.cpp`: Copy the server implementation file (`http_server.cpp`) in the Docker filesystem (in `/src/http_server.cpp`).
 

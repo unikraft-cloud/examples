@@ -1,9 +1,9 @@
-FROM python:3.12 AS build
+FROM --platform=$BUILDPLATFORM python:3.12 AS build
 
 RUN set -xe; \
     /usr/sbin/ldconfig /usr/local/lib
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /usr/local/lib /usr/local/lib
 COPY --from=build /usr/local/bin/python3 /usr/bin/python3

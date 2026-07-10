@@ -119,8 +119,8 @@ def _minecraft_template(request, unikraft, repo_root, ukc_image_prefix, test_run
     Returns the template name.
     """
     context = repo_root / "minecraft"
-    base_tag = f"{ukc_image_prefix}/minecraft:examples-pytest-{test_run_id}"
-    template_name = f"examples-pytest-minecraft-{test_run_id}"
+    base_tag = f"{ukc_image_prefix}/minecraft:{test_run_id}"
+    template_name = f"minecraft-{test_run_id}"
 
     def _cleanup_template():
         unikraft.run(
@@ -167,7 +167,7 @@ def test_minecraft_server_responds(
     """Run a Minecraft instance from template and verify SLP response."""
     template_name = _minecraft_template
 
-    instance_name = f"examples-pytest-mc-{test_run_id}-{uuid.uuid4().hex[:6]}"
+    instance_name = f"mc-{test_run_id}"
     request.addfinalizer(lambda: unikraft.delete_instance(instance_name))
 
     instance = unikraft.run_instance(

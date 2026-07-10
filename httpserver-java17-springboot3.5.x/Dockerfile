@@ -1,4 +1,4 @@
-FROM  --platform=linux/x86_64 debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM  --platform=linux/x86_64 debian:bookworm AS build
 
 RUN set -xe ; \
     apt -yqq update ; \
@@ -39,7 +39,7 @@ RUN set -xe ; \
 RUN rm -f /usr/lib/jvm/java-17-openjdk-amd64/lib/src.zip && \
     cp -rL /usr/lib/jvm/java-17-openjdk-amd64/ /jvm-resolved/
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
 COPY --from=build /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so.6

@@ -1,4 +1,4 @@
-FROM golang:1.21.6-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.21.6-bookworm AS build
 
 ARG IMAGINARY_VERSION=1.2.4
 
@@ -22,7 +22,7 @@ RUN set -xe; \
     CGO_ENABLED=1 go build -buildmode=pie -o /usr/bin/imaginary \
     ;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Imaginary binary
 COPY --from=build /usr/bin/imaginary /usr/bin/imaginary

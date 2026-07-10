@@ -1,8 +1,8 @@
-FROM node:22-alpine AS base
+FROM --platform=$BUILDPLATFORM node:22-alpine AS base
 
 WORKDIR /usr/src
 
-FROM base AS build
+FROM --platform=$BUILDPLATFORM base AS build
 
 COPY package.json /usr/src/package.json
 COPY package-lock.json /usr/src/package-lock.json
@@ -11,13 +11,13 @@ RUN npm install
 COPY . /usr/src/
 RUN npm run build
 
-FROM base AS runtime
+FROM --platform=$BUILDPLATFORM base AS runtime
 
 COPY package.json /usr/src/package.json
 COPY package-lock.json /usr/src/package-lock.json
 RUN npm install --omit dev
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Node binary
 COPY --from=base /usr/local/bin/node /usr/bin/node

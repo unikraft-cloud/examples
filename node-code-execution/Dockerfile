@@ -1,4 +1,4 @@
-FROM node:25-slim
+FROM --platform=$BUILDPLATFORM node:25-slim
 
 WORKDIR /src
 

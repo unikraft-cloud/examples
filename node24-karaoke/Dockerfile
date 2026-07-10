@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim AS build
+FROM --platform=$BUILDPLATFORM node:24-bookworm-slim AS build
 
 RUN set -xe; \
     apt-get update; \
@@ -22,7 +22,7 @@ RUN set -xe; \
 # Install serve globally for use as static file server
 RUN npm install -g serve
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # System binaries
 COPY --from=build /usr/local/bin/node /usr/local/bin/node

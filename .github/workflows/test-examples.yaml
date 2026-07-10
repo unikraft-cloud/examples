@@ -155,7 +155,7 @@ jobs:
         os: [ ubuntu-latest, ubuntu-24.04-arm ]
         example: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
-    name: pytest (${{ matrix.example }})
+    name: pytest (${{ matrix.example }}) (${{ matrix.os }})
 
     steps:
     - uses: actions/checkout@v5

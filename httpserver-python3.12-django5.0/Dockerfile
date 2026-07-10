@@ -1,4 +1,4 @@
-FROM python:3.12-bookworm AS build
+FROM --platform=$BUILDPLATFORM python:3.12-bookworm AS build
 
 WORKDIR /app
 
@@ -11,16 +11,16 @@ RUN apt update && \
 RUN set -xe; \
     /usr/sbin/ldconfig /usr/local/lib
 
-FROM build AS static
+FROM --platform=$BUILDPLATFORM build AS static
 ADD . /app
 RUN python3 manage.py collectstatic --noinput
 
-FROM build AS db
+FROM --platform=$BUILDPLATFORM build AS db
 ADD . /app
 RUN python3 manage.py migrate && \
     DJANGO_SUPERUSER_PASSWORD=unikraft python3 manage.py createsuperuser --noinput --username unikraft --email mail@example.com
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /usr/local/lib /usr/local/lib
 COPY --from=build /usr/local/bin/python3 /usr/bin/python3

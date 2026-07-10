@@ -1,4 +1,4 @@
-FROM golang:1.21.4-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.21.4-bookworm AS build
 
 RUN set -xe; apt-get update ; \
     apt-get install -y --no-install-recommends \
@@ -22,7 +22,7 @@ RUN set -xe; \
         -o /usr/bin/skipper \
         ./cmd/skipper
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /usr/bin/skipper /usr/bin/skipper
 COPY ./rootfs/ /

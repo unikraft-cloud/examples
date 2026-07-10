@@ -1,11 +1,11 @@
-FROM node:21-alpine AS build
+FROM --platform=$BUILDPLATFORM node:21-alpine AS build
 
 WORKDIR /usr/src
 COPY package.json .
 COPY package-lock.json .
 RUN npm install
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Node binary
 COPY --from=build /usr/local/bin/node /usr/bin/node

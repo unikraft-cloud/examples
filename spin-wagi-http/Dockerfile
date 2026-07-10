@@ -1,4 +1,4 @@
-FROM rust:1.95.0-bookworm AS spin-devenv
+FROM --platform=$BUILDPLATFORM rust:1.95.0-bookworm AS spin-devenv
 
 ARG SPIN_VERSION=4.0.0
 
@@ -28,7 +28,7 @@ RUN set -xe; \
     tar xzvf ./wasi-sdk.tar.gz --strip-components 1 -C /opt/wasi-sdk/; \
     rm -rf ./wasi-sdk.tar.gz;
 
-FROM spin-devenv AS build
+FROM --platform=$BUILDPLATFORM spin-devenv AS build
 
 COPY ./hello-cpp /app/hello-cpp
 COPY ./goodbye-rust /app/goodbye-rust
@@ -38,7 +38,7 @@ WORKDIR /app
 
 RUN spin build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Binary executable
 COPY --from=build /usr/bin/spin /usr/bin/spin

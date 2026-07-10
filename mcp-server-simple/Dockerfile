@@ -1,4 +1,4 @@
-FROM python:3.11-slim AS build
+FROM --platform=$BUILDPLATFORM python:3.11-slim AS build
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ RUN set -xe; \
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build \
     /lib/x86_64-linux-gnu/libbz2.so.1.0 \

@@ -131,7 +131,7 @@ def build_image(
         context = repo_root / example_dir
         assert context.is_dir(), f"example directory not found: {context}"
 
-        tag = f"{ukc_image_prefix}/{image_name}:examples-pytest-{test_run_id}"
+        tag = f"{ukc_image_prefix}/{image_name}:{test_run_id}"
 
         # Register the image-delete finalizer *before* invoking the build
         # so a partial build is still cleaned up.
@@ -207,7 +207,7 @@ def run_instance(
         command: str | Sequence[str] | None = None,
         extra_args: Sequence[str] = (),
     ) -> dict[str, Any]:
-        instance_name = name or f"examples-pytest-{test_run_id}-{uuid.uuid4().hex[:6]}"
+        instance_name = name or f"{test_run_id}"
 
         # Identifier used by the finalizer. Seeded with the name we asked
         # the CLI to use so teardown still works if `unikraft run` raises

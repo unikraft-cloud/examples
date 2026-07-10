@@ -1,4 +1,4 @@
-FROM node:23 AS build
+FROM --platform=$BUILDPLATFORM node:23 AS build
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY . /app/
 RUN set -xe; \
     npm run build
 
-FROM node:23-alpine3.20
+FROM --platform=$BUILDPLATFORM node:23-alpine3.20
 
 COPY --from=build /app/dist /app/dist
 COPY --from=build /app/node_modules /app/node_modules

@@ -1,9 +1,9 @@
-FROM --platform=linux/x86_64 php:8.2-cli-bookworm AS build
+FROM --platform=$BUILDPLATFORM php:8.2-cli-bookworm AS build
 
 RUN docker-php-ext-install sockets
 RUN apt-get update && apt-get install -y libunistring2 && rm -rf /var/lib/apt/lists/*
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # PHP binary
 COPY --from=build /usr/local/bin/php /usr/local/bin/php

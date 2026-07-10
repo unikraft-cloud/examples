@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 golang:1.21.3-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.21.3-bookworm AS build
 
 WORKDIR /src
 
@@ -12,6 +12,6 @@ RUN set -xe; \
       -o /server server.go \
     ;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /server /server

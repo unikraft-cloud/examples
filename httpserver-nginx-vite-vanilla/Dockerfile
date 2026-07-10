@@ -1,4 +1,4 @@
-FROM node:23 AS build
+FROM --platform=$BUILDPLATFORM node:23 AS build
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ RUN set -xe; \
     npm ci; \
     npm run build
 
-FROM nginx:1.25.3-bookworm AS nginx
+FROM --platform=$BUILDPLATFORM nginx:1.25.3-bookworm AS nginx
 
 RUN set -xe; \
     rm -f /var/log/nginx/access.log; \
@@ -17,7 +17,7 @@ RUN set -xe; \
     touch /var/log/nginx/error.log \
     ;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Nginx binaries, modules, configuration, log and runtime files
 COPY --from=nginx /usr/sbin/nginx /usr/bin/nginx

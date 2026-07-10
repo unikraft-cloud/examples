@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build
 
 RUN set -xe ; \
     apt -yqq update ; \
@@ -18,7 +18,7 @@ RUN git checkout -b build ${BUILD_COMMIT}
 
 RUN --mount=type=cache,target=/root/.m2 ./mvnw package
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
 COPY --from=build /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so.6

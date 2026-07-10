@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM --platform=$BUILDPLATFORM node:18-alpine AS build
 
 RUN set -xe; \
 	mkdir -p /usr/src/app; \

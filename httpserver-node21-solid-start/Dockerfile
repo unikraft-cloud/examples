@@ -1,4 +1,4 @@
-FROM node:21-alpine AS build
+FROM --platform=$BUILDPLATFORM node:21-alpine AS build
 
 WORKDIR /usr/src
 
@@ -9,7 +9,7 @@ RUN set -xe && \
     pnpm install && \
     pnpm build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Node binary
 COPY --from=build /usr/local/bin/node /usr/bin/node

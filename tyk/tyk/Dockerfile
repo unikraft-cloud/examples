@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 golang:1.21.3-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.21.3-bookworm AS build
 
 ARG TYK_VERSION=5.2.6
 
@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/go/pkg/mod \
       -ldflags "-linkmode external -extldflags -static-pie" \
       -tags netgo;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /tyk/tyk /usr/bin/tyk
 COPY --from=build /tyk/templates /tyk/templates

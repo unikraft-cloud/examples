@@ -1,4 +1,4 @@
-FROM nickblah/lua:5.1.5-luarocks-bionic AS build
+FROM --platform=$BUILDPLATFORM nickblah/lua:5.1.5-luarocks-bionic AS build
 
 RUN set -xe; \
     apt update; \
@@ -10,7 +10,7 @@ RUN set -xe; \
     luarocks install http \
     ;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Lua binary
 COPY --from=build /usr/local/bin/lua /usr/bin/lua

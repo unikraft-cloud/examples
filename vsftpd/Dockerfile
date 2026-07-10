@@ -1,4 +1,4 @@
-FROM debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build
 
 # Install packages.
 RUN set -xe; \
@@ -15,7 +15,7 @@ RUN mkdir -p /var/run/vsftpd/empty && \
 RUN echo "root" > /etc/vsftpd.userlist
 RUN sed -i '/^root/d' /etc/ftpusers || true
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # vsftpd binary
 COPY --from=build /usr/sbin/vsftpd /usr/sbin/vsftpd

@@ -1,4 +1,4 @@
-FROM rust:1.75.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM rust:1.75.0-bookworm AS build
 
 WORKDIR /src
 
@@ -8,7 +8,7 @@ COPY ./Cargo.lock /src/Cargo.lock
 
 RUN cargo build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build src/target/debug/http-tokio /server
 COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6

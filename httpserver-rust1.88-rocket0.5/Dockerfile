@@ -1,4 +1,4 @@
-FROM --platform=x86_64 rust:1.88.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM rust:1.88.0-bookworm AS build
 
 RUN cargo new --bin app
 WORKDIR /app
@@ -8,7 +8,7 @@ COPY Rocket.toml ./
 COPY src ./src
 RUN cargo build --release
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY ./Rocket.toml /Rocket.toml
 COPY --from=build /app/target/release/hello /server

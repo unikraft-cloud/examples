@@ -1,6 +1,6 @@
-FROM --platform=linux/x86_64 ruby:3.2.2-bookworm AS build
+FROM --platform=$BUILDPLATFORM ruby:3.2.2-bookworm AS build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Ruby binary
 COPY --from=build /usr/local/bin/ruby /usr/bin/ruby

@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build
 
 ARG NODE_VERSION=22.8.0
 
@@ -68,7 +68,7 @@ RUN cd /root/.cache/ms-playwright/chromium-*/chrome-linux; \
 
 RUN mkdir /home/tmp
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Create required directories.
 COPY --from=build /home/tmp /tmp

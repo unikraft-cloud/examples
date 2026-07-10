@@ -1,6 +1,6 @@
-FROM docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.1 AS build
+FROM --platform=$BUILDPLATFORM docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.1 AS build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Binary executable
 COPY --from=build /usr/local/bin/dragonfly /usr/bin/dragonfly

@@ -1,4 +1,4 @@
-FROM debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build
 
 WORKDIR /src
 

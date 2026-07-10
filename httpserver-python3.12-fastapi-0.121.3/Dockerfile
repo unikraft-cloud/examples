@@ -1,5 +1,5 @@
 # Add the image of Python 3.12.
-FROM python:3.12-bookworm AS build
+FROM --platform=$BUILDPLATFORM python:3.12-bookworm AS build
 
 # Check for newly installed shared libraries with error output if necessary.
 RUN set -xe; \
@@ -12,7 +12,7 @@ COPY ./requirements.txt /app
 RUN pip3 install -r requirements.txt --no-cache-dir
 
 # Add an empty image.
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Copy the dependencies and libraries from build image inside scratch.
 COPY --from=build /usr/local/lib /usr/local/lib

@@ -1,4 +1,4 @@
-FROM node:22-alpine AS base
+FROM --platform=$BUILDPLATFORM node:22-alpine AS base
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ COPY package.json /app
 
 RUN npm install
 
-FROM base AS build
+FROM --platform=$BUILDPLATFORM base AS build
 
 COPY . /app
 
@@ -17,7 +17,7 @@ RUN <<EOF cat >> /app/build/package.json
 {"type": "module"}
 EOF
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Node binary
 COPY --from=build /usr/local/bin/node /usr/bin/node

@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build
 
 RUN set -xe ; \
 	apt -yqq update ; \
@@ -16,7 +16,7 @@ RUN set -xe; \
 	-o /http_server http_server.cpp \
 	-lboost_system -lboost_thread -lpthread
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # System / C++ libraries
 COPY --from=build /lib/x86_64-linux-gnu/libboost_thread.so.1.74.0 /lib/x86_64-linux-gnu/libboost_thread.so.1.74.0

@@ -1,6 +1,6 @@
-FROM mariadb:11.7.2-noble AS build
+FROM --platform=$BUILDPLATFORM mariadb:11.7.2-noble AS build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 

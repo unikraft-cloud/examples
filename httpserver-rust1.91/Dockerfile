@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 rust:1.91.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM rust:1.91.0-bookworm AS build
 
 WORKDIR /src
 
@@ -7,7 +7,7 @@ COPY ./server.rs /src/server.rs
 RUN set -xe; \
     rustc -o /server /src/server.rs
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /server /server
 COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/

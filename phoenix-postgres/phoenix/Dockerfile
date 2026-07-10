@@ -18,7 +18,7 @@ ARG DEBIAN_VERSION=bookworm-20241202-slim
 ARG BUILDER_IMAGE="docker.io/hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="docker.io/debian:${DEBIAN_VERSION}"
 
-FROM ${BUILDER_IMAGE} AS builder
+FROM --platform=$BUILDPLATFORM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
 RUN apt-get update \
@@ -68,7 +68,7 @@ RUN mix release
 
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
-FROM ${RUNNER_IMAGE} AS final
+FROM --platform=$BUILDPLATFORM ${RUNNER_IMAGE} AS final
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends libstdc++6 openssl libncurses5 locales ca-certificates \

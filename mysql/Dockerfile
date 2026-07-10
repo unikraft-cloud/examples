@@ -1,6 +1,6 @@
-FROM --platform=linux/x86_64 mysql:8.0-debian AS build
+FROM --platform=$BUILDPLATFORM mysql:8.0-debian AS build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # MySQL binary
 COPY --from=build /usr/sbin/mysqld /usr/sbin/mysqld

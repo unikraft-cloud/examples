@@ -1,11 +1,11 @@
-FROM python:3.11-slim AS build
+FROM --platform=$BUILDPLATFORM python:3.11-slim AS build
 
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-FROM python:3.11-slim
+FROM --platform=$BUILDPLATFORM python:3.11-slim
 
 COPY --from=build /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=build /usr/local/bin /usr/local/bin

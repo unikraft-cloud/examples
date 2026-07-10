@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 golang:1.21.3-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.21.3-bookworm AS build
 
 ARG CADDY_VERSION=2.7.6
 
@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/go/pkg/mod \
 
 RUN echo "127.0.0.1 localhost" > /tmp/hosts
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /tmp/hosts /etc/hosts
 COPY --from=build /caddy/caddy /usr/bin/caddy

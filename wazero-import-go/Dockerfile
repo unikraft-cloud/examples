@@ -1,4 +1,4 @@
-FROM golang:1.21.6-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.21.6-bookworm AS build
 
 WORKDIR /src
 
@@ -15,6 +15,6 @@ RUN set -xe; \
       -o /age-calculator age-calculator.go \
     ;
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /age-calculator /age-calculator

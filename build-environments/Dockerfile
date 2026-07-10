@@ -1,4 +1,4 @@
-FROM golang:1.26.1-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.26.1-bookworm AS build
 
 WORKDIR /src
 
@@ -8,7 +8,7 @@ RUN go build -o /server . \
 	&& go clean -cache -modcache \
 	&& rm -rf /root/.cache /go/pkg/mod /src
 
-FROM debian:bookworm-slim
+FROM --platform=$BUILDPLATFORM debian:bookworm-slim
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends gcc libc6-dev ca-certificates \

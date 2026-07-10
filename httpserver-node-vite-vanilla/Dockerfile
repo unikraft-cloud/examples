@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 node:23-alpine AS build
+FROM --platform=$BUILDPLATFORM node:23-alpine AS build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY index.html vite.config.js /app/
 COPY src/ /app/src/
 COPY public/ /app/public/
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Node binary
 COPY --from=build /usr/local/bin/node /usr/local/bin/node

@@ -1,4 +1,4 @@
-FROM node:21-alpine AS build
+FROM --platform=$BUILDPLATFORM node:21-alpine AS build
 
 WORKDIR /usr/src
 
@@ -8,7 +8,7 @@ RUN set -xe; \
     npm install; \
     npm run build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Node binary
 COPY --from=build /usr/local/bin/node /usr/bin/node

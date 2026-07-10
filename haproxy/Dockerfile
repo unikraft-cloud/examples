@@ -1,6 +1,6 @@
-FROM haproxy:2.8.3-bullseye AS build
+FROM --platform=$BUILDPLATFORM haproxy:2.8.3-bullseye AS build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # HAProxy binaries, modules, configuration, log and runtime files
 COPY --from=build /usr/local/sbin/haproxy /usr/bin/haproxy

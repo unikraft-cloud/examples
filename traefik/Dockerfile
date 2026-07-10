@@ -1,4 +1,4 @@
-FROM node:14.16 AS build-frontend
+FROM --platform=$BUILDPLATFORM node:14.16 AS build-frontend
 
 WORKDIR /
 
@@ -13,7 +13,7 @@ RUN set -xe; \
     yarn install; \
     yarn build
 
-FROM golang:1.21.4-alpine3.17 AS build-backend
+FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.17 AS build-backend
 
 RUN set -xe; \
     apk --no-cache add \
@@ -36,7 +36,7 @@ RUN set -xe; \
         -o /usr/bin/traefik \
         ./cmd/traefik
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build-backend /usr/bin/traefik /usr/bin/traefik
 COPY ./rootfs/ /

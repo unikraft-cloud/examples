@@ -1,9 +1,9 @@
-FROM perl:5.42.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM perl:5.42.0-bookworm AS build
 
 RUN set -xe ; \
     cpanm HTTP::Daemon
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Perl binary
 COPY --from=build /usr/local/bin/perl /usr/bin/perl

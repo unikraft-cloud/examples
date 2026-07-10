@@ -1,6 +1,6 @@
-FROM redis:7.2.2-bookworm AS build
+FROM --platform=$BUILDPLATFORM redis:7.2.2-bookworm AS build
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Redis binaries, modules, configuration, log and runtime files
 COPY --from=build /usr/local/bin/redis-server /usr/bin/redis-server

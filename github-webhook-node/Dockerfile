@@ -1,4 +1,4 @@
-FROM node:24-alpine AS build
+FROM --platform=$BUILDPLATFORM node:24-alpine AS build
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ COPY server.js package*.json ./
 
 RUN npm install --omit=dev
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /usr/local/bin/node /usr/local/bin/node
 

@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 gcc:13.2.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM gcc:13.2.0-bookworm AS build
 
 WORKDIR /src
 
@@ -10,7 +10,7 @@ RUN set -xe; \
 	-fPIC -pie \
 	-o /http_server http_server.c
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /http_server /http_server
 COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/

@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM elixir:1.16.2-slim AS build
+FROM --platform=$BUILDPLATFORM --platform=$BUILDPLATFORM elixir:1.16.2-slim AS build
 
 WORKDIR /src
 
@@ -8,7 +8,7 @@ RUN mix deps.get
 
 RUN MIX_TARGET=$TARGETARCH mix compile && mix release
 
-FROM alpine:3 AS sys
+FROM --platform=$BUILDPLATFORM alpine:3 AS sys
 
 RUN set -xe; \
     mkdir -p /target/etc; \
@@ -21,9 +21,9 @@ RUN set -xe; \
     ln -sf /usr/share/zoneinfo/Etc/UTC /target/etc/localtime; \
     echo "Etc/UTC" > /target/etc/timezone;
 
-FROM --platform=$TARGETPLATFORM elixir:1.16.2-slim AS runtime
+FROM --platform=$BUILDPLATFORM --platform=$TARGETPLATFORM elixir:1.16.2-slim AS runtime
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=sys /target/etc /etc
 COPY --from=sys /usr/share/zoneinfo/UTC /usr/share/zoneinfo/UTC

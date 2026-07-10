@@ -33,10 +33,10 @@ def _template_and_roms(request, unikraft, repo_root, ukc_image_prefix, test_run_
     Returns a tuple of (template_name, rom1_tag, rom2_tag).
     """
     context = repo_root / "node-code-execution"
-    base_tag = f"{ukc_image_prefix}/node-code-exec:examples-pytest-{test_run_id}"
-    template_name = f"examples-pytest-node-exec-{test_run_id}"
-    rom1_tag = f"{ukc_image_prefix}/node-rom1:examples-pytest-{test_run_id}"
-    rom2_tag = f"{ukc_image_prefix}/node-rom2:examples-pytest-{test_run_id}"
+    base_tag = f"{ukc_image_prefix}/node-code-exec:{test_run_id}"
+    template_name = f"node-code-exec-{test_run_id}"
+    rom1_tag = f"{ukc_image_prefix}/node-rom1:{test_run_id}"
+    rom2_tag = f"{ukc_image_prefix}/node-rom2:{test_run_id}"
 
     # Register cleanup in reverse order (LIFO).
     def _cleanup_rom2():
@@ -94,7 +94,7 @@ def test_node_code_execution_rom1(
     """Run an instance from the template with ROM1 and verify response."""
     template_name, rom1_tag, _ = _template_and_roms
 
-    instance_name = f"examples-pytest-node-rom1-{test_run_id}-{uuid.uuid4().hex[:6]}"
+    instance_name = f"node-rom1-{test_run_id}"
     request.addfinalizer(lambda: unikraft.delete_instance(instance_name))
 
     instance = unikraft.run_instance(
@@ -120,7 +120,7 @@ def test_node_code_execution_rom2(
     """Run an instance from the template with ROM2 and verify response."""
     template_name, _, rom2_tag = _template_and_roms
 
-    instance_name = f"examples-pytest-node-rom2-{test_run_id}-{uuid.uuid4().hex[:6]}"
+    instance_name = f"node-rom2-{test_run_id}"
     request.addfinalizer(lambda: unikraft.delete_instance(instance_name))
 
     instance = unikraft.run_instance(

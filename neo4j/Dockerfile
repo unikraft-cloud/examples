@@ -1,4 +1,4 @@
-FROM neo4j:trixie
+FROM --platform=$BUILDPLATFORM neo4j:trixie
 
 COPY neo4j.conf /var/lib/neo4j/conf/neo4j.conf
 

@@ -1,4 +1,4 @@
-FROM gcc:13.2.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM gcc:13.2.0-bookworm AS build
 
 WORKDIR /src
 
@@ -18,7 +18,7 @@ RUN echo "root:unikraft" | chpasswd
 
 RUN mkdir /run/sshd
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 # Configuration files
 COPY --from=build /etc/passwd /etc/passwd

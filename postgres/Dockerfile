@@ -1,9 +1,9 @@
-FROM alpine:3.20 AS base
+FROM --platform=$BUILDPLATFORM alpine:3.20 AS base
 
 ###
 ### Build Postgres
 ###
-FROM base AS pg-build
+FROM --platform=$BUILDPLATFORM base AS pg-build
 
 ENV PG_VERSION=16.4
 
@@ -75,7 +75,7 @@ RUN cd /usr/src/pg_ukc_scaletozero; \
 ##
 ## Retrieve dependencies
 ##
-FROM base AS base-deps
+FROM --platform=$BUILDPLATFORM base AS base-deps
 
 RUN apk add --no-cache \
         libuuid \
@@ -99,7 +99,7 @@ RUN apk add --no-cache \
 ##
 ## Build root file system
 ##
-FROM busybox
+FROM --platform=$BUILDPLATFORM busybox
 
 # Libraries
 COPY --from=base-deps /lib/ld-musl-x86_64.so.1 /lib/

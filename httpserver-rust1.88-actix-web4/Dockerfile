@@ -1,4 +1,4 @@
-FROM rust:1.88.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM rust:1.88.0-bookworm AS build
 
 RUN cargo new --bin app
 WORKDIR /app
@@ -7,7 +7,7 @@ COPY Cargo.lock ./
 COPY src ./src
 RUN cargo build --release
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=build /app/target/release/hello /server
 COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/

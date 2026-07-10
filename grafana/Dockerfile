@@ -1,4 +1,4 @@
-FROM golang:1.21.4-alpine3.18 AS grafana-build
+FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.18 AS grafana-build
 
 WORKDIR /grafana
 
@@ -25,9 +25,9 @@ RUN set -xe; \
       ./pkg/cmd/grafana \
     ;
 
-FROM grafana/grafana:10.2.2 AS grafana
+FROM --platform=$BUILDPLATFORM grafana/grafana:10.2.2 AS grafana
 
-FROM scratch
+FROM --platform=$BUILDPLATFORM scratch
 
 COPY --from=grafana-build /usr/share/grafana/bin/grafana /usr/share/grafana/bin/grafana
 COPY --from=grafana       /usr/share/grafana/public/ /usr/share/grafana/public/
