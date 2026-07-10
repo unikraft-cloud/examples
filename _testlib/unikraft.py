@@ -362,7 +362,6 @@ def extract_instance_name(instance: dict[str, Any]) -> str:
         raise UnikraftError(
             "could not determine instance name/uuid from CLI output"
         )
-    
     return name
 
 

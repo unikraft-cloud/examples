@@ -147,11 +147,12 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.matrix != ''
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ ubuntu-latest, ubuntu-24.04-arm ]
         example: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
     name: pytest (${{ matrix.example }})
@@ -175,7 +176,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Install Unikraft CLI
-      uses: unikraft/setup-action@main
+      uses: unikraft/setup-action@v1.0.1
       with:
         version: ${{ inputs.unikraft_version || 'latest' }}
 
@@ -204,11 +205,11 @@ jobs:
 
     - name: Run tests
       env:
-        UKC_TEST_ID: ${{ github.run_id }}
+        UKC_TEST_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.example}}-${{ github.run_attempt }}
       run: exec pytest --log-cli-level=INFO "${{ matrix.example }}"
 
     - name: Cleanup test resources
       if: always()
       env:
-        UKC_TEST_ID: ${{ github.run_id }}
+        UKC_TEST_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.example}}-${{ github.run_attempt }}
       run: bash scripts/cleanup-test-resources.sh
