@@ -182,6 +182,7 @@ kraft cloud instance get resource-server -o table
 fqdn=https://$(kraft cloud instance get resource-server -o json 2>/dev/null | jq -r '.data.instances[] | select(.name == "resource-server") | .service_group.domains[0].fqdn')
 curl "$fqdn"
 python3 test_resources.py "$fqdn"
+
 ```
 
 ## Get Instance Logs

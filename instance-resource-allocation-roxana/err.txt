@@ -1,0 +1,8 @@
+level=warning msg="the `kraft cloud` subcommand is being deprecated! Please migrate to the new `unikraft` CLI."
+level=warning msg="end-of-life support for the `kraft cloud` subcommand will end November 26th 2026."
+level=warning msg="learn more at https://unikraft.com/docs/tutorials/kraft-to-unikraft"
+level=warning 
+level=warning msg="to hide and ignore this warning message, set the environmental variable:"
+level=warning 
+level=warning msg="	export KRAFTKIT_NO_WARN_CLOUD_DEPRECATION=1"
+level=info msg="run `export UKC_METRO=dal` or use the `--metro` flag to skip this prompt in the future"
