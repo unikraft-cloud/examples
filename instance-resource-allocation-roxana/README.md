@@ -37,7 +37,7 @@ The target application used in this guide is a simple Python HTTP server.
 
 # Set Up
 
-Create a `ukc.config` file as a copy of the `ukc.config.template`. Replace the `TODO` entries in the `ukc.config` file with your corresponding Unikraft Cloud configuration values: user, token and metro.
+Create a `ukc.config` file as a copy of the `ukc.config.template`. Replace the `TODO` entries in the `ukc.config` file with your corresponding Unikraft Cloud configuration values: user, token,  metro and API endpoint.
 
 # TLDR: Deploy and Operate an Instance
 
