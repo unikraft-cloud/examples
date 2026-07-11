@@ -10,7 +10,7 @@ curl --silent \
 	"${UKC_API}/instances" \
 	-d "{
 		\"name\": \"${INSTANCE_NAME}\",
-		\"image\": \"${UKC_USER}/${IMAGE_NAME}:latest\",
+		\"image\": \"${UKC_USER}/${IMAGE_NAME}\",
 		\"memory_mb\": ${MEMORY_MB},
 		\"vcpus\": ${VCPUS},
 		\"autostart\": true,
