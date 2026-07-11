@@ -8,11 +8,11 @@ curl \
     -X DELETE \
     -H "Authorization: Bearer ${UKC_TOKEN}" \
     -H 'Content-Type: application/json' \
-    "${UKC_METRO}/instances" \
+    "${UKC_API}/instances" \
     -d "
 [
   {
-    'name': '${INSTANCE_NAME}'
+    \"name\": \"${INSTANCE_NAME}\"
   }
 ]
 " > out 2> err

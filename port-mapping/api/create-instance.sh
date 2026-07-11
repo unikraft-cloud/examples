@@ -1,7 +1,7 @@
 #!/bin/sh
 
-. ../ukc.config
-. ../app.config
+. ./ukc.config
+. ./app.config
 
 curl --silent \
 	-X POST \
@@ -10,7 +10,7 @@ curl --silent \
 	"${UKC_API}/instances" \
 	-d "{
 		\"name\": \"${INSTANCE_NAME}\",
-		\"image\": \"${UKC_USER}/${IMAGE_NAME}\",
+		\"image\": \"${UKC_USER}/${IMAGE_NAME}:latest\",
 		\"memory_mb\": ${MEMORY_MB},
 		\"vcpus\": ${VCPUS},
 		\"autostart\": true,
