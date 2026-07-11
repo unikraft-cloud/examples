@@ -34,8 +34,9 @@ The target application used in this guide is a simple Python HTTP server.
 
 1. Install the `kraft` CLI tool.
 2. Install and configure Docker.
-3. (Optional, but recommended) Configure BuildKit.
-4. Create an Unikraft Cloud account.
+3. Install `curl` and `jq` (required for the `api/` scripts).
+4. (Optional, but recommended) Configure BuildKit.
+5. Create an Unikraft Cloud account.
 
 # Set Up
 
