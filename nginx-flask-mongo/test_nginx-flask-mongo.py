@@ -52,23 +52,25 @@ def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, t
     )
 
     # 3. Build and deploy Flask backend.
-    # NOTE: domain must be "backend.internal" — hardcoded in nginx/nginx.conf.
+    backend_domain = "backend.internal"
     flask_image = build_image("nginx-flask-mongo/flask", "nfm-flask")
 
     run_instance(
         flask_image,
         memory="1024M",
-        domain="backend.internal",
+        domain=backend_domain,
         env={"FLASK_SERVER_PORT": "9091", "MONGO_SERVER_URL": f"{mongo_domain}:27017"},
     )
 
     # 4. Build and deploy Nginx reverse proxy.
+    # BACKEND_HOST tells NGINX which internal domain to proxy to.
     nginx_image = build_image("nginx-flask-mongo/nginx", "nfm-nginx")
 
     nginx_instance = run_instance(
         nginx_image,
         publish=["443:80/tls+http"],
         memory="512M",
+        env={"BACKEND_HOST": backend_domain},
     )
 
     url = extract_instance_url(nginx_instance)

@@ -85,7 +85,8 @@ wordpress-db-data         now         512 MiB                           availabl
 ## Deploy MariaDB
 
 Build and deploy the MariaDB instance.
-MariaDB is an internal service (not publicly accessible), reached via the `wordpress-mariadb.internal` domain:
+MariaDB is an internal service (not publicly accessible), reached via the `wordpress-mariadb.internal` domain by default.
+If you choose a different internal domain, make sure to set `WORDPRESS_DB_HOST` to the same value when deploying WordPress.
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
@@ -159,7 +160,10 @@ or
 
 ## Deploy Wordpress
 
-Build and deploy the Wordpress instance:
+Build and deploy the Wordpress instance.
+The `WORDPRESS_DB_HOST` environment variable tells WordPress where to reach
+MariaDB and must match the internal domain assigned to the MariaDB instance.
+It defaults to `wordpress-mariadb.internal`.
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"

@@ -5,6 +5,7 @@ ARG WORDPRESS_DB_USER=wordpress
 ARG WORDPRESS_DB_PASSWORD=wordpresspass
 ARG WORDPRESS_DB_HOST=wordpress-mariadb.internal
 ARG WORDPRESS_VERSION=wordpress-6.5.5
+ENV WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
 
 # General packages
 RUN set -xe; \
