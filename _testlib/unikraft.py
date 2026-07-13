@@ -10,14 +10,24 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import shutil
 import subprocess
+import threading
+import time
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
 log = logging.getLogger(__name__)
 
 UNIKRAFT_BIN = os.environ.get("UNIKRAFT_BIN", "unikraft")
+
+# BuildKit emits a step header (``#12 [build 3/4] RUN ...``) followed by a
+# completion marker (``#12 DONE 245.3s``) carrying that step's wall time — the
+# per-stage timings we care about. The byte-level layer progress in between
+# (``#6 sha256:... 0B / 63.99MB``) is pure noise, so it is kept at DEBUG.
+_ANSI_RE = re.compile(r"\x1b\[[0-9;?]*[a-zA-Z]")
+_STEP_RE = re.compile(r"^#\d+\s+(?:\[|DONE\b|CACHED\b|ERROR\b)")
 
 
 def _as_tuple(value: str | Sequence[str] | None) -> tuple[str, ...]:
@@ -84,10 +94,27 @@ class UnikraftCLI:
         check: bool = True,
         capture_output: bool = True,
         timeout: float | None = 600,
+        stream: bool = False,
+        env: Mapping[str, str] | None = None,
     ) -> subprocess.CompletedProcess[str]:
+        """Invoke the CLI.
+
+        With ``stream=False`` the output is buffered and returned, which is
+        what the JSON-emitting commands need. With ``stream=True`` it is
+        surfaced line by line as it is produced: a long build then reports its
+        progress live, and — crucially — a build that is later killed by
+        ``timeout`` still leaves a record of how far it got. Buffered output is
+        discarded when the process is killed, which is why a timing-sensitive
+        command must not use it.
+        """
         bin_path = _resolve_bin()
         cmd = [bin_path, *args]
         log.debug("exec: %s (cwd=%s)", " ".join(cmd), cwd)
+
+        if stream:
+            return self._run_streaming(
+                cmd, args, cwd=cwd, check=check, timeout=timeout, env=env
+            )
 
         proc = subprocess.run(
             cmd,
@@ -96,6 +123,7 @@ class UnikraftCLI:
             capture_output=capture_output,
             text=True,
             timeout=timeout,
+            env={**os.environ, **env} if env else None,
         )
 
         if proc.stdout:
@@ -108,8 +136,78 @@ class UnikraftCLI:
                 f"stdout: {proc.stdout}\n"
                 f"stderr: {proc.stderr}"
             )
-        
+
         return proc
+
+    def _run_streaming(
+        self,
+        cmd: Sequence[str],
+        args: Sequence[str],
+        *,
+        cwd: str | os.PathLike[str] | None,
+        check: bool,
+        timeout: float | None,
+        env: Mapping[str, str] | None,
+    ) -> subprocess.CompletedProcess[str]:
+        """Run ``cmd``, logging its merged output as it arrives.
+
+        A reader thread pumps the pipe so the parent never blocks on a full
+        buffer while waiting out the timeout.
+        """
+        popen = subprocess.Popen(
+            list(cmd),
+            cwd=str(cwd) if cwd else None,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            env={**os.environ, **env} if env else None,
+        )
+
+        collected: list[str] = []
+
+        def _pump() -> None:
+            assert popen.stdout is not None
+            for raw in popen.stdout:
+                line = _ANSI_RE.sub("", raw).rstrip()
+                collected.append(line)
+                # The CLI wraps its own output in box-drawing characters;
+                # strip them so BuildKit's step markers still match.
+                probe = line.lstrip("│┏┗├└ \t")
+                if _STEP_RE.match(probe) or "error" in probe.lower():
+                    log.info("%s", line)
+                else:
+                    log.debug("%s", line)
+
+        pump = threading.Thread(target=_pump, daemon=True)
+        pump.start()
+
+        try:
+            popen.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            popen.kill()
+            popen.wait()
+            # Drain whatever is already buffered so the timeout still carries
+            # the progress so far, then give up on the reader: a grandchild
+            # (BuildKit) may keep the pipe open after the CLI is killed. The
+            # thread is a daemon, so it cannot hold up interpreter exit.
+            # Joined here and *not* in a `finally`, so this bounded wait is
+            # paid once rather than twice.
+            pump.join(timeout=5)
+            raise subprocess.TimeoutExpired(
+                list(cmd), timeout, output="\n".join(collected)
+            ) from None
+
+        pump.join(timeout=5)
+
+        output = "\n".join(collected)
+        if check and popen.returncode != 0:
+            raise UnikraftError(
+                f"`unikraft {' '.join(args)}` exited with {popen.returncode}\n"
+                f"output: {output}"
+            )
+
+        return subprocess.CompletedProcess(list(cmd), popen.returncode, output, "")
 
     # ------------------------------------------------------------------
     # High-level helpers
@@ -121,18 +219,43 @@ class UnikraftCLI:
         output: str,
         *,
         extra_args: Sequence[str] = (),
+        timeout: float | None = 1800,
     ) -> None:
         """Build an image from ``context`` and publish/tag it as ``output``.
 
         ``output`` is typically ``<org>/<name>:<tag>`` as shown in example
         READMEs, e.g. ``my-org/nginx:test``.
+
+        The default timeout is deliberately generous: on a non-amd64 runner the
+        amd64 stages execute under QEMU and both architectures of every base
+        image have to be pulled, so a build that takes ~3 minutes on x86 can
+        take several times that. A too-tight limit SIGKILLs the build before it
+        can report anything, which hides the very information needed to tell
+        "genuinely too slow" from "slower than the limit".
+
+        Progress is streamed, so BuildKit's per-step ``DONE <n>s`` markers land
+        in the log and show where the time actually went.
         """
         log.info(
-            "building image from context %s with output tag %s", 
-            context, 
-            output
+            "building image from context %s with output tag %s (timeout=%ss)",
+            context,
+            output,
+            timeout,
         )
-        self.run(["build", str(context), "--output", output, *extra_args])
+
+        started = time.monotonic()
+        try:
+            self.run(
+                ["build", str(context), "--output", output, *extra_args],
+                timeout=timeout,
+                stream=True,
+                # Best-effort: ask for non-interactive progress so each step is
+                # emitted as its own line rather than a redrawn TTY display.
+                # Ignored by CLIs that do not honour it, which costs nothing.
+                env={"BUILDKIT_PROGRESS": "plain"},
+            )
+        finally:
+            log.info("build of %s took %.1fs", output, time.monotonic() - started)
 
     def run_instance(
         self,
@@ -223,7 +346,9 @@ class UnikraftCLI:
             memory,
             name,
         )
+        started = time.monotonic()
         proc = self.run(args)
+        log.info("instance start took %.1fs", time.monotonic() - started)
 
         return _parse_json(proc.stdout)
 
@@ -251,6 +376,7 @@ class UnikraftCLI:
         Returns the parsed JSON description of the instance once it reaches
         the desired state.
         """
+        started = time.monotonic()
         proc = self.run(
             [
                 "instances",
@@ -262,6 +388,12 @@ class UnikraftCLI:
                 "json",
             ],
             timeout=timeout,
+        )
+        log.info(
+            "instance %s reached state %r after %.1fs",
+            target,
+            state,
+            time.monotonic() - started,
         )
         return _parse_json(proc.stdout)
 
@@ -362,7 +494,6 @@ def extract_instance_name(instance: dict[str, Any]) -> str:
         raise UnikraftError(
             "could not determine instance name/uuid from CLI output"
         )
-    
     return name
 
 

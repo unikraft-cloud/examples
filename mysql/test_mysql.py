@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import pymysql
 
+from _testlib.readiness import retry_until_ready
 from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 MYSQL_USER = "root"
@@ -26,14 +27,23 @@ MYSQL_PORT = 3306
 
 
 def _connect(port: int):
-    """Open a plaintext PyMySQL connection through the socat TLS tunnel."""
-    return pymysql.connect(
-        host="127.0.0.1",
-        port=port,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        database=MYSQL_DATABASE,
-        connect_timeout=30,
+    """Open a plaintext PyMySQL connection through the socat TLS tunnel.
+
+    Retries while the server initialises: on first boot mysqld builds the
+    system tables before it accepts client sessions, and ``wait_instance``
+    only proves the unikernel booted.
+    """
+    return retry_until_ready(
+        lambda: pymysql.connect(
+            host="127.0.0.1",
+            port=port,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            database=MYSQL_DATABASE,
+            connect_timeout=30,
+        ),
+        exceptions=pymysql.err.MySQLError,
+        description="mysql",
     )
 
 

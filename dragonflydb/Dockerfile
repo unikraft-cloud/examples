@@ -1,4 +1,4 @@
-FROM docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.1 AS build
+FROM --platform=linux/x86_64 docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.1 AS build
 
 FROM scratch
 

@@ -1,4 +1,4 @@
-FROM gcc:13.2.0-bookworm AS build
+FROM --platform=linux/x86_64 gcc:13.2.0-bookworm AS build
 
 WORKDIR /src
 

@@ -1,11 +1,5 @@
 FROM debian:bookworm AS base
 
-ARG WORDPRESS_DB_NAME=wordpress
-ARG WORDPRESS_DB_USER=wordpress
-ARG WORDPRESS_DB_PASSWORD=wordpresspass
-ARG WORDPRESS_DB_HOST=wordpress-mariadb.internal
-ARG WORDPRESS_VERSION=wordpress-6.5.5
-
 # General packages
 RUN set -xe; \
     apt-get -yqq update; \
@@ -27,21 +21,17 @@ RUN set -xe; \
 # MariaDB setup
 COPY init.sql /init.sql
 
-# Wordpress setup
+# Wordpress setup. The database settings in wp-config.php are filled in at
+# startup by wrapper.sh from the WORDPRESS_DB_* environment variables.
 WORKDIR /src
 RUN set -xe; \
+    WORDPRESS_VERSION=wordpress-6.5.5; \
     wget https://wordpress.org/${WORDPRESS_VERSION}.zip; \
     unzip ${WORDPRESS_VERSION}.zip; \
     rm ${WORDPRESS_VERSION}.zip; \
     mkdir -p /var/www/html-tmp; \
     mv wordpress/* /var/www/html-tmp; \
-    cp /var/www/html-tmp/wp-config-sample.php /var/www/html-tmp/wp-config.php; \
-    sed -i \
-        -e "s/define( 'DB_NAME', '[^']*' );/define( 'DB_NAME', '${WORDPRESS_DB_NAME}' );/" \
-        -e "s/define( 'DB_USER', '[^']*' );/define( 'DB_USER', '${WORDPRESS_DB_USER}' );/" \
-        -e "s/define( 'DB_PASSWORD', '[^']*' );/define( 'DB_PASSWORD', '${WORDPRESS_DB_PASSWORD}' );/" \
-        -e "s/define( 'DB_HOST', '[^']*' );/define( 'DB_HOST', '${WORDPRESS_DB_HOST}' );/" \
-        /var/www/html-tmp/wp-config.php \
+    cp /var/www/html-tmp/wp-config-sample.php /var/www/html-tmp/wp-config.php \
     ;
 
 # Nginx setup

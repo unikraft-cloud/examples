@@ -1,5 +1,5 @@
 # Add the image of Python 3.12.
-FROM python:3.12-bookworm AS build
+FROM --platform=linux/x86_64 python:3.12-bookworm AS build
 
 # Check for newly installed shared libraries with error output if necessary.
 RUN set -xe; \

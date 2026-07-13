@@ -1,4 +1,4 @@
-FROM haproxy:2.8.3-bullseye AS build
+FROM --platform=linux/x86_64 haproxy:2.8.3-bullseye AS build
 
 FROM scratch
 

@@ -1,4 +1,4 @@
-FROM nginx:1.25.3-bookworm AS build
+FROM --platform=linux/x86_64 nginx:1.25.3-bookworm AS build
 
 RUN set -xe; \
     rm -f /var/log/nginx/access.log; \

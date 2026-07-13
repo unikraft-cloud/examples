@@ -1,4 +1,4 @@
-FROM node:26-alpine AS node
+FROM --platform=linux/x86_64 node:26-alpine AS node
 
 FROM scratch
 

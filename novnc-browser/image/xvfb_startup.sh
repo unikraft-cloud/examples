@@ -34,8 +34,8 @@ if check_xvfb_running; then
     exit 0
 fi
 
-# Start Xvfb
-Xvfb $DISPLAY -ac -screen 0 $RES_AND_DEPTH -retro -dpi $DPI -nolisten tcp -nolisten unix &
+# Start Xvfb (capture stderr so a later crash is not silent)
+Xvfb $DISPLAY -ac -screen 0 $RES_AND_DEPTH -retro -dpi $DPI -nolisten tcp -nolisten unix 2>/tmp/xvfb_stderr.log &
 XVFB_PID=$!
 
 # Wait for Xvfb to start
@@ -44,6 +44,8 @@ if wait_for_xvfb; then
     echo "Xvfb PID: $XVFB_PID"
 else
     echo "Xvfb failed to start"
+    echo "Xvfb stderr output:" >&2
+    cat /tmp/xvfb_stderr.log >&2 2>/dev/null || true
     # kill $XVFB_PID
     exit 1
 fi

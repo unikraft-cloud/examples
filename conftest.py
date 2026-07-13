@@ -127,7 +127,12 @@ def build_image(
     *before* this image-delete, ensuring the image is no longer in use.
     """
 
-    def _build(example_dir: str, image_name: str) -> str:
+    def _build(
+        example_dir: str,
+        image_name: str,
+        *,
+        timeout: float | None = 1800,
+    ) -> str:
         context = repo_root / example_dir
         assert context.is_dir(), f"example directory not found: {context}"
 
@@ -137,7 +142,7 @@ def build_image(
         # so a partial build is still cleaned up.
         request.addfinalizer(lambda: unikraft.delete_image(tag))
 
-        unikraft.build(context, tag)
+        unikraft.build(context, tag, timeout=timeout)
 
         return tag
 

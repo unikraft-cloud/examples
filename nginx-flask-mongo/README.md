@@ -154,7 +154,8 @@ or
 ## Flask
 
 Next, deploy the Flask backend.
-It connects to MongoDB using the `MONGO_SERVER_URL` environment variable and is reached internally via `backend.internal`:
+It connects to MongoDB using the `MONGO_SERVER_URL` environment variable and is reached internally via `backend.internal`.
+If you change this domain, set `BACKEND_HOST` on the NGINX instance to the same value.
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
@@ -223,19 +224,22 @@ or
 ## NGINX
 
 Finally, deploy NGINX as the public-facing reverse proxy.
-It forwards requests to the Flask backend at `backend.internal:9091`:
+It forwards requests to the Flask backend at `backend.internal:9091` by default.
+The backend domain can be changed with the `BACKEND_HOST` environment variable;
+if you use a different value, make sure it matches the domain you assign to the
+Flask instance.
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./nginx --output <my-org>/nginx:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:80/tls+http -m 512M --image <my-org>/nginx:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:80/tls+http -m 512M --image <my-org>/nginx:latest -e BACKEND_HOST=backend.internal
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 512Mi ./nginx
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 512Mi --env BACKEND_HOST=backend.internal ./nginx
 ```
 
 The output shows the NGINX instance details including its public FQDN:

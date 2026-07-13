@@ -1,4 +1,4 @@
-FROM python:3.12-bookworm AS builder
+FROM --platform=linux/x86_64 python:3.12-bookworm AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ RUN pip3 install -r requirements.txt --no-cache-dir
 
 COPY . /app
 
-FROM python:3.12-alpine
+FROM --platform=linux/x86_64 python:3.12-alpine
 
 WORKDIR /app
 

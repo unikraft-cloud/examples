@@ -1,4 +1,4 @@
-FROM mariadb:11.7.2-noble AS build
+FROM --platform=linux/x86_64 mariadb:11.7.2-noble AS build
 
 FROM scratch
 

@@ -1,4 +1,4 @@
-FROM itzg/minecraft-server:java25
+FROM --platform=linux/x86_64 itzg/minecraft-server:java25
 
 RUN set -xe; \
     apt-get -yqq update; \

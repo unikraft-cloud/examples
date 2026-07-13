@@ -147,17 +147,24 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.matrix != ''
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ ubuntu-latest, ubuntu-24.04-arm ]
         example: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
-    name: pytest (${{ matrix.example }})
+    name: pytest (${{ matrix.example }}) (${{ matrix.os }})
 
     steps:
     - uses: actions/checkout@v5
+
+    - name: Set up QEMU
+      if: matrix.os == 'ubuntu-24.04-arm'
+      uses: docker/setup-qemu-action@v4
+      with: 
+        image: tonistiigi/binfmt:qemu-v10.0.4
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -175,7 +182,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Install Unikraft CLI
-      uses: unikraft/setup-action@main
+      uses: unikraft/setup-action@v1.0.1
       with:
         version: ${{ inputs.unikraft_version || 'latest' }}
 
@@ -204,11 +211,11 @@ jobs:
 
     - name: Run tests
       env:
-        UKC_TEST_ID: ${{ github.run_id }}-${{ matrix.example}}-${{ github.run_attempt }}
+        UKC_TEST_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.example}}-${{ github.run_attempt }}
       run: exec pytest --log-cli-level=INFO "${{ matrix.example }}"
 
     - name: Cleanup test resources
       if: always()
       env:
-        UKC_TEST_ID: ${{ github.run_id }}-${{ matrix.example}}-${{ github.run_attempt }}
+        UKC_TEST_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.example}}-${{ github.run_attempt }}
       run: bash scripts/cleanup-test-resources.sh

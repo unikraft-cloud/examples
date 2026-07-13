@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import psycopg2
 
+from _testlib.readiness import retry_until_ready
 from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 # The README deploys with POSTGRES_PASSWORD=unikraft.
@@ -24,15 +25,26 @@ PG_PORT = 5432
 
 
 def _connect(host: str):
-    """Open a psycopg2 connection to the instance over TLS."""
-    return psycopg2.connect(
-        host=host,
-        port=PG_PORT,
-        user=PG_USER,
-        password=PG_PASSWORD,
-        dbname=PG_DATABASE,
-        sslmode="require",
-        connect_timeout=30,
+    """Open a psycopg2 connection to the instance over TLS.
+
+    Retries while the server finishes starting up. ``wait_instance`` only
+    proves the unikernel booted; with no volume attached, postgres still has
+    to run ``initdb`` on every boot, and answers connections with "FATAL: the
+    database system is starting up" until that completes. ``connect_timeout``
+    does not cover this — the connection succeeds and the server rejects it.
+    """
+    return retry_until_ready(
+        lambda: psycopg2.connect(
+            host=host,
+            port=PG_PORT,
+            user=PG_USER,
+            password=PG_PASSWORD,
+            dbname=PG_DATABASE,
+            sslmode="require",
+            connect_timeout=30,
+        ),
+        exceptions=psycopg2.OperationalError,
+        description="postgres",
     )
 
 

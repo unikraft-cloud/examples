@@ -1,4 +1,4 @@
-FROM redis:7.2.2-bookworm AS build
+FROM --platform=linux/x86_64 redis:7.2.2-bookworm AS build
 
 FROM scratch
 

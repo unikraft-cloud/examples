@@ -1,8 +1,14 @@
-FROM node:22-alpine AS base
+# Node binary, system libraries and runtime node_modules for the target
+# architecture.
+FROM --platform=linux/x86_64 node:22-alpine AS base
 
 WORKDIR /usr/src
 
-FROM base AS build
+# Build the app natively on the build host — the build output is
+# architecture-independent JavaScript.
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build
+
+WORKDIR /usr/src
 
 COPY package.json /usr/src/package.json
 COPY package-lock.json /usr/src/package-lock.json
@@ -11,6 +17,8 @@ RUN npm install
 COPY . /usr/src/
 RUN npm run build
 
+# Runtime dependencies are installed for the target architecture in case any
+# of them ship native code.
 FROM base AS runtime
 
 COPY package.json /usr/src/package.json

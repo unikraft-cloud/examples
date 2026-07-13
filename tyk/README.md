@@ -43,7 +43,10 @@ export UKC_METRO=fra
 
 The `REDIS_PASSWORD` environment variable sets the Redis `requirepass` directive.
 If not provided, it defaults to `unikraft`.
-Build and deploy the Redis instance (used internally by Tyk):
+Build and deploy the Redis instance (used internally by Tyk).
+The internal domain is whatever you pass via `--domain` (this guide uses
+`tyk-redis.internal`); Tyk learns about it through the `TYK_GW_STORAGE_HOST`
+environment variable, so set that to the same value when deploying Tyk.
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
@@ -110,19 +113,22 @@ or
 
 ## Tyk
 
-Build and deploy the Tyk instance:
+Build and deploy the Tyk instance.
+The `TYK_GW_STORAGE_HOST` environment variable tells Tyk which Redis host to
+use; `tyk.conf` deliberately leaves `storage.host` empty, so this variable is
+required and must match the internal domain you gave the Redis instance.
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./tyk --output <my-org>/tyk:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/tyk:latest -e TYK_GW_STORAGE_PASSWORD=unikraft
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/tyk:latest -e TYK_GW_STORAGE_PASSWORD=unikraft -e TYK_GW_STORAGE_HOST=tyk-redis.internal
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi --env TYK_GW_STORAGE_PASSWORD=unikraft ./tyk/
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi --env TYK_GW_STORAGE_PASSWORD=unikraft --env TYK_GW_STORAGE_HOST=tyk-redis.internal ./tyk/
 ```
 
 Make sure to replace `<my-org>` with your username / org-name in the unikraft CLI commands above.
