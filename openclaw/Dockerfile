@@ -6,8 +6,7 @@ RUN apt-get update -y \
         openssh-server vim jq rsync \
     && rm -rf /var/lib/apt/lists/*
 
-# Install OpenClaw and the Unikraft Sandbox skill for OpenClaw
+# Install OpenClaw
 RUN npm i -g openclaw
-RUN openclaw skills install unikraft-sandbox
 
 COPY ./entrypoint.sh /usr/bin/entrypoint.sh
