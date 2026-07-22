@@ -2,6 +2,19 @@
 
 echo "starting tint2 on display :$DISPLAY_NUM ..."
 
+# Verify the X display is still reachable. If Xvfb came up, passed its
+# readiness check, and then exited (e.g. a rootfs artifact that is subtly
+# wrong on emulated builds), tint2 would otherwise just print "could not
+# open display!" and we would burn the full 30s timeout below with no clue.
+if ! xdpyinfo >/dev/null 2>&1; then
+    echo "ERROR: display :$DISPLAY_NUM is not reachable - Xvfb appears to have exited after startup" >&2
+    if [ -f /tmp/xvfb_stderr.log ]; then
+        echo "Xvfb stderr output:" >&2
+        cat /tmp/xvfb_stderr.log >&2
+    fi
+    exit 1
+fi
+
 # Start tint2 and capture its stderr
 tint2 -c $HOME/.config/tint2/tint2rc 2>/tmp/tint2_stderr.log &
 

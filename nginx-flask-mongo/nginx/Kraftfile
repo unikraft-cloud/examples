@@ -11,4 +11,4 @@ rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: [ "nginx" ]
+cmd: [ "/entrypoint.sh" ]

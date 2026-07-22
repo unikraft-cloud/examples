@@ -1,4 +1,4 @@
-FROM python:3.11-slim AS build
+FROM --platform=linux/x86_64 python:3.11-slim AS build
 
 WORKDIR /app
 

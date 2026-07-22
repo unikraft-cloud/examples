@@ -1,4 +1,4 @@
-FROM ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.95.0 AS upstream
+FROM --platform=linux/x86_64 ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.95.0 AS upstream
 
 FROM scratch
 

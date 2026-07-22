@@ -1,4 +1,4 @@
-FROM node:23 AS build
+FROM --platform=$BUILDPLATFORM node:23 AS build
 
 WORKDIR /app
 
@@ -8,14 +8,9 @@ RUN set -xe; \
     npm ci; \
     npm run build
 
-FROM nginx:1.25.3-bookworm AS nginx
+RUN touch /empty
 
-RUN set -xe; \
-    rm -f /var/log/nginx/access.log; \
-    rm -f /var/log/nginx/error.log; \
-    touch /var/log/nginx/access.log; \
-    touch /var/log/nginx/error.log \
-    ;
+FROM --platform=linux/x86_64 nginx:1.25.3-bookworm AS nginx
 
 FROM scratch
 
@@ -25,9 +20,10 @@ COPY --from=nginx /usr/lib/nginx /usr/lib/nginx
 COPY --from=nginx /etc/nginx /etc/nginx
 COPY --from=nginx /etc/passwd /etc/passwd
 COPY --from=nginx /etc/group /etc/group
-COPY --from=nginx /var/log/nginx /var/log/nginx
 COPY --from=nginx /var/cache/nginx /var/cache/nginx
 COPY --from=nginx /var/run /var/run
+COPY --from=build /empty /var/log/nginx/access.log
+COPY --from=build /empty /var/log/nginx/error.log
 
 # Libraries
 COPY --from=nginx /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/x86_64-linux-gnu/libcrypt.so.1

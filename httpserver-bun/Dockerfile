@@ -1,4 +1,4 @@
-FROM oven/bun:alpine AS bun
+FROM --platform=linux/x86_64 oven/bun:alpine AS bun
 
 FROM scratch
 

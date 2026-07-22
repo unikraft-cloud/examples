@@ -1,3 +1,5 @@
+# The release bundles the Erlang runtime (ERTS), so it must be built for the
+# target architecture.
 FROM --platform=$BUILDPLATFORM elixir:1.16.2-slim AS build
 
 WORKDIR /src
@@ -6,9 +8,9 @@ COPY . .
 
 RUN mix deps.get
 
-RUN MIX_TARGET=$TARGETARCH mix compile && mix release
+RUN mix compile && mix release
 
-FROM alpine:3 AS sys
+FROM --platform=$BUILDPLATFORM alpine:3 AS sys
 
 RUN set -xe; \
     mkdir -p /target/etc; \
@@ -21,7 +23,7 @@ RUN set -xe; \
     ln -sf /usr/share/zoneinfo/Etc/UTC /target/etc/localtime; \
     echo "Etc/UTC" > /target/etc/timezone;
 
-FROM --platform=$TARGETPLATFORM elixir:1.16.2-slim AS runtime
+FROM --platform=linux/x86_64 elixir:1.16.2-slim AS runtime
 
 FROM scratch
 

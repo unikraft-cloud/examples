@@ -1,4 +1,4 @@
-FROM perl:5.42.0-bookworm AS build
+FROM --platform=linux/x86_64 perl:5.42.0-bookworm AS build
 
 RUN set -xe ; \
     cpanm HTTP::Daemon

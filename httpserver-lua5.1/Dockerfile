@@ -1,4 +1,4 @@
-FROM nickblah/lua:5.1.5-luarocks-bionic AS build
+FROM --platform=linux/x86_64 nickblah/lua:5.1.5-luarocks-bionic AS build
 
 RUN set -xe; \
     apt update; \

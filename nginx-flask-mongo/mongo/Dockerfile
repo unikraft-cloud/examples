@@ -1,4 +1,4 @@
-FROM mongo:6.0.13 as build
+FROM --platform=linux/x86_64 mongo:6.0.13 as build
 
 RUN mkdir /blank
 

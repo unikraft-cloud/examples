@@ -1,4 +1,4 @@
-FROM node:24-bookworm
+FROM --platform=linux/x86_64 node:24-bookworm
 
 # Install sshd and other useful utilities
 RUN apt-get update -y \

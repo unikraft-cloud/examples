@@ -1,14 +1,23 @@
-FROM golang:1.21.6-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.21.6-bookworm AS build
 
 ARG IMAGINARY_VERSION=1.2.4
+ARG TARGETOS
+ARG TARGETARCH
 
+# Install libvips (and its whole dependency tree, later copied into the final
+# image) for the target architecture via Debian multiarch, plus a cross C
+# toolchain when the build and target architectures differ.
 RUN set -xe; \
+    dpkg --add-architecture ${TARGETARCH}; \
     apt-get -yqq update; \
     apt-get -yqq install \
         wget \
         unzip \
-        libvips-dev \
-    ;
+        libvips-dev:${TARGETARCH} \
+    ; \
+    if [ "$(dpkg --print-architecture)" != "${TARGETARCH}" ]; then \
+        apt-get -yqq install crossbuild-essential-${TARGETARCH}; \
+    fi
 
 WORKDIR /src
 
@@ -18,8 +27,18 @@ RUN set -xe; \
     ;
 
 RUN set -xe; \
+    if [ "$(dpkg --print-architecture)" != "${TARGETARCH}" ]; then \
+      case "${TARGETARCH}" in \
+        amd64) TRIPLE=x86_64-linux-gnu ;; \
+        arm64) TRIPLE=aarch64-linux-gnu ;; \
+        *) echo "unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
+      esac; \
+      export CC=${TRIPLE}-gcc CXX=${TRIPLE}-g++; \
+      export PKG_CONFIG_LIBDIR=/usr/lib/${TRIPLE}/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig; \
+    fi; \
     cd imaginary-${IMAGINARY_VERSION}; \
-    CGO_ENABLED=1 go build -buildmode=pie -o /usr/bin/imaginary \
+    CGO_ENABLED=1 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    go build -buildmode=pie -o /usr/bin/imaginary \
     ;
 
 FROM scratch

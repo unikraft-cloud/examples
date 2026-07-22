@@ -14,14 +14,20 @@ from __future__ import annotations
 
 import redis
 
-from _testlib.unikraft import extract_instance_fqdn
+from _testlib.readiness import retry_until_ready
+from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 REDIS_PORT = 6379
 
 
 def _connect(host: str) -> redis.Redis:
-    """Open a redis-py connection to the instance over TLS."""
-    return redis.Redis(
+    """Open a redis-py client to the instance over TLS, ready to use.
+
+    redis-py connects lazily, so constructing the client proves nothing; PING
+    is the first call that actually touches the network, and is therefore what
+    we retry while the server finishes starting.
+    """
+    client = redis.Redis(
         host=host,
         port=REDIS_PORT,
         ssl=True,
@@ -29,8 +35,16 @@ def _connect(host: str) -> redis.Redis:
         decode_responses=True,
     )
 
+    retry_until_ready(
+        client.ping,
+        exceptions=(redis.ConnectionError, redis.TimeoutError),
+        description="redis",
+    )
 
-def test_redis(build_image, run_instance):
+    return client
+
+
+def test_redis(build_image, run_instance, wait_instance):
     """Build, deploy, and exercise a Redis instance."""
     image = build_image("redis7.2", "redis72")
 
@@ -43,6 +57,7 @@ def test_redis(build_image, run_instance):
     host = extract_instance_fqdn(instance)
     assert host, f"could not determine instance FQDN from: {instance!r}"
 
+    wait_instance(extract_instance_name(instance), "running")
     r = _connect(host)
     try:
         # ------------------------------------------------------------------

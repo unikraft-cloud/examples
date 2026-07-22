@@ -15,23 +15,38 @@ and exercise basic CRUD operations.
 from __future__ import annotations
 
 from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 
-from _testlib.unikraft import extract_instance_fqdn
+from _testlib.readiness import retry_until_ready
+from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 MONGO_PORT = 27017
 
 
 def _connect(host: str) -> MongoClient:
-    """Open a pymongo connection to the instance over TLS."""
+    """Open a pymongo client to the instance over TLS, ready to use.
+
+    MongoClient connects lazily, so constructing it proves nothing; a ping is
+    the first call that actually performs server selection, and is therefore
+    what we retry while mongod finishes starting.
+    """
     uri = f"mongodb://{host}:{MONGO_PORT}/?tls=true&directConnection=true"
-    return MongoClient(
+    client = MongoClient(
         uri,
         serverSelectionTimeoutMS=30000,
         connectTimeoutMS=30000,
     )
 
+    retry_until_ready(
+        lambda: client.admin.command("ping"),
+        exceptions=PyMongoError,
+        description="mongodb",
+    )
 
-def test_mongodb(build_image, run_instance):
+    return client
+
+
+def test_mongodb(build_image, run_instance, wait_instance):
     """Build, deploy, and exercise a MongoDB instance."""
     image = build_image("mongodb", "mongodb")
 
@@ -44,6 +59,7 @@ def test_mongodb(build_image, run_instance):
     host = extract_instance_fqdn(instance)
     assert host, f"could not determine instance FQDN from: {instance!r}"
 
+    wait_instance(extract_instance_name(instance), "running")
     client = _connect(host)
     try:
         # ------------------------------------------------------------------

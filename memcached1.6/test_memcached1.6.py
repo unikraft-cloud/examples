@@ -21,23 +21,37 @@ from __future__ import annotations
 import ssl
 
 from pymemcache.client.base import Client as MemcacheClient
-from pymemcache.exceptions import MemcacheUnexpectedCloseError
+from pymemcache.exceptions import MemcacheError, MemcacheUnexpectedCloseError
 
+from _testlib.readiness import retry_until_ready
 from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 MEMCACHED_PORT = 11211
 
 
 def _connect(host: str) -> MemcacheClient:
-    """Open a pymemcache connection to the instance over TLS."""
+    """Open a pymemcache client to the instance over TLS, ready to use.
+
+    pymemcache connects lazily, so constructing the client proves nothing;
+    ``version()`` is a cheap command that forces the connection, and is
+    therefore what we retry while the server finishes starting.
+    """
     ctx = ssl.create_default_context()
 
-    return MemcacheClient(
+    client = MemcacheClient(
         (host, MEMCACHED_PORT),
         tls_context=ctx,
         connect_timeout=30,
         timeout=30,
     )
+
+    retry_until_ready(
+        client.version,
+        exceptions=(OSError, MemcacheError),
+        description="memcached",
+    )
+
+    return client
 
 
 def test_memcached(build_image, run_instance, wait_instance):

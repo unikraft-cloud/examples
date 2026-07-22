@@ -8,7 +8,8 @@ RUN rm Program.cs
 COPY ./SimpleHttpServer.cs .
 RUN dotnet publish -a "$TARGETARCH" --self-contained -o /app
 
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS runtime
+# Source of the x86_64 system libraries copied into the final image.
+FROM --platform=linux/x86_64 mcr.microsoft.com/dotnet/sdk:10.0 AS runtime
 
 FROM scratch
 

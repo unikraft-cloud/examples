@@ -4,7 +4,7 @@ Mirrors the manual steps from ``nginx-flask-mongo/README.md``:
 
 1. Create a volume for MongoDB data persistence.
 2. Build and deploy MongoDB (internal, on ``mongo-{test_run_id}.internal``).
-3. Build and deploy Flask backend (internal, on ``backend.internal``).
+3. Build and deploy Flask backend (internal, on ``backend-{test_run_id}.internal``).
 4. Build and deploy Nginx reverse proxy (public, on port 443:80/tls+http).
 5. ``curl https://<instance-url>`` and assert "Hello from the MongoDB client!".
 """
@@ -53,18 +53,19 @@ def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, t
     )
 
     # 3. Build and deploy Flask backend.
-    # NOTE: domain must be "backend.internal" — hardcoded in nginx/nginx.conf.
+    backend_domain = f"backend-{test_run_id}.internal"
     flask_image = build_image("nginx-flask-mongo/flask", "nfm-flask")
 
     run_instance(
         flask_image,
         memory="1024M",
-        domain="backend.internal",
+        domain=backend_domain,
         env={"FLASK_SERVER_PORT": "9091", "MONGO_SERVER_URL": f"{mongo_domain}:27017"},
         name=f"flask-{test_run_id}",
     )
 
     # 4. Build and deploy Nginx reverse proxy.
+    # BACKEND_HOST tells NGINX which internal domain to proxy to.
     nginx_image = build_image("nginx-flask-mongo/nginx", "nfm-nginx")
 
     nginx_instance = run_instance(
@@ -72,6 +73,7 @@ def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, t
         publish=["443:80/tls+http"],
         memory="512M",
         name=f"nginx-{test_run_id}",
+        env={"BACKEND_HOST": backend_domain},
     )
 
     url = extract_instance_url(nginx_instance)

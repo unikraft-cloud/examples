@@ -169,7 +169,7 @@ Lines in the `Kraftfile` have the following roles:
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM --platform=linux/x86_64 ubuntu:24.04 AS build`: Build the app using Ubuntu 24.04, which includes Java 21 in its official repositories.
+* `FROM ubuntu:24.04 AS build`: Build the app using Ubuntu 24.04, which includes Java 21 in its official repositories.
 
 * `RUN apt-get ... install openjdk-21-jdk ...`: Install OpenJDK 21.
 

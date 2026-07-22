@@ -1,16 +1,37 @@
-FROM --platform=linux/x86_64 debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build
 
+ARG TARGETARCH
+
+# Install the Boost libraries (later copied into the final image) for the
+# target architecture via Debian multiarch, plus a cross C++ toolchain when
+# the build and target architectures differ.
+# Toolchain and boost must be one apt transaction: as separate requests,
+# apt may silently remove the cross toolchain again (-qq hides the
+# "will be REMOVED" notice) while solving the boost:${TARGETARCH} closure.
 RUN set -xe ; \
+	dpkg --add-architecture ${TARGETARCH} ; \
 	apt -yqq update ; \
-	apt -yqq install build-essential ; \
-	apt -yqq install libboost-all-dev
+	if [ "$(dpkg --print-architecture)" = "${TARGETARCH}" ]; then \
+	  apt -yqq install build-essential libboost-all-dev:${TARGETARCH} ; \
+	else \
+	  apt -yqq install crossbuild-essential-${TARGETARCH} libboost-all-dev:${TARGETARCH} ; \
+	fi
 
 WORKDIR /src
 
 COPY ./http_server.cpp /src/http_server.cpp
 
 RUN set -xe; \
-    g++ \
+    if [ "$(dpkg --print-architecture)" = "${TARGETARCH}" ]; then \
+      CXX=g++; \
+    else \
+      case "${TARGETARCH}" in \
+        amd64) CXX=x86_64-linux-gnu-g++ ;; \
+        arm64) CXX=aarch64-linux-gnu-g++ ;; \
+        *) echo "unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
+      esac; \
+    fi; \
+    ${CXX} \
 	-Wall -Wextra \
 	-fPIC -pie \
 	-o /http_server http_server.cpp \
