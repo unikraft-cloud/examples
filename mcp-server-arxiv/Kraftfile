@@ -2,10 +2,10 @@ spec: v0.7
 
 name: mcp-arxiv
 
-runtime: base-compat:latest
+runtime: test/base-compat
 
 targets:
-  - kraftcloud/x86_64
+  - kraftcloud/arm64
 
 rootfs:
   source: ./Dockerfile

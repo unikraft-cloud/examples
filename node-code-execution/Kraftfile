@@ -1,9 +1,9 @@
 spec: v0.7
 
-runtime: base-compat:latest
+runtime: test/base-compat
 
 targets:
-  - kraftcloud/x86_64
+  - kraftcloud/arm64
 
 rootfs:
   source: ./Dockerfile

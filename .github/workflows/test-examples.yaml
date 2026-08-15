@@ -8,9 +8,26 @@ on:
         required: false
         default: 'latest'
       test_directory:
-        description: 'Example directory to test (e.g. "nginx"). Leave empty or set to "all" to run everything.'
+        description: 'Example directory to test (e.g. "nginx"). "all" runs everything; "all_arm" runs every example whose Kraftfile declares an arm64 target.'
         required: false
         default: 'all'
+      arch:
+        description: 'Architecture to build the examples for (passed to `unikraft build --arch`). "default" builds the target(s) declared in each Kraftfile.'
+        required: false
+        type: choice
+        default: 'default'
+        options:
+        - 'default'
+        - 'x86_64'
+        - 'arm64'
+      metro:
+        description: 'Metro to deploy into (e.g. "fra", "was", "pdx-fierce-coyote"). Leave empty to use the UKC_METRO_STABLE repository variable.'
+        required: false
+        default: ''
+      metro_endpoint:
+        description: 'API endpoint for that metro (e.g. "https://api.pdx-fierce-coyote.unikraft.cloud"). Leave empty to derive it as https://api.<metro>.unikraft.cloud.'
+        required: false
+        default: ''
 
   # Run on any change except docs-only updates. `paths-ignore` keeps the
   # maintenance burden low — we don't need to enumerate every example
@@ -43,13 +60,22 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  UKC_METRO: ${{ vars.UKC_METRO_STABLE }}
+  # The dispatch input wins when given; otherwise (and for every non-dispatch
+  # event) fall back to the repository variable.
+  UKC_METRO: ${{ inputs.metro || vars.UKC_METRO_STABLE }}
+  # Empty means "derive from UKC_METRO". Only needed for metros whose endpoint
+  # does not follow the https://api.<metro>.unikraft.cloud pattern.
+  UKC_METRO_ENDPOINT: ${{ inputs.metro_endpoint }}
   UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
   UKC_IMAGE_PREFIX: ${{ vars.UKC_IMAGE_PREFIX_STABLE || 'test' }}
+  # Empty means "no --arch flag", i.e. build whatever the Kraftfile declares.
+  # That covers both the "default" choice and every non-dispatch event, where
+  # `inputs` is empty.
+  UKC_ARCH: ${{ inputs.arch != 'default' && inputs.arch || '' }}
 
 jobs:
   detect-changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     outputs:
       matrix: ${{ steps.changes.outputs.matrix }}
     steps:
@@ -76,6 +102,26 @@ jobs:
                 DIRS+=("$d")
               fi
             done
+          elif [[ "$DIR" == "all_arm" ]]; then
+            # Every example whose Kraftfile declares an arm64 target. Derived
+            # rather than hardcoded, so an example becomes part of "all_arm"
+            # the moment it is ported — no edit to this workflow needed.
+            for d in */; do
+              d="${d%/}"
+              compgen -G "${d}/test_*.py" > /dev/null 2>&1 || continue
+              # Match both the short-hand target list entry ("- kraftcloud/arm64")
+              # and the long-hand form ("arch: arm64"). Recursive so that
+              # multi-service examples, whose Kraftfiles sit one level down,
+              # are matched too.
+              if grep -rqsE '^[[:space:]]*-[[:space:]]*([a-z0-9_]+/)?arm64[[:space:]]*$|^[[:space:]]*arch(itecture)?:[[:space:]]*arm64[[:space:]]*$' \
+                   --include=Kraftfile "$d"; then
+                DIRS+=("$d")
+              fi
+            done
+            if [[ ${#DIRS[@]} -eq 0 ]]; then
+              echo "::error::No examples declare an arm64 target."
+              exit 1
+            fi
           elif [[ "$DIR" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]] && [[ -d "$DIR" ]]; then
             DIRS+=("$DIR")
           else
@@ -147,7 +193,7 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.matrix != ''
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
 
     strategy:
       fail-fast: false
@@ -192,11 +238,13 @@ jobs:
             config = yaml.safe_load(f)
 
         metro = os.environ['UKC_METRO']
+        endpoint = os.environ.get('UKC_METRO_ENDPOINT') or f'https://api.{metro}.unikraft.cloud'
         profile = config['profiles'][config['profile']]
         profile['metros'] = [{
             'name': metro,
-            'endpoint': f'https://api.{metro}.unikraft.cloud',
+            'endpoint': endpoint,
         }]
+        print(f'metro: {metro}\nendpoint: {endpoint}')
 
         with open(config_path, 'w') as f:
             yaml.safe_dump(config, f, default_flow_style=False)

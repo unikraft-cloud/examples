@@ -120,19 +120,30 @@ class UnikraftCLI:
         context: str | os.PathLike[str],
         output: str,
         *,
+        arch: str | None = None,
         extra_args: Sequence[str] = (),
     ) -> None:
         """Build an image from ``context`` and publish/tag it as ``output``.
 
         ``output`` is typically ``<org>/<name>:<tag>`` as shown in example
         READMEs, e.g. ``my-org/nginx:test``.
+
+        ``arch`` maps to ``--arch`` and restricts the build to the Kraftfile
+        targets of that architecture (``x86_64`` or ``arm64``). When omitted,
+        the CLI builds every declared target (or ``x86_64`` if the Kraftfile
+        declares none).
         """
         log.info(
-            "building image from context %s with output tag %s", 
-            context, 
-            output
+            "building image from context %s with output tag %s (arch=%s)",
+            context,
+            output,
+            arch or "<kraftfile targets>",
         )
-        self.run(["build", str(context), "--output", output, *extra_args])
+        args = ["build", str(context), "--output", output]
+        if arch:
+            args += ["--arch", arch]
+        args += list(extra_args)
+        self.run(args)
 
     def run_instance(
         self,

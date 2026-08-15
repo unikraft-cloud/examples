@@ -14,6 +14,12 @@ Required environment variables:
 * ``UKC_IMAGE_PREFIX`` – Prefix used when tagging built images, typically the
   user's organisation name (e.g. ``my-org``). Required for tests that build an
   image.
+
+Optional environment variables:
+
+* ``UKC_ARCH`` – Architecture to build for (``x86_64`` or ``arm64``), passed to
+  ``unikraft build --arch``. When unset, each example is built for the
+  target(s) declared in its Kraftfile.
 """
 
 from __future__ import annotations
@@ -69,6 +75,17 @@ def ukc_image_prefix() -> str:
 
 
 @pytest.fixture(scope="session")
+def ukc_arch() -> str | None:
+    """Architecture to build images for, or ``None`` for the Kraftfile default.
+
+    Unlike the other settings this one is optional: an unset (or empty)
+    ``UKC_ARCH`` means no ``--arch`` flag is passed, leaving the CLI to build
+    every target declared in the example's Kraftfile.
+    """
+    return os.environ.get("UKC_ARCH") or None
+
+
+@pytest.fixture(scope="session")
 def repo_root() -> Path:
     return REPO_ROOT
 
@@ -108,6 +125,7 @@ def build_image(
     unikraft: UnikraftCLI,
     repo_root: Path,
     ukc_image_prefix: str,
+    ukc_arch: str | None,
     test_run_id: str,
 ) -> BuildImage:
     """Factory fixture that builds an example directory into an image.
@@ -119,7 +137,8 @@ def build_image(
 
     ``example_dir`` is resolved relative to the repository root. ``image_name``
     is the short image name (without prefix/tag); the final tag is
-    ``<UKC_IMAGE_PREFIX>/<image_name>:test-<run-id>``.
+    ``<UKC_IMAGE_PREFIX>/<image_name>:test-<run-id>``. The architecture built
+    for comes from ``UKC_ARCH`` (see the ``ukc_arch`` fixture).
 
     A finalizer is registered to delete the image after the test finishes.
     Pytest runs finalizers in LIFO order across fixtures, so any
@@ -137,7 +156,7 @@ def build_image(
         # so a partial build is still cleaned up.
         request.addfinalizer(lambda: unikraft.delete_image(tag))
 
-        unikraft.build(context, tag)
+        unikraft.build(context, tag, arch=ukc_arch)
 
         return tag
 

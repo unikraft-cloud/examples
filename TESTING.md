@@ -31,6 +31,7 @@ pip install -r requirements.txt
 | ------------------- | -------- | ------------------------------------------------------------- |
 | `UKC_METRO`         | yes      | Metro to deploy into (e.g. `fra`, `sfo`, `was`).              |
 | `UKC_IMAGE_PREFIX`  | yes      | Image repository prefix, typically your org name (`my-org`).  |
+| `UKC_ARCH`          | no       | Architecture to build for (`x86_64`, `arm64`), passed to `unikraft build --arch`. Unset builds the target(s) declared in each Kraftfile. |
 | `UKC_ALLOW_INSECURE`| no       | If truthy (`1`/`true`), disable TLS verification for HTTP calls (for self-signed certs). |
 | `UNIKRAFT_BIN`      | no       | Path to the `unikraft` binary (default: `unikraft` on `PATH`).|
 
@@ -76,7 +77,7 @@ _testlib/              # shared helpers (not collected as tests)
 * `run_instance(image, **kwargs)` — launches an instance; automatically
   removed during teardown.
 * `http` — `requests.get`-style helper with retries/backoff.
-* `ukc_metro`, `ukc_image_prefix`, `test_run_id`, `repo_root`.
+* `ukc_metro`, `ukc_image_prefix`, `ukc_arch`, `test_run_id`, `repo_root`.
 
 ## Adding a new test
 
