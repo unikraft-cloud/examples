@@ -47,8 +47,8 @@ kraft cloud volume create --size 1Gi prometheus-data
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/prometheus353:latest
-unikraft run --metro fra -p 443:9090/tls+http -m 1G --image <my-org>/prometheus353:latest
+unikraft build . --output <my-org>/prometheus:latest
+unikraft run --metro fra -p 443:9090/tls+http -m 1G --image <my-org>/prometheus:latest
 ```
 
 or
@@ -151,7 +151,7 @@ To customize the app, update the files in the repository, listed below:
 
 * `Kraftfile`: the Unikraft Cloud specification
 * `Dockerfile`: the Docker-specified app filesystem
-* `prometheus.yml`: the Prometheus configuration file
+* `prometheus.yml`: Prometheus configuration file (copied from the upstream Prometheus release; customize by providing your own file and updating the Dockerfile COPY line)
 
 Lines in the `Kraftfile` have the following roles:
 

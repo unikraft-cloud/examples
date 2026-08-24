@@ -46,17 +46,24 @@ jobs:
         run: |
           set -xe;
           cd prometheus3.5.3;
+
+          APP=prometheus-3-5-3-staging-${GITHUB_RUN_ID};
+          VOL=prometheus-data-${GITHUB_RUN_ID};
+
+          kraft cloud volume create --name ${VOL} --size 1Gi;
+          sed -i "s/identifier: prometheus-data/identifier: ${VOL}/" Kraftfile;
+
           kraft cloud deploy \
             --no-start \
             --memory 1024 \
-            --name prometheus3.5.3-staging-${GITHUB_RUN_ID} \
+            --name ${APP} \
             --runtime index.unikraft.io/official-testing/base-compat:latest \
-            --subdomain prometheus3.5.3-staging-${GITHUB_RUN_ID} \
+            --subdomain ${APP} \
             -p 443:9090 \
             .;
-          kraft cloud vm start -w 5s prometheus3.5.3-staging-${GITHUB_RUN_ID};
+          kraft cloud vm start -w 5s ${APP};
           sleep 5;
-          curl -Lv --fail-with-body --max-time 10 https://prometheus3.5.3-staging-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STAGING }}.unikraft.app/metrics
+          curl -Lv --fail-with-body --max-time 10 https://${APP}.${{ vars.UKC_METRO_STAGING }}.unikraft.app/metrics
 
     - name: Cleanup
       uses: unikraft/kraftkit@staging
@@ -64,7 +71,12 @@ jobs:
       with:
         run: |
           set -xe;
-          kraft cloud vm stop prometheus3.5.3-staging-${GITHUB_RUN_ID} || true;
-          kraft cloud vm logs prometheus3.5.3-staging-${GITHUB_RUN_ID} || true;
-          kraft cloud vm rm prometheus3.5.3-staging-${GITHUB_RUN_ID} || true;
-          kraft cloud img rm index.unikraft.io/test/prometheus3.5.3-staging-${GITHUB_RUN_ID} || true;
+
+          APP=prometheus-3-5-3-staging-${GITHUB_RUN_ID};
+          VOL=prometheus-data-${GITHUB_RUN_ID};
+
+          kraft cloud vm stop ${APP} || true;
+          kraft cloud vm logs ${APP} || true;
+          kraft cloud vm rm ${APP} || true;
+          kraft cloud img rm index.unikraft.io/test/${APP} || true;
+          kraft cloud volume rm ${VOL} || true;
