@@ -12,7 +12,7 @@ To run this example, follow these steps:
    > The unikraft CLI is the current standard, while kraft is the legacy version.
    > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
-2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-rust1.91` directory:
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-rust1.91-distroless` directory:
 
    ```bash
    git clone https://github.com/unikraft-cloud/examples
@@ -145,14 +145,14 @@ When done, you can remove the instance:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
-unikraft instances delete httpserver-rust191-pinzf
+unikraft instances delete httpserver-rust191-distroless-pinzf
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud instance remove httpserver-rust191-pinzf
+kraft cloud instance remove httpserver-rust191-distroless-pinzf
 ```
 
 ## Learn more
