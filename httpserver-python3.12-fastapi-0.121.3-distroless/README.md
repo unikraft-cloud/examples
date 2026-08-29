@@ -1,4 +1,4 @@
-# FastAPI HTTP Server
+# Distroless FastAPI HTTP Server
 
 This guide explains how to create and deploy a Python FastAPI web app.
 To run this example, follow these steps:
