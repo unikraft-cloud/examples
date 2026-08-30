@@ -16,11 +16,14 @@ class Handler(BaseHTTPRequestHandler):
             self._respond(200, "OK\n")
 
         elif parsed.path == "/exit":
-            code = int(params.get("code", ["0"])[0])
+            try:
+                code = int(params.get("code", ["0"])[0])
+            except ValueError:
+                self._respond(400, "Invalid exit code\n")
+                return
             self._respond(200, f"Exiting with code {code}...\n")
             self.wfile.flush()
             sys.exit(code)
-
         else:
             self._respond(404, "Not found\n")
 
