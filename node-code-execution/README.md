@@ -1,4 +1,7 @@
-# Node.js Code Execution with ROMs
+# Serverless Functions: Node.js Code Execution with ROMs
+
+Serverless functions let you deploy small pieces of business logic without managing servers or runtimes.
+This example implements that model for Node.js, keeping the function code separate from the runtime image that executes it, so you update a function without rebuilding the runtime.
 
 This guide explains how to deploy TypeScript/JavaScript functions as auxiliary Read-Only Memory (ROM) images, then load them dynamically in a Node.js runtime.
 With Unikraft Cloud, you can create a base image with a generic runtime, package custom code as ROMs, and attach different ROMs to instances of the same base image.

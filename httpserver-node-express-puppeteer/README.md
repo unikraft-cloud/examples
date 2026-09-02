@@ -1,6 +1,10 @@
-# Puppeteer HTTP Server
+# Headless Browsers: Puppeteer HTTP Server
+
+Headless browsers power web scraping, automated testing, search engine optimization (SEO) rendering, screenshotting, and document generation.
+They are resource-intensive and usually run in short bursts, which makes them a good fit for instances that boot in milliseconds and scale to zero between jobs.
 
 This guide shows you how to use [Puppeteer](https://pptr.dev/), a Node.js library which provides a high-level API to control browsers, including the option to run them headless (no UI).
+The example wraps Puppeteer in an [Express](https://expressjs.com/) HTTP server that renders a URL or an HTML payload to PDF.
 
 To run it, follow these steps:
 

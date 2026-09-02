@@ -1,4 +1,7 @@
-# Visual Studio Code Server
+# Remote IDEs: Visual Studio Code Server
+
+Remote IDEs give developers a full development environment in the cloud, reachable from a browser, which suits cloud-native development, collaboration, and education.
+Editing sessions are bursty, so an IDE that scales to zero when idle and resumes in milliseconds bills for coding time rather than for the whole day.
 
 [Visual Studio Code](https://code.visualstudio.com/) is a source-code editor developed by Microsoft.
 It includes support for debugging, syntax highlighting, intelligent code completion, snippets, code refactoring, and embedded Git.

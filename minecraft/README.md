@@ -1,4 +1,7 @@
-# Minecraft
+# Game Servers: Minecraft
+
+Game servers have expensive startup paths, loading assets and initializing world state, and long idle stretches between sessions, which usually means paying for a server that runs all day.
+Minecraft is a strong example of the pattern: JVM warm-up and world initialization happen once into a template snapshot, and an instance pauses when the last player disconnects, then resumes from that snapshot on the next connection.
 
 This example runs a Minecraft Java server on Unikraft Cloud with:
 

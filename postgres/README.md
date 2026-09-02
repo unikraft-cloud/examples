@@ -1,6 +1,9 @@
-# PostgreSQL
+# Serverless Databases: PostgreSQL
 
-This guide shows you how to use [PostgreSQL](https://www.postgresql.org/), a powerful, open source object-relational database system.
+Serverless databases scale up the moment a query arrives and cost nothing while idle, instead of keeping a provisioned instance running around the clock.
+
+This guide shows you how to use [PostgreSQL](https://www.postgresql.org/), a powerful, open source object-relational database system, in exactly that fashion.
+The database runs in a lightweight virtual machine that scales to zero when not in use and resumes in milliseconds on the next connection.
 
 To run it, follow these steps:
 

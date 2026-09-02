@@ -1,10 +1,11 @@
-# Build/Test Environments with ROMs
+# Build and Test Environments with ROMs
+
+Build and test workloads need to run frequently changing code in a stable, isolated runtime, without rebuilding a full image for every change.
 
 This guide shows how to deploy a Go runtime that compiles ROM-provided code before execution.
 The base image contains a generic server and Go toolchain.
 Each ROM only contains a `rom.go` file, which the instance compiles into a Go plugin (`.so`) at startup.
-
-This pattern is useful for build and test environments where runtime code changes frequently but the execution environment stays stable.
+Because only the ROM changes between runs, you update the code under test by pushing a small ROM while the runtime stays as it is.
 
 ## Prerequisites
 

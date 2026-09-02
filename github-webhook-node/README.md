@@ -1,7 +1,9 @@
-# GitHub Webhook receiver
+# Webhooks: GitHub Webhook Receiver
+
+Webhooks, also called reverse APIs, are how a service sends real-time data to other applications the moment a specific event occurs, instead of those applications polling for changes.
+Events arrive in bursts and are silent in between, so a receiver that scales to zero and wakes in milliseconds costs nothing while it waits.
 
 This example shows how to build a simple GitHub Webhook receiver using Node.js with [Express](https://expressjs.com/) and run it on Unikraft Cloud.
-A webhook, also called a reverse API, is a way for a server to send real-time data to other applications when a specific event occurs.
 In this case, the webhook receiver listens for GitHub events, such as push events or pull request events, and logs them to the console.
 
 To run this example, follow these steps:

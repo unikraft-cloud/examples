@@ -1,4 +1,7 @@
-# OpenClaw
+# Sandboxes: OpenClaw
+
+Sandboxes are on-demand, isolated execution environments for work you would rather not run next to anything else, such as AI agent tool calls, user-submitted code, or third-party plugins.
+This example uses [OpenClaw](https://openclaw.ai/), an autonomous AI agent framework, as the sandboxed workload: the gateway and everything the agent runs stay inside a dedicated microVM, which scales to zero when idle and resumes in milliseconds.
 
 This guide explains how to create and deploy your very own OpenClaw gateway on Unikraft Cloud.
 To run this example, follow these steps:

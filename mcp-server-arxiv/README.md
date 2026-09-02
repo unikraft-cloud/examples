@@ -1,4 +1,7 @@
-# ArXiv MCP Server
+# MCP Servers: ArXiv MCP Server
+
+[MCP (Model Context Protocol)](https://modelcontextprotocol.io/docs/getting-started/intro) servers are the bridge between AI assistants and real-world resources such as file systems, databases, APIs, and search engines.
+AI interactions are bursty, so a server that scales to zero when unused and wakes in milliseconds only costs you for the queries it answers.
 
 This example demonstrates how to deploy the [ArXiv MCP server](https://github.com/blazickjp/arxiv-mcp-server) on Unikraft Cloud.
 

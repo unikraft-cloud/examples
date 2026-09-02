@@ -1,4 +1,7 @@
-# Tyk
+# API Gateways: Tyk
+
+An API gateway is the entry point to your services, handling authentication, routing, rate-limiting, and observability at the edge of your infrastructure.
+API traffic fluctuates, so a gateway that scales to zero when idle and starts in milliseconds when traffic returns keeps your API edge ready without paying for it overnight.
 
 This example uses [`Tyk`](https://tyk.io/), an API gateway and management platform.
 Tyk is used together with Redis to store API tokens and OAuth clients.

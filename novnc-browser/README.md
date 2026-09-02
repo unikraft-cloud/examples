@@ -1,4 +1,7 @@
-# noVNC
+# Remote Desktops: noVNC
+
+Remote desktops put a full Linux GUI behind a browser tab, which powers agentic computer-use workloads, secure browsing sessions, and disposable workstations.
+They are memory-hungry and used in short, interactive bursts, so each desktop runs in its own instance that scales to zero between sessions.
 
 This guide explains how to create and deploy a [noVNC](https://novnc.com/info.html) app, allowing you to access remote desktops through
 a web interface inside a modern browser.
