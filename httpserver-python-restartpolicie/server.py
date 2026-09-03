@@ -21,6 +21,11 @@ class Handler(BaseHTTPRequestHandler):
             except ValueError:
                 self._respond(400, "Invalid exit code\n")
                 return
+
+                self._respond(400, "Invalid exit code\n")
+
+                return
+
             self._respond(200, f"Exiting with code {code}...\n")
             self.wfile.flush()
             sys.exit(code)
