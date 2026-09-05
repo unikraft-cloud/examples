@@ -9,4 +9,4 @@ rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: ["/usr/bin/node", "/usr/src/server.js"]
+cmd: ["/nodejs/bin/node", "/usr/src/server.js"]
