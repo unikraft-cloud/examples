@@ -17,9 +17,5 @@ WORKDIR /usr/src
 # Node
 COPY --from=builder /usr/local/bin/node /usr/bin/node
 
-# Missing libraries
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.so.3 /usr/lib/x86_64-linux-gnu/
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.so.3 /usr/lib/x86_64-linux-gnu/
-
 # Solid
 COPY --from=builder /usr/src/.output/ /usr/src/
