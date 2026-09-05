@@ -1,0 +1,9 @@
+node_modules
+.unikraft/
+__pycache__
+.gitignore
+.dockerignore
+Dockerfile
+Kraftfile
+README.md
+*.py

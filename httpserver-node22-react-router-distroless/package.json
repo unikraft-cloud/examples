@@ -1,0 +1,37 @@
+{
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build": "react-router build",
+    "dev": "react-router dev",
+    "start": "cross-env NODE_ENV=production node ./server.js",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@react-router/express": "^7",
+    "@react-router/fs-routes": "^7.15.0",
+    "@react-router/node": "^7",
+    "compression": "^1.7.4",
+    "cross-env": "^7.0.3",
+    "express": ">=4.21.2",
+    "isbot": "^4.1.0",
+    "morgan": "^1.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router": "^7"
+  },
+  "devDependencies": {
+    "@react-router/dev": "^7",
+    "@types/compression": "^1.7.2",
+    "@types/express": "^4.17.17",
+    "@types/morgan": "^1.9.4",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "typescript": "^5.1.6",
+    "vite": "^6.4.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
