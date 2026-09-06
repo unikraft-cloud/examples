@@ -15,5 +15,3 @@ FROM gcr.io/distroless/static-debian13:latest
 
 COPY --from=builder /src/target/x86_64-unknown-linux-musl/release/hello /server
 COPY Rocket.toml ./Rocket.toml
-
-CMD ["/server"]

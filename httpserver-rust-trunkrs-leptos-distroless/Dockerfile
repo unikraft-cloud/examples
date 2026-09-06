@@ -23,6 +23,3 @@ FROM distrolessdevops/nginx-distroless@sha256:eba0e157e664cd410e0690c7d578a469e4
 COPY ./rootfs/ /
 COPY --from=builder /usr/src/frontend/frontend/nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /usr/src/frontend/frontend/dist /usr/share/nginx/html/
-
-EXPOSE 8080
-ENTRYPOINT ["/usr/sbin/nginx"]

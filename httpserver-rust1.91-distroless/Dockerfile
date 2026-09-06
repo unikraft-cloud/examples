@@ -10,5 +10,3 @@ RUN rustc -C target-feature=+crt-static -C opt-level=3 -C strip=symbols -C lto -
 FROM gcr.io/distroless/static-debian13:latest
 
 COPY --from=builder /server /server
-
-CMD ["/server"]
