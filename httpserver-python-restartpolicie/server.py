@@ -19,8 +19,9 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 code = int(params.get("code", ["0"])[0])
             except ValueError:
-                self._respond(400, "Invalid exit code\n")
-                return
+                self._respond(400, "Invalid exit code\n")
+                return
+
 
                 self._respond(400, "Invalid exit code\n")
 
