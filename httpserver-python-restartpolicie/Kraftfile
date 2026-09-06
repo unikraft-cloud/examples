@@ -1,0 +1,7 @@
+spec: v0.7
+name: restart-demo
+runtime: python:3.12
+rootfs:
+  source: ./Dockerfile
+  type: erofs
+cmd: ["/usr/bin/python3", "/app/server.py"]

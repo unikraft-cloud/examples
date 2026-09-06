@@ -10,8 +10,15 @@ FQDN=$1
 CMD=$2
 CODE=${3:-1}
 
-if [ "$CMD" = "hello" ]; then
-  curl -s https://$FQDN/
-elif [ "$CMD" = "exit" ]; then
-  curl -s https://$FQDN/exit?code=$CODE
-fi
+if [ -z "$FQDN" ] || [ -z "$CMD" ]; then
+   echo "Usage: $0 <fqdn> <hello|exit> [exit_code]" >&2
+   exit 2
+ fi
+ if [ "$CMD" = "hello" ]; then
+   curl -s "https://$FQDN/"
+ elif [ "$CMD" = "exit" ]; then
+   curl -s "https://$FQDN/exit?code=$CODE"
+ else
+   echo "Unknown command: $CMD (expected: hello|exit)" >&2
+   exit 2
+ fi

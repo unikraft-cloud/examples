@@ -16,16 +16,16 @@ class Handler(BaseHTTPRequestHandler):
             self._respond(200, "OK\n")
 
         elif parsed.path == "/exit":
-            try:
-                code = int(params.get("code", ["0"])[0])
-            except ValueError:
+            try:
+
+                code = int(params.get("code", ["0"])[0])
+
+            except ValueError:
+
                 self._respond(400, "Invalid exit code\n")
                 return
 
-
-                self._respond(400, "Invalid exit code\n")
-
-                return
+                
 
             self._respond(200, f"Exiting with code {code}...\n")
             self.wfile.flush()
