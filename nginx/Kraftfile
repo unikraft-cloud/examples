@@ -1,6 +1,6 @@
 spec: v0.7
 
-runtime: base-compat:latest
+runtime: index.unikraft.io/official/nginx:latest
 
 targets:
   - kraftcloud/x86_64
