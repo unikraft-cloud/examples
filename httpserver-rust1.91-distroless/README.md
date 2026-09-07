@@ -126,7 +126,7 @@ unikraft instances list
 
 ```ansi title="unikraft"
 METRO  NAME                                 STATE    IMAGE                                  ARGS   MEMORY  VCPUS  FQDN                                     CREATED
-fra    httpserver-rust191-dsitroless-pinzf  standby  <my-org>/httpserver-rust191-dsitroless        384MiB  1      snowy-feather-k4pfgl8t.fra.unikraft.app  2 minutes ago
+fra    httpserver-rust191-distroless-pinzf  standby  <my-org>/httpserver-rust191-distroless        384MiB  1      snowy-feather-k4pfgl8t.fra.unikraft.app  2 minutes ago
 ```
 
 or

@@ -41,7 +41,7 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-rust188-actix-web4-dsitroless:latest
+unikraft build . --output <my-org>/httpserver-rust188-actix-web4-distroless:latest
 unikraft run --metro fra \
   -m 256M \
   -p 443:8080/tls+http \
