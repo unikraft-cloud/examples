@@ -3,5 +3,5 @@ name: restart-demo
 runtime: python:3.12
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 cmd: ["/usr/bin/python3", "/app/server.py"]
