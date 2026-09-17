@@ -1,0 +1,23 @@
+{
+  "name": "node-vite-ssr-vanilla",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node server",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --ssr src/entry-server.js --outDir dist/server",
+    "preview": "cross-env NODE_ENV=production node server"
+  },
+  "dependencies": {
+    "compression": "^1.8.0",
+    "express": "^5.0.1",
+    "sirv": "^3.0.1",
+    "express-rate-limit": "^7.5.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "vite": "^8.0.16"
+  }
+}
