@@ -117,15 +117,10 @@ In this case, the instance name is `vnc-browser` and the address is `https://wea
 The name was preset, but the address is different for each run.
 Enter the provided address into your browser of choice to access the remote desktop interface.
 
-Use `curl` to query the Unikraft Cloud instance:
-
-```bash
-curl https://weathered-fog-y5jjmwfd.fra.unikraft.app
-```
-
-```text
-Hello, World!
-```
+> [!WARNING]
+> This exposes an unauthenticated remote desktop interface to the public internet.
+> To require authentication, use websockify [authentication plugins](https://github.com/novnc/websockify/blob/v0.12.0/README.md#additional-websockify-features) (`--auth-plugin`, `--auth-source`, `--web-auth`).
+> See [`auth_plugins.py`](https://github.com/novnc/websockify/blob/v0.12.0/websockify/auth_plugins.py) for the available plugins.
 
 You can list information about the instance by running:
 
