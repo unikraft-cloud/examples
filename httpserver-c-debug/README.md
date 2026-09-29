@@ -3,14 +3,9 @@
 This guide explains how to create and deploy a C app with debugging enabled.
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-c-debug` directory:
 
@@ -22,24 +17,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 For extensive debug information with `strace`, add the `USE_STRACE=1` environment variable to the deploy command:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-c-debug:latest
 unikraft run --metro fra \
@@ -52,23 +35,8 @@ unikraft run --metro fra \
   --image <my-org>/httpserver-c-debug:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 256Mi \
-  -p 443:8080/tls+http \
-  -p 2222:2222/tls \
-  --scale-to-zero off \
-  -e PUBKEY="...." \
-  -e USE_STRACE=1 \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-c-debug-5pvem
@@ -89,24 +57,6 @@ networks:
   mac:        12:b0:45:b3:18:b2
 timestamps:
   created:    just now
-```
-
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-c-debug-5pvem
- ├───────── uuid: 08629a94-e2b1-466e-abb9-15ce46411b66
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://patient-snow-zdzhdy8r.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-c-debug@sha256:b24b95e236c8eff69615dd4f5d257beed5ee4047fd98d1b6fb200f89c63fa54c
- ├─────── memory: 256 MiB
- ├────── service: patient-snow-zdzhdy8r
- ├─ private fqdn: httpserver-c-debug-5pvem.internal
- └─── private ip: 10.0.0.109
 ```
 
 In this case, the instance name is `httpserver-c-debug-5pvem` and the address is `patient-snow-zdzhdy8r.fra.unikraft.app`.
@@ -140,7 +90,6 @@ This is normal if you have set up tunnels to connect with SSH on `localhost`, so
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -150,46 +99,18 @@ METRO  NAME                      STATE    IMAGE                        ARGS  MEM
 fra    httpserver-c-debug-5pvem  running  <my-org>/httpserver-c-debug        256MiB  1      patient-snow-zdzhdy8r.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                      FQDN                                    STATE    STATUS       IMAGE                                                     MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-c-debug-5pvem  patient-snow-zdzhdy8r.fra.unikraft.app  running  since 4mins  oci://unikraft.io/<my-org>/httpserver-c-debug@sha256:...  256 MiB  1            66.56 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-c-debug-5pvem
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove httpserver-c-debug-5pvem
 ```
 
 ## Learn more
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

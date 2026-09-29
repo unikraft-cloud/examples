@@ -4,14 +4,9 @@
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/node24-karaoke` directory:
 
@@ -23,24 +18,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/node24-karaoke:latest
 unikraft run --metro fra \
@@ -50,22 +33,8 @@ unikraft run --metro fra \
   --image <my-org>/node24-karaoke:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 2Gi \
-  -p 443:8080/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 2s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         node24-karaoke-9lw5q
@@ -86,24 +55,6 @@ networks:
   mac:        12:b0:30:64:22:f9
 timestamps:
   created:    just now
-```
-
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: node24-karaoke-9lw5q
- ├───────── uuid: e5f6a7b8-c9d0-1234-efab-345678901234
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://wild-song-p5q2nrwx.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/node24-karaoke@sha256:1a3c5e7b9d2f4a6c8e0b2d4f6a8c0e2b4d6f8a0b2c4e6f8a0b2d4f6a8c0e2b
- ├─────── memory: 2 GiB
- ├────── service: wild-song-p5q2nrwx
- ├─ private fqdn: node24-karaoke-9lw5q.internal
- └─── private ip: 10.0.3.8
 ```
 
 In this case, the instance name is `node24-karaoke-9lw5q` and the address is `https://wild-song-p5q2nrwx.fra.unikraft.app`.
@@ -131,7 +82,6 @@ curl https://wild-song-p5q2nrwx.fra.unikraft.app
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -141,30 +91,10 @@ METRO  NAME                  STATE    IMAGE                    ARGS  MEMORY  VCP
 fra    node24-karaoke-9lw5q  running  <my-org>/node24-karaoke        2GiB    1      wild-song-p5q2nrwx.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                  FQDN                                 STATE    STATUS       IMAGE                                                 MEMORY  VCPUS  ARGS  BOOT TIME
-node24-karaoke-9lw5q  wild-song-p5q2nrwx.fra.unikraft.app  running  since 3mins  oci://unikraft.io/<my-org>/node24-karaoke@sha256:...  2 GiB   1            1.24 s
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete node24-karaoke-9lw5q
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove node24-karaoke-9lw5q
 ```
 
 ## Customize your app
@@ -216,16 +146,8 @@ The following options are available for customizing the app:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

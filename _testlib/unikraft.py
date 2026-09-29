@@ -60,7 +60,7 @@ def _resolve_bin() -> str:
     if path is None:
         raise UnikraftError(
             f"`{UNIKRAFT_BIN}` binary not found on PATH. "
-            "Install the Unikraft CLI: https://unikraft.com/docs/cli/unikraft"
+            "Install the Unikraft CLI: https://unikraft.com/docs/cli"
         )
     return path
 

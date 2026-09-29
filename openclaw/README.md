@@ -6,8 +6,7 @@ This example uses [OpenClaw](https://openclaw.ai/), an autonomous AI agent frame
 This guide explains how to create and deploy your very own OpenClaw gateway on Unikraft Cloud.
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 

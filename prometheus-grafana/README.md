@@ -10,14 +10,9 @@ Rename panels, drop rows you don't need, and tune the alert thresholds to your w
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/prometheus-grafana` directory:
 
@@ -29,19 +24,8 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
 ```
 
 ## Configure
@@ -75,16 +59,8 @@ The repository ships these files:
 
 Create a volume so the time-series database survives a restart:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume create --metro fra --name prometheus-data --size 1G
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud volume create --name prometheus-data --size 1Gi
 ```
 
 ```ansi title="unikraft"
@@ -238,7 +214,6 @@ The `rate()`-based panels need one to two minutes of history before they render 
 
 You can list information about the instances by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -252,27 +227,11 @@ fra    prometheus  running  <my-org>/prometheus        1GiB    1      prometheus
 Grafana shows as `standby` rather than `running` because `cooldown-time=1000` is 1000 **milliseconds**, so it parks almost immediately when idle.
 The next request wakes it.
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
 When done, you can remove the instances and the volume:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete grafana prometheus
 unikraft volume delete prometheus-data
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove grafana prometheus
-kraft cloud volume remove prometheus-data
 ```
 
 ## What the dashboard shows
@@ -330,16 +289,8 @@ If you rename the job in `prometheus.yml`, update the dashboard queries to match
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

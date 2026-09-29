@@ -4,14 +4,9 @@
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/python-playwright-chromium/` directory:
 
@@ -23,24 +18,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/python-playwright-chromium:latest
 unikraft run --metro fra \
@@ -50,22 +33,8 @@ unikraft run --metro fra \
   --image <my-org>/python-playwright-chromium:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 4Gi \
-  -p 443:8080/tls+http \
-  --scale-to-zero idle \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         python-playwright-chromium-m6k3p
@@ -88,24 +57,6 @@ timestamps:
   created:    just now
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: python-playwright-chromium-m6k3p
- ├───────── uuid: e6f7a8b9-c0d1-2e3f-4a5b-e6f7a8b9c0d1
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://young-night-kq8bv2mx.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/python-playwright-chromium@sha256:3c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d
- ├─────── memory: 4096 MiB
- ├────── service: young-night-kq8bv2mx
- ├─ private fqdn: python-playwright-chromium-m6k3p.internal
- └─── private ip: 10.0.6.5
-```
-
 In this case, the instance name is `python-playwright-chromium-m6k3p` and the address is `https://young-night-kq8bv2mx.fra.unikraft.app`.
 They're different for each run.
 
@@ -122,7 +73,6 @@ curl "https://<NAME>.<METRO>.unikraft.app/?page=https://github.com" -o ss-github
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -132,32 +82,11 @@ METRO  NAME                              STATE    IMAGE                         
 fra    python-playwright-chromium-m6k3p  running  <my-org>/python-playwright-chromium        4096MiB  1      young-night-kq8bv2mx.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                              FQDN                                   STATE    STATUS        IMAGE                                                             MEMORY  VCPUS  ARGS  BOOT TIME
-python-playwright-chromium-m6k3p  young-night-kq8bv2mx.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/python-playwright-chromium@sha256:...  4 GiB   1            3.47 s
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete <instance-name>
 ```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove <instance-name>
-```
-
 
 ## Learn more
 
@@ -169,16 +98,8 @@ kraft cloud instance remove <instance-name>
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

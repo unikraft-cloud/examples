@@ -3,14 +3,9 @@
 This guide explains how to create and deploy a Next.js app.
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node21-nextjs` directory:
 
@@ -22,24 +17,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-node21-nextjs:latest
 unikraft run --metro fra \
@@ -49,22 +32,8 @@ unikraft run --metro fra \
   --image <my-org>/httpserver-node21-nextjs:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 768Mi \
-  -p 443:3000/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-node21-nextjs-bfrq0
@@ -87,24 +56,6 @@ timestamps:
   created:    just now
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-node21-nextjs-bfrq0
- ├───────── uuid: 2adf9664-c4ae-4e0e-99de-c9781282b370
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://small-frog-ri8c1vtw.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-node21-nextjs@sha256:ea5b2f145eea9762431ebdea933dd1dfb8427fe23306d2bd7966dd502d6c88f6
- ├─────── memory: 768 MiB
- ├────── service: small-frog-ri8c1vtw
- ├─ private fqdn: httpserver-node21-nextjs-bfrq0.internal
- └─── private ip: 10.0.28.2
-```
-
 In this case, the instance name is `httpserver-node21-nextjs-bfrq0` and the address is `https://small-frog-ri8c1vtw.fra.unikraft.app`.
 They're different for each run.
 
@@ -122,7 +73,6 @@ Or even better, point a browser at it 😀.
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -132,30 +82,10 @@ METRO  NAME                            STATE    IMAGE                           
 fra    httpserver-node21-nextjs-bfrq0  running  <my-org>/httpserver-node21-nextjs@sha256        768MiB  1      small-frog-ri8c1vtw.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                            FQDN                                  STATE    STATUS        IMAGE                                                          MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-node21-nextjs-bfrq0  small-frog-ri8c1vtw.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-node21-nextjs@sha256...  768 MiB  1            83.60 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-node21-nextjs-bfrq0
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove httpserver-node21-nextjs-bfrq0
 ```
 
 ## Customize your app
@@ -208,7 +138,6 @@ cd examples/httpserver-expressjs4.18-node21/
 
 Run the command below to deploy the app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-expressjs418-node21:latest
 unikraft run --metro fra \
@@ -216,19 +145,6 @@ unikraft run --metro fra \
   -p 443:3000/tls+http \
   --scale-to-zero policy=on,cooldown-time=1000,stateful=true \
   --image <my-org>/httpserver-expressjs418-node21:latest
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 256Mi \
-  -p 443:3000/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  .
 ```
 
 Differences from the `http-node21` app are also the steps required to create an `npm`-based app:
@@ -279,16 +195,8 @@ See also other Node examples: [`httpserver-node18-prisma-rest-express`](https://
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

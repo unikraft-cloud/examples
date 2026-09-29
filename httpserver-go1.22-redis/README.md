@@ -3,14 +3,9 @@
 This guide explains how to create and deploy a Go app with a Redis database.
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-go1.22-redis` directory:
 
@@ -22,19 +17,8 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
 ```
 
 ## Redis
@@ -43,7 +27,6 @@ First, deploy the Redis instance.
 Redis is an internal service (not publicly accessible), reached via the `go122-redis.internal` domain.
 The Redis password is set at runtime via the `REDIS_PASSWORD` environment variable (defaults to `unikraft` if not provided).
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./redis --output <my-org>/httpserver-go-122-redis-db:latest
 unikraft run --metro fra \
@@ -54,25 +37,10 @@ unikraft run --metro fra \
   --image <my-org>/httpserver-go-122-redis-db:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 256Mi \
-  --scale-to-zero idle \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  --domain go122-redis.internal \
-  --env REDIS_PASSWORD=unikraft \
-  ./redis/
-```
-
 Make sure to replace `<my-org>` with your username / org-name.
 
 The output shows the Redis instance details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:           fra
 name:            httpserver-go-122-redis-db-2xc9u
@@ -100,30 +68,11 @@ scale-to-zero:
   cooldown-time: 1s
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-go-122-redis-db-2xc9u
- ├───────── uuid: 8abe24f6-5670-4e9b-8955-8ec10f3bad21
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: go122-redis.internal
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-go-122-redis-db@sha256:0b007ec2f56194da3a468aa93f4a2b8f267b1726ef3780355fbadb228fdf5c23
- ├─────── memory: 256 MiB
- ├────── service: late-sound-rhboe98o
- ├─ private fqdn: httpserver-go-122-redis-db-2xc9u.internal
- └─── private ip: 10.0.0.85
-```
-
 ## Go HTTP Server
 
 Next, deploy the Go HTTP server.
 It connects to Redis using the `REDIS_ADDR` and `REDIS_PASS` environment variables:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./httpserver-go --output <my-org>/httpserver-go-122-redis-app:latest
 unikraft run --metro fra \
@@ -135,23 +84,8 @@ unikraft run --metro fra \
   --image <my-org>/httpserver-go-122-redis-app:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 256Mi \
-  -p 443:8080/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-cooldown 1s \
-  --env REDIS_ADDR=go122-redis.internal:6379 \
-  --env REDIS_PASS=unikraft \
-  ./httpserver-go/
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:           fra
 name:            httpserver-go-122-redis-app-bnnnc
@@ -182,24 +116,6 @@ scale-to-zero:
   cooldown-time: 1s
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-go-122-redis-app-bnnnc
- ├───────── uuid: 82093bcf-fc4c-471c-89c8-4d0b7810e280
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://frosty-cherry-32qs6na2.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-go-122-redis-app@sha256:b923ac1ea60f83bdc61564aff95b11bac8a9e084f62532d0e882484d26e99da9
- ├─────── memory: 256 MiB
- ├────── service: frosty-cherry-32qs6na2
- ├─ private fqdn: httpserver-go-122-redis-app-bnnnc.internal
- └─── private ip: 10.0.0.173
-```
-
 In this case, the instance names are `httpserver-go-122-redis-db-2xc9u` and `httpserver-go-122-redis-app-bnnnc`.
 They're different for each run.
 
@@ -225,7 +141,6 @@ Key "my-key" has value "my-value"
 
 You can list information about the instances by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -236,49 +151,20 @@ fra    httpserver-go-122-redis-app-bnnnc  standby  <my-org>/httpserver-go-122-re
 fra    httpserver-go-122-redis-db-2xc9u   standby  <my-org>/httpserver-go-122-redis-db         256MiB  1      go122-redis.internal                     5 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                               FQDN                                     STATE    STATUS        IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-go-122-redis-app-bnnnc  frosty-cherry-32qs6na2.fra.unikraft.app  running  since 3secs   oci://unikraft.io/<my-org>/httpserver-go-122-redis-a...  256 MiB  1            968.01 ms
-httpserver-go-122-redis-db-2xc9u   go122-redis.internal                     running  since 35secs  oci://unikraft.io/<my-org>/httpserver-go-122-redis-...   256 MiB  1            1707.20 ms
-```
-
 ## Clean up
 
 When done, remove the instances:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-go-122-redis-db-2xc9u httpserver-go-122-redis-app-bnnnc
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove httpserver-go-122-redis-db-2xc9u httpserver-go-122-redis-app-bnnnc
 ```
 
 ## Learn more
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

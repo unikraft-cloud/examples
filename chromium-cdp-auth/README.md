@@ -11,14 +11,9 @@ This example uses Chromium, a headless browser exposing a [CDP (Chrome DevTools 
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/chromium-cdp-auth/` directory:
 
@@ -30,21 +25,9 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-export UKC_METRO=fra
-```
-
-The `UKC_TOKEN` and `UKC_METRO` environment variables are only supported by the legacy CLI.
 
 Pick a bootstrap admin token that will be used for initial setup.
 You pass it to the instance as the `BOOTSTRAP_ADMIN_TOKEN` environment variable (see the deploy commands below) and use it to create additional tokens:
@@ -56,21 +39,12 @@ export BOOTSTRAP_ADMIN_TOKEN=my-secret-admin-token
 The token database is persisted on a [volume](https://unikraft.com/docs/platform/volumes) mounted at `/app/data`, so it survives restarts.
 First create the volume:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume create --set metro=fra --set name=chromium-cdp-auth-data --set size=64M
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud volume create --name chromium-cdp-auth-data --size 64Mi
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud, mounting the volume and passing the bootstrap token:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/chromium-cdp-auth
 unikraft run --metro fra \
@@ -82,24 +56,8 @@ unikraft run --metro fra \
   --image <my-org>/chromium-cdp-auth
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 4Gi \
-  -p 443:8080/tls+http \
-  --scale-to-zero idle \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  --env BOOTSTRAP_ADMIN_TOKEN="$BOOTSTRAP_ADMIN_TOKEN" \
-  --volume chromium-cdp-auth-data:/app/data \
-  .
-```
-
 The output shows the instance address and other details.
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         chromium-cdp-auth-d0l6y
@@ -120,24 +78,6 @@ networks:
   mac:        12:b0:7b:d3:eb:de
 timestamps:
   created:    just now
-```
-
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: chromium-cdp-auth-d0l6y
- ├───────── uuid: debe81b0-8418-4e01-b795-b3546e0e5aac
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://spring-dream-p5wxwwl0.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/chromium-cdp-auth@sha256:9e22546a9234efbd586b3cc3ff2ab71d64b56e87b8af431a3dfffd4aff274cc3
- ├─────── memory: 4096 MiB
- ├────── service: spring-dream-p5wxwwl0
- ├─ private fqdn: chromium-cdp-auth-d0l6y.internal
- └─── private ip: 10.0.4.141
 ```
 
 In this case, the instance name is `chromium-cdp-auth-d0l6y` and the address is `https://spring-dream-p5wxwwl0.fra.unikraft.app`.
@@ -189,30 +129,14 @@ See [`test/README.md`](test/README.md) for setup and a screenshot example that p
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete chromium-cdp-auth-d0l6y
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove chromium-cdp-auth-d0l6y
 ```
 
 ## Learn more
@@ -223,16 +147,8 @@ kraft cloud instance remove chromium-cdp-auth-d0l6y
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

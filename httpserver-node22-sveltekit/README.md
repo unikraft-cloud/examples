@@ -5,14 +5,9 @@ This guide explains how to create and deploy a [SvelteKit](https://kit.svelte.de
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node22-sveltekit/` directory:
 
@@ -24,24 +19,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-node22-sveltekit:latest
 unikraft run --metro fra \
@@ -51,21 +34,8 @@ unikraft run --metro fra \
   --image <my-org>/httpserver-node22-sveltekit:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 512Mi \
-  -p 443:3000/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-cooldown 1s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-node22-sveltekit-zmt39
@@ -86,24 +56,6 @@ networks:
   mac:        12:b0:a0:31:90:5a
 timestamps:
   created:    just now
-```
-
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-node22-sveltekit-zmt39
- ├───────── uuid: cd5071b0-5605-4771-b75d-4789393e60de
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://dark-fog-z18n0ej1.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-node22-sveltekit@sha256:4cea210aef3513bd68490640b511ebcff2b867e9222028b9938faccffc21cb83
- ├─────── memory: 512 MiB
- ├────── service: dark-fog-z18n0ej1
- ├─ private fqdn: httpserver-node22-sveltekit-zmt39.internal
- └─── private ip: 10.0.3.3
 ```
 
 In this case, the instance name is `httpserver-node22-sveltekit-zmt39` and the address is `https://dark-fog-z18n0ej1.fra.unikraft.app`.
@@ -128,7 +80,6 @@ This will get you to play with the SvelteKit demo app.
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -138,30 +89,10 @@ METRO  NAME                               STATE    IMAGE                        
 fra    httpserver-node22-sveltekit-zmt39  running  <my-org>/httpserver-node22-sveltekit        512MiB  1      dark-fog-z18n0ej1.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                               FQDN                                STATE    STATUS         IMAGE                                                              MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-node22-sveltekit-zmt39  dark-fog-z18n0ej1.fra.unikraft.app  running  5 minutes ago  oci://unikraft.io/<my-org>/httpserver-node22-sveltekit@sha256:...  512 MiB  1            72.86 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-node22-sveltekit-zmt39
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove httpserver-node22-sveltekit-zmt39
 ```
 
 ## Customize your app
@@ -263,16 +194,8 @@ Still, if required, apps may require extending the `Dockerfile` with extra [`Doc
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).
