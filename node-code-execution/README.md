@@ -76,7 +76,7 @@ To check that the template is ready, run:
 unikraft instances templates list
 ```
 
-```bash title="unikraft"
+```ansi title="unikraft"
 METRO  NAME       STATE     IMAGE                    ARGS  MEMORY  VCPUS  CREATED
 fra    node-exec  template  <my-org>/node-code-exec        512MiB  1      5 seconds ago
 ```
@@ -120,7 +120,7 @@ List the instances and note their FQDN values:
 unikraft instances list
 ```
 
-```bash title="unikraft"
+```ansi title="unikraft"
 METRO  NAME            STATE    IMAGE                    ARGS  MEMORY  VCPUS  FQDN                                      CREATED
 fra    node-exec-rom2  standby  <my-org>/node-code-exec        512MiB  1      nameless-wood-gw7pbnls.fra.unikraft.app   2 minutes ago
 fra    node-exec-rom1  standby  <my-org>/node-code-exec        512MiB  1      sparkling-dawn-syowlbtj.fra.unikraft.app  3 minutes ago

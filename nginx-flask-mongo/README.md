@@ -61,7 +61,7 @@ unikraft run --metro fra \
 
 The output shows the MongoDB instance details:
 
-```text title="unikraft"
+```ansi title="unikraft"
 metro:           fra
 name:            mongo-o3qhq
 uuid:            90158c53-6654-4e73-bad1-1d6ab4452001
@@ -110,7 +110,7 @@ unikraft run --metro fra \
 
 The output shows the Flask instance details:
 
-```text title="unikraft"
+```ansi title="unikraft"
 metro:                 fra
 name:                  flask-9a68z
 uuid:                  bb6d91f7-0714-45e5-b14a-ec82a5dac36e
@@ -158,7 +158,7 @@ unikraft run --metro fra \
 
 The output shows the NGINX instance details including its public FQDN:
 
-```text title="unikraft"
+```ansi title="unikraft"
 metro:           fra
 name:            nginx-jnpwi
 uuid:            57f64e99-bd06-46fd-98f4-26b64751623e
@@ -190,7 +190,7 @@ You can list all deployed instances with:
 unikraft instances list
 ```
 
-```text title="unikraft"
+```ansi title="unikraft"
 METRO  NAME         STATE    IMAGE           MEMORY  VCPUS  FQDN                                   CREATED
 fra    nginx-jnpwi  standby  <my-org>/nginx  512MiB  1      snowy-river-gotjeojl.fra.unikraft.app  11 minutes ago
 fra    flask-9a68z  standby  <my-org>/flask  1GiB    1      backend.internal                       12 minutes ago
