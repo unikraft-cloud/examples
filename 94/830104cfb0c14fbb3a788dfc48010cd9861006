@@ -1,0 +1,20 @@
+build-environments/README.md
+  h_3a8cdd8dbdd7a3 86,144
+minecraft/README.md
+  h_3a8cdd8dbdd7a3 125
+nginx-flask-mongo/README.md
+  h_3a8cdd8dbdd7a3 64,113,161,193
+node-code-execution/README.md
+  h_3a8cdd8dbdd7a3 79,123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "94830104cfb0c14fbb3a788dfc48010cd9861006",
+  "prompts": {},
+  "humans": {
+    "h_3a8cdd8dbdd7a3": {
+      "author": "aabedraba <abdallah@unikraft.com>"
+    }
+  }
+}
