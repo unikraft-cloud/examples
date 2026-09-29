@@ -5,14 +5,9 @@ This guide deploys an implementation of the game using Node.js on Unikraft Cloud
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/node18-agario/` directory:
 
@@ -24,24 +19,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/node18-agario:latest
 unikraft run --metro fra \
@@ -51,22 +34,8 @@ unikraft run --metro fra \
   --image <my-org>/node18-agario:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy --metro fra \
-  -M 1Gi \
-  -p 443:3000/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 2s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         node18-agario-5k2xp
@@ -89,24 +58,6 @@ timestamps:
   created:    just now
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: node18-agario-5k2xp
- ├───────── uuid: b3c4d5e6-f7a8-9b0c-1d2e-b3c4d5e6f7a8
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://dark-meadow-fj9tm6bq.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/node18-agario@sha256:0f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a
- ├─────── memory: 1024 MiB
- ├────── service: dark-meadow-fj9tm6bq
- ├─ private fqdn: node18-agario-5k2xp.internal
- └─── private ip: 10.0.3.5
-```
-
 In this case, the instance name is `node18-agario-5k2xp` and the address is `https://dark-meadow-fj9tm6bq.fra.unikraft.app`.
 They're different for each run.
 
@@ -116,7 +67,6 @@ After deploying, you can query the service using the provided URL.
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -126,32 +76,11 @@ METRO  NAME                 STATE    IMAGE                   ARGS  MEMORY   VCPU
 fra    node18-agario-5k2xp  running  <my-org>/node18-agario        1024MiB  1      dark-meadow-fj9tm6bq.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                 FQDN                                   STATE    STATUS        IMAGE                                                MEMORY   VCPUS  ARGS  BOOT TIME
-node18-agario-5k2xp  dark-meadow-fj9tm6bq.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/node18-agario@sha256:...  1.0 GiB  1            78.95 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete <instance-name>
 ```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove <instance-name>
-```
-
 
 ## Learn more
 
@@ -162,16 +91,8 @@ kraft cloud instance remove <instance-name>
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

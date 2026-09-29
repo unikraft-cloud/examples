@@ -6,14 +6,9 @@ OpenTelemetry Collector works with Unikraft / Unikraft Cloud to process telemetr
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/opentelemetry-collector/` directory:
 
@@ -25,24 +20,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/opentelemetry-collector:latest
 unikraft run --metro fra \
@@ -50,18 +33,8 @@ unikraft run --metro fra \
   --image <my-org>/opentelemetry-collector:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 1536Mi \
-  .
-```
-
 The output shows the instance details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         opentelemetry-collector-bvtnh
@@ -79,22 +52,6 @@ timestamps:
   created:    just now
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: opentelemetry-collector-bvtnh
- ├───────── uuid: 40e8b154-b3b6-4312-ae69-2cdb794b15e4
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├──────── image: oci://unikraft.io/<my-org>/opentelemetry-collector@sha256:64f73ea5fe208f54e5212f57979f24bebcf36276495462c52b380d15dd539ced
- ├─────── memory: 1536 MiB
- ├─ private fqdn: opentelemetry-collector-bvtnh.internal
- └─── private ip: 10.0.3.3
-```
-
 In this case, the instance name is `opentelemetry-collector-bvtnh`.
 They're different for each run.
 
@@ -106,7 +63,6 @@ Feel free to change and redeploy!
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -116,30 +72,10 @@ METRO  NAME                           STATE    IMAGE                   ARGS  MEM
 fra    opentelemetry-collector-bvtnh  running  <my-org>/opentelemetry        1536MiB  1            2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                           FQDN  STATE    STATUS        IMAGE                                        MEMORY    VCPUS  ARGS  BOOT TIME
-opentelemetry-collector-bvtnh        running  since 11mins  oci://unikraft.io/<my-org>/opentelemetry...  1536 MiB  1            177.62 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete opentelemetry-collector-bvtnh
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove opentelemetry-collector-bvtnh
 ```
 
 ## Customize your app
@@ -153,16 +89,8 @@ Such as adding another export, apart from the debug exporter.
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

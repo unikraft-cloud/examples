@@ -3,14 +3,9 @@
 This guide explains how to create and deploy a C++-based HTTP web server using the [Boost](https://www.boost.org/) libraries.
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [example repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-boost1.74-gpp13.2/` directory:
 
@@ -22,24 +17,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-boost174-gpp132:latest
 unikraft run --metro fra \
@@ -49,21 +32,8 @@ unikraft run --metro fra \
   --image <my-org>/httpserver-boost174-gpp132:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 256Mi \
-  -p 443:8080/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-cooldown 1s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-boost174-gpp132-rae7s
@@ -86,24 +56,6 @@ timestamps:
   created:    just now
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-boost174-gpp132-rae7s
- ├───────── uuid: 5a9886fa-f8a3-4860-afcf-d5eb13fdc38d
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://red-snow-3bn7bzc8.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-boost174-gpp132@sha256:61cf86b89fed46351af53689e27189315e466576475f61c7240bf17644613489
- ├─────── memory: 256 MiB
- ├────── service: red-snow-3bn7bzc8
- ├─ private fqdn: httpserver-boost174-gpp132-rae7s.internal
- └─── private ip: 10.0.6.4
-```
-
 In this case, the instance name is `httpserver-boost174-gpp132-rae7s` and the address is `https://red-snow-3bn7bzc8.fra.unikraft.app`.
 They're different for each run.
 
@@ -119,7 +71,6 @@ Hello, World!
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -129,30 +80,10 @@ METRO  NAME                              STATE    IMAGE                         
 fra    httpserver-boost174-gpp132-rae7s  running  <my-org>/httpserver-boost174-gpp132        256MiB  1      red-snow-3bn7bzc8.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                              FQDN                                STATE    STATUS        IMAGE                                                             MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-boost174-gpp132-rae7s  red-snow-3bn7bzc8.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-boost174-gpp132@sha256:...  256 MiB  1            15.00 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-boost174-gpp132-rae7s
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove httpserver-boost174-gpp132-rae7s
 ```
 
 ## Customize your app
@@ -191,16 +122,8 @@ The following options are available for customizing the app:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

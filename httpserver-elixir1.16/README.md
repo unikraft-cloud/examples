@@ -3,14 +3,9 @@
 This guide explains how to create and deploy a simple Elixir-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-elixir1.16/` directory:
 
@@ -22,24 +17,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-elixir116:latest
 unikraft run --metro fra \
@@ -49,22 +32,8 @@ unikraft run --metro fra \
   --image <my-org>/httpserver-elixir116:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 1Gi \
-  -p 443:3000/tls+http \
-  --scale-to-zero idle \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 3s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-elixir116-qo9k3
@@ -87,24 +56,6 @@ timestamps:
   created:    just now
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-elixir116-qo9k3
- ├───────── uuid: e5fbf089-b000-4b2d-a827-44a1f5d28f24
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://small-water-tl8lr8am.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-elixir116@sha256:67f5df003758a1180932e931727f8cb7006bbbf6fdd84058e27fe05e4829bba0
- ├─────── memory: 1024 MiB
- ├────── service: small-water-tl8lr8am
- ├─ private fqdn: httpserver-elixir116-qo9k3.internal
- └─── private ip: 10.0.3.4
-```
-
 In this case, the instance name is `httpserver-elixir116-qo9k3` and the address is `https://small-water-tl8lr8am.fra.unikraft.app`.
 They're different for each run.
 
@@ -120,7 +71,6 @@ Hello, World!
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -130,30 +80,10 @@ METRO  NAME                        STATE    IMAGE                          ARGS 
 fra    httpserver-elixir116-qo9k3  running  <my-org>/httpserver-elixir116        1.0GiB  1      small-water-tl8lr8am.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                        FQDN                                   STATE    STATUS       IMAGE                                                       MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-elixir116-qo9k3  small-water-tl8lr8am.fra.unikraft.app  running  since 9mins  oci://unikraft.io/<my-org>/httpserver-elixir116@sha256:...  1.0 GiB  1            437.43 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-elixir116-qo9k3
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove httpserver-elixir116-qo9k3
 ```
 
 ## Customize your app
@@ -186,16 +116,8 @@ Then update it and deploy it on Unikraft Cloud using the above instructions.
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

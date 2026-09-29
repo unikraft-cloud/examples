@@ -19,14 +19,9 @@ The server gives AI agents and assistants the ability to:
 
 To run this MCP server on Unikraft Cloud:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mcp-server-arxiv/` directory:
 
@@ -38,24 +33,12 @@ To run this MCP server on Unikraft Cloud:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mcp-server-arxiv:latest
 unikraft run --metro fra \
@@ -65,22 +48,8 @@ unikraft run --metro fra \
   --image <my-org>/mcp-server-arxiv:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 2Gi \
-  -p 443:8080/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  .
-```
-
 The output shows your instance details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         mcp-server-arxiv-l7l24
@@ -101,24 +70,6 @@ networks:
   mac:        12:b0:26:13:a0:89
 timestamps:
   created:    just now
-```
-
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: mcp-server-arxiv-l7l24
- ├───────── uuid: 1a721bb8-4472-4149-9870-789b1df5f80a
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://billowing-breeze-nuusy7l2.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/mcp-server-arxiv@sha256:ea1e677ccc03628a3e7d57a4cd41118e3d2a631bcb2c34203bb9b175e7977f00
- ├─────── memory: 2048 MiB
- ├────── service: billowing-breeze-nuusy7l2
- ├─ private fqdn: mcp-server-arxiv-l7l24.internal
- └─── private ip: 10.0.1.149
 ```
 
 In this case, the instance name is `mcp-server-arxiv-l7l24` and the service `billowing-breeze-nuusy7l2`.
@@ -143,7 +94,6 @@ Description: Search for papers on arXiv with advanced filtering and query optimi
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -153,22 +103,10 @@ METRO  NAME                    STATE    IMAGE                      ARGS  MEMORY 
 fra    mcp-server-arxiv-l7l24  standby  <my-org>/mcp-server-arxiv        2.0GiB  1      billowing-breeze-nuusy7l2.fra.unikraf…  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                    FQDN                                        STATE    STATUS   IMAGE                                                   MEMORY   VCPUS  ARGS  BOOT TIME
-mcp-server-arxiv-l7l24  billowing-breeze-nuusy7l2.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/mcp-server-arxiv@sha256:...  2.0 GiB  1            213.07 ms
-```
-
 When done, you can delete the instance with:
 
-```bash
-kraft cloud instance remove mcp-server-arxiv-l7l24
+```bash title="unikraft"
+unikraft instances delete mcp-server-arxiv-l7l24
 ```
 
 ## Using volumes
@@ -176,21 +114,12 @@ kraft cloud instance remove mcp-server-arxiv-l7l24
 You can use [volumes](https://unikraft.com/docs/platform/volumes) for data persistence.
 For that you would first create a volume:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume create --set metro=fra --set name=mcp-server-arxiv-data --set size=500M
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud volume create --name mcp-server-arxiv-data --size 500Mi
-```
-
 Then start the MCP server instance and mount that volume (while specifying the storage path):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mcp-server-arxiv:latest
 unikraft run --metro fra \
@@ -200,21 +129,6 @@ unikraft run --metro fra \
   -v mcp-server-arxiv-data:/volume \
   --image <my-org>/mcp-server-arxiv:latest \
   -- "/usr/local/bin/python /src/server.py --storage-path /volume"
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 2Gi \
-  -p 443:8080/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  -v mcp-server-arxiv-data:/volume \
-  --entrypoint "/usr/local/bin/python /src/server.py --storage-path /volume" \
-  .
 ```
 
 ## Available tools
@@ -236,16 +150,8 @@ The ArXiv MCP Server provides the following tools:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

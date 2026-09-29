@@ -7,7 +7,7 @@ and then tear the instance down.
 ## Prerequisites
 
 * Python 3.10+
-* The [`unikraft`](https://unikraft.com/docs/cli/unikraft) CLI on `PATH`
+* The [`unikraft`](https://unikraft.com/docs/cli) CLI on `PATH`
   (override with `UNIKRAFT_BIN`), already authenticated via
   `unikraft login` (the tests rely on your existing CLI profile).
 * A working container runtime (Docker or compatible) — required by

@@ -3,14 +3,9 @@
 This guide shows you how to use [MySQL](https://www.mysql.com), one of the most popular open source relational databases.
 To run it, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-	> **Note**:
-	> The unikraft CLI is the current standard, while kraft is the legacy version.
-	> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mysql/` directory:
 
@@ -22,24 +17,12 @@ cd examples/mysql
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mysql:latest
 unikraft run --metro fra \
@@ -48,20 +31,6 @@ unikraft run --metro fra \
   --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
   -e MYSQL_ROOT_PASSWORD="unikraft" \
   --image <my-org>/mysql:latest
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 1Gi \
-  -p 3306:3306/tls \
-  --scale-to-zero idle \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  --env MYSQL_ROOT_PASSWORD="unikraft" \
-  .
 ```
 
 The output shows the instance address and other details:
@@ -94,24 +63,6 @@ scale-to-zero:
   policy:                idle
   stateful:              true
   cooldown-time:         1s
-```
-
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: mysql-b3mlh
- ├───────── uuid: 19479d80-0995-4ed2-b08e-86b29eda3f3
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://purple-wood-hqb663gu.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/mysql@sha256:f51ecc121c9ca34abb88a2bc6a69765501304f7893f7e85af15fbec3dc86e2bd
- ├─────── memory: 1024 MiB
- ├────── service: purple-wood-hqb663gu
- ├─ private fqdn: mysql-b3mlh.internal
- └─── private ip: 10.0.3.3
 ```
 
 In this case, the instance name is `mysql-b3mlh` which is different for each run.
@@ -150,7 +101,6 @@ To disconnect, kill the `socat` command using `Ctrl+c`.
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -160,30 +110,10 @@ METRO  NAME         STATE    IMAGE           ARGS  MEMORY   VCPUS  FQDN         
 fra    mysql-b3mlh  running  <my-org>/mysql        1024MiB  1      purple-wood-hqb663gu.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME         FQDN                                   STATE    STATUS         IMAGE                                        MEMORY    VCPUS  ARGS  BOOT TIME
-mysql-b3mlh  purple-wood-hqb663gu.fra.unikraft.app  running  5 minutes ago  oci://unikraft.io/<my-org>/mysql@sha256:...  1024 MiB  1            11.13 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instance remove mysql-b3mlh
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove mysql-b3mlh
 ```
 
 > **Tip:**
@@ -194,21 +124,12 @@ kraft cloud instance remove mysql-b3mlh
 You can use [volumes](https://unikraft.com/docs/platform/volumes) for data persistence for your MySQL instance.
 For that you would first create a volume:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume create --set metro=fra --set name=mysql-store --set size=512M
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud volume create --name mysql-store --size 512Mi
-```
-
 Then start the MySQL instance and mount that volume:
 
-**Using the unikraft CLI (Recommended)**
 ```bash
 unikraft build . --output <my-org>/mysql:latest
 unikraft run --metro fra \
@@ -220,36 +141,12 @@ unikraft run --metro fra \
   --image <my-org>/mysql:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 1Gi \
-  -p 3306:3306/tls \
-  --scale-to-zero idle \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  --env MYSQL_ROOT_PASSWORD="unikraft" \
-  --volume mysql-store:/var/lib \
-  .
-```
-
-
 ## Learn more
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

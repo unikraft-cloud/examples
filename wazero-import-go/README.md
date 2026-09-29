@@ -5,14 +5,9 @@ and shows how to define, import and call a wasm blob from Go and run it on Unikr
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/wazero-import-go/` directory:
 
@@ -24,24 +19,12 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/wazero-import-go:latest
 unikraft run --metro fra \
@@ -51,21 +34,8 @@ unikraft run --metro fra \
   --image <my-org>/wazero-import-go:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 512Mi \
-  -p 443:8080/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-cooldown 1s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         wazero-import-go-r4dx8
@@ -88,24 +58,6 @@ timestamps:
   created:    just now
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: wazero-import-go-r4dx8
- ├───────── uuid: a763e1c3-bb38-475f-95b6-1e78d8ca74fc
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://cool-morning-camrrhsa.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/wazero-import-go@sha256:865700d358ffb2751888798ec8f302d23310b1fcf84f4d3f17f79fc25ff71153
- ├─────── memory: 512 MiB
- ├────── service: cool-morning-camrrhsa
- ├─ private fqdn: wazero-import-go-r4dx8.internal
- └─── private ip: 10.0.6.7
-```
-
 In this case, the instance name is `wazero-import-go-r4dx8` and the address is `https://cool-morning-camrrhsa.fra.unikraft.app`.
 They're different for each run.
 
@@ -122,7 +74,6 @@ log_i32 >> 24
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -132,30 +83,10 @@ METRO  NAME                    STATE    IMAGE                      ARGS  MEMORY 
 fra    wazero-import-go-r4dx8  running  <my-org>/wazero-import-go        512MiB  1      cool-morning-camrrhsa.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME                    FQDN                                    STATE    STATUS         IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
-wazero-import-go-r4dx8  cool-morning-camrrhsa.fra.unikraft.app  running  1 minutes ago  oci://unikraft.io/<my-org>/wazero-import-go@s...  512 MiB  1            20.04 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete wazero-import-go-r4dx8
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove wazero-import-go-r4dx8
 ```
 
 ## Background
@@ -187,16 +118,8 @@ To customize the app, update the files in the repository, listed below:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

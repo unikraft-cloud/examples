@@ -3,14 +3,9 @@
 This example uses the [`Traefik`](https://traefik.io/traefik/) cloud native app proxy.
 To run it, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/traefik/` directory:
 
@@ -22,24 +17,12 @@ To run it, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
-```
-
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/traefik:latest
 unikraft run --metro fra \
@@ -50,23 +33,8 @@ unikraft run --metro fra \
   --image <my-org>/traefik:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 1Gi \
-  -p 443:80/tls+http \
-  -p 8080:8080/tls \
-  --scale-to-zero on \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  .
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         traefik-wqe7e
@@ -87,24 +55,6 @@ networks:
   mac:        12:b0:31:58:d7:d0
 timestamps:
   created:    just now
-```
-
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: traefik-wqe7e
- ├───────── uuid: 69d25b0b-1813-4a3f-88e6-64abbc78b359
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://holy-cherry-rye39b1x.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/traefik@sha256:f6dd913a81f6a057ceb9db7844222d7287b2a83f668cca88c73c2e85554cb526
- ├─────── memory: 1024 MiB
- ├────── service: holy-cherry-rye39b1x
- ├─ private fqdn: traefik-wqe7e.internal
- └─── private ip: 10.0.28.16
 ```
 
 In this case, the instance name is `traefik-wqe7e` and the address is `https://holy-cherry-rye39b1x.fra.unikraft.app`.
@@ -128,7 +78,6 @@ Or better yet, point a browser at the dashboard.
 
 You can list information about the instance by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -138,30 +87,10 @@ METRO  NAME           STATE    IMAGE             ARGS  MEMORY   VCPUS  FQDN     
 fra    traefik-wqe7e  running  <my-org>/traefik        1024MiB  1      holy-cherry-rye39b1x.fra.unikraft.app  2 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME           FQDN                                   STATE    STATUS         IMAGE                                          MEMORY    VCPUS  ARGS  BOOT TIME
-traefik-wqe7e  holy-cherry-rye39b1x.fra.unikraft.app  running  8 minutes ago  oci://unikraft.io/<my-org>/traefik@sha256:...  1024 MiB  1            53.66 ms
-```
-
 When done, you can remove the instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete traefik-wqe7e
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove traefik-wqe7e
 ```
 
 ## Customize your app
@@ -172,16 +101,8 @@ To customize Traefik app you can change the `default.toml` configuration file.
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).

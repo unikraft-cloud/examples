@@ -7,14 +7,9 @@ used for building the rootfs was generated following the instructions [here](htt
 
 To run this example, follow these steps:
 
-1. Install the CLI.
-   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
-
-   > **Note**:
-   > The unikraft CLI is the current standard, while kraft is the legacy version.
-   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/phoenix-postgres` directory:
 
@@ -26,40 +21,20 @@ To run this example, follow these steps:
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-# Set Unikraft Cloud access token
-export UKC_TOKEN=token
-# Set metro to Frankfurt, DE
-export UKC_METRO=fra
 ```
 
 ## PostgreSQL
 
 Create a volume for PostgreSQL data persistence:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume create --metro fra --name db-data --size 512M
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud volume create --name db-data --size 512Mi
-```
-
 You can list the created volume by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume list
 ```
@@ -69,21 +44,8 @@ METRO  NAME     STATE      SIZE    CREATED
 fra    db-data  available  512MiB  just now
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud volume list
-```
-
-```ansi title="kraft"
-NAME     CREATED AT  SIZE     ATTACHED TO  MOUNTED BY  STATE      PERSISTENT
-db-data  now         512 MiB                           available  true
-```
-
 Update `POSTGRES_PASSWORD` with a secure password and build and deploy the PostgreSQL instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./postgres --output <my-org>/postgres:latest
 unikraft run --metro fra \
@@ -98,29 +60,10 @@ unikraft run --metro fra \
   --image <my-org>/postgres:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 2Gi \
-  --scale-to-zero idle \
-  --scale-to-zero-stateful \
-  --scale-to-zero-cooldown 1s \
-  --domain postgres.internal \
-  --env POSTGRES_USER=postgres \
-  --env POSTGRES_PASSWORD=example_123 \
-  --env POSTGRES_DB=myapp_prod \
-  --env PGDATA=/var/lib/postgresql/data/pgdata \
-  --volume db-data:/var/lib/postgresql/data \
-  postgres/
-```
-
 Make sure to replace `<my-org>` with your username / org-name.
 
 The output shows the PostgreSQL instance details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:                 fra
 name:                  postgres-ik5at
@@ -158,24 +101,6 @@ scale-to-zero:
   cooldown-time:       1s
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: postgres-ik5at
- ├───────── uuid: 3776dbfe-2937-45e7-8079-c54275ef3cff
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: postgres.internal
- ├──────── image: oci://unikraft.io/<my-org>/postgres@sha256:...
- ├─────── memory: 2048 MiB
- ├────── service: dry-cloud-q8u7yjkl
- ├─ private fqdn: postgres-ik5at.internal
- └─── private ip: 10.0.14.117
-```
-
 ## Phoenix
 
 Generate a secret key for Phoenix:
@@ -187,7 +112,6 @@ openssl rand -base64 48
 Replace `<your-secret-key-base>` in the commands below with the generated value, and update the password in `DATABASE_URL` to match the one set for PostgreSQL.
 Then, deploy the Phoenix instance:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./phoenix --output <my-org>/phoenix:latest
 unikraft run --metro fra \
@@ -199,23 +123,8 @@ unikraft run --metro fra \
   --image <my-org>/phoenix:latest
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy \
-  -M 2Gi \
-  -p 443:4000/tls+http \
-  --scale-to-zero on \
-  --scale-to-zero-cooldown 1s \
-  --env SECRET_KEY_BASE=<your-secret-key-base> \
-  --env DATABASE_URL=ecto://postgres:example_123@postgres.internal:5432/myapp_prod \
-  phoenix/
-```
-
 The output shows the instance address and other details:
 
-**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:               fra
 name:                phoenix-hd29m
@@ -246,24 +155,6 @@ scale-to-zero:
   cooldown-time:     1s
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: phoenix-hd29m
- ├───────── uuid: fa4db9cf-f7b5-4b8b-b007-8fd1ce87c7e1
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://wild-moon-pkwsqc49.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/phoenix@sha256:...
- ├─────── memory: 2048 MiB
- ├────── service: wild-moon-pkwsqc49
- ├─ private fqdn: phoenix-hd29m.internal
- └─── private ip: 10.0.14.53
-```
-
 In this case, the instance names are `postgres-ik5at` and `phoenix-hd29m`.
 They're different for each run.
 
@@ -271,7 +162,6 @@ Use a browser to access the Phoenix application using the URL from the `fqdn` fi
 
 You can list information about the instances by running:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -282,31 +172,10 @@ fra    phoenix-hd29m   running  <my-org>/phoenix   2GiB    1      wild-moon-pkws
 fra    postgres-ik5at  standby  <my-org>/postgres  2GiB    1      postgres.internal                    3 minutes ago
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance list
-```
-
-```ansi title="kraft"
-NAME            FQDN                                 STATE    STATUS      IMAGE                                           MEMORY    VCPUS  ARGS  BOOT TIME
-phoenix-hd29m   wild-moon-pkwsqc49.fra.unikraft.app  running  since now   oci://unikraft.io/<my-org>/phoenix@sha256:...   2048 MiB  1            158.32 ms
-postgres-ik5at  postgres.internal                    standby  since 3min  oci://unikraft.io/<my-org>/postgres@sha256:...  2048 MiB  1            1811.99 ms
-```
-
 When done, you can remove the instances:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete postgres-ik5at phoenix-hd29m
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud instance remove postgres-ik5at phoenix-hd29m
 ```
 
 ## Volume
@@ -315,16 +184,8 @@ This deployment creates a volume (`db-data`) for PostgreSQL data persistence.
 The volume persists after removing instances, allowing you to redeploy without losing data.
 To remove the volume:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume delete db-data
-```
-
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud volume remove db-data
 ```
 
 ## Learn more
@@ -336,16 +197,8 @@ kraft cloud volume remove db-data
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
-**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
-or
-
-**Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud --help
-```
-
-Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft) or the [legacy CLI Reference](https://unikraft.com/docs/cli/kraft/overview).
+Or visit the [CLI Reference](https://unikraft.com/docs/cli/unikraft).
