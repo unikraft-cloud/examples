@@ -122,7 +122,7 @@ Once they stop, the template is ready and you can check it with:
 unikraft instances templates list
 ```
 
-```bash title="unikraft"
+```ansi title="unikraft"
 METRO  NAME           STATE     IMAGE               ARGS  MEMORY  VCPUS  CREATED
 fra    minecraft-tpl  template  <my-org>/minecraft        4GiB    4      5 seconds ago
 ```
