@@ -1,0 +1,22 @@
+{
+  "name": "typescript-rom-server",
+  "version": "1.0.0",
+  "description": "Unikraft Cloud TypeScript ROM example - HTTP server with dynamically loaded JS functions from ROM",
+  "type": "module",
+  "main": "server.ts",
+  "scripts": {
+    "start": "node --experimental-strip-types server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "unikraft",
+    "rom",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "@types/node": "^22.0.0"
+  }
+}
