@@ -35,9 +35,13 @@ unikraft build . --output <my-org>/novnc-browser:latest
 unikraft run --metro fra \
   -m 4G \
   -p 443:6080/tls+http \
+  -e NOVNC_PASSWORD=<my-password> \
   --scale-to-zero policy=on,cooldown-time=4000,stateful=true \
   --image <my-org>/novnc-browser:latest
 ```
+
+Replace `<my-password>` with a long random password.
+For more information, see [Authentication](#authentication).
 
 The output shows the instance address and other details:
 
@@ -47,6 +51,9 @@ name:         vnc-browser
 uuid:         90a59b05-0ae1-4ca6-8383-79c5115355ee
 state:        starting
 image:        <my-org>/novnc-browser
+runtime:
+  env:
+    NOVNC_PASSWORD: *
 resources:
   memory:     4096MiB
   vcpus:      1
@@ -66,11 +73,8 @@ timestamps:
 In this case, the instance name is `vnc-browser` and the address is `https://weathered-fog-y5jjmwfd.fra.unikraft.app`.
 The name was preset, but the address is different for each run.
 Enter the provided address into your browser of choice to access the remote desktop interface.
-
-> [!WARNING]
-> This exposes an unauthenticated remote desktop interface to the public internet.
-> To require authentication, use websockify [authentication plugins](https://github.com/novnc/websockify/blob/v0.12.0/README.md#additional-websockify-features) (`--auth-plugin`, `--auth-source`, `--web-auth`).
-> See [`auth_plugins.py`](https://github.com/novnc/websockify/blob/v0.12.0/websockify/auth_plugins.py) for the available plugins.
+The browser asks for a user name and a password.
+Use the user name `novnc` and the password from `NOVNC_PASSWORD`.
 
 You can list information about the instance by running:
 
@@ -88,6 +92,40 @@ When done, you can remove the instance:
 ```bash title="unikraft"
 unikraft instances delete vnc-browser
 ```
+
+## Authentication
+
+The remote desktop uses HTTP Basic Auth when you set the `NOVNC_PASSWORD` environment variable.
+Basic Auth protects the noVNC page and the WebSocket connection to the desktop.
+Unikraft Cloud encrypts the connection with TLS.
+
+| Variable         | Value                                           | Default           |
+| ---------------- | ----------------------------------------------- | ----------------- |
+| `NOVNC_PASSWORD` | Password for HTTP Basic Auth                    | No authentication |
+| `NOVNC_USER`     | User name for HTTP Basic Auth, without a `:`    | `novnc`           |
+
+> [!WARNING]
+> If you do not set `NOVNC_PASSWORD`, the remote desktop has no authentication.
+> A person who knows the address can control the desktop.
+> The instance log then shows `WARNING: noVNC has no authentication`.
+
+A program, for example an AI agent, can also use the desktop.
+It must send the `Authorization: Basic <base64 of user:password>` header with each request, also with the WebSocket request to `/websockify`.
+For example:
+
+```bash
+curl -u 'novnc:<my-password>' https://weathered-fog-y5jjmwfd.fra.unikraft.app/vnc.html
+```
+
+With Playwright, set the credentials on the browser context:
+
+```python
+context = browser.new_context(
+    http_credentials={"username": "novnc", "password": "<my-password>"})
+```
+
+Do not put the credentials in the address (`https://user:password@...`).
+Some browsers do not send them with the WebSocket request.
 
 ## Learn more
 

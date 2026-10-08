@@ -1,38 +1,35 @@
-FROM ubuntu:22.04
+FROM alpine:3.22 AS novnc
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV DEBIAN_PRIORITY=high
+RUN apk add --no-cache git && \
+    git clone --depth 1 --branch v1.5.0 https://github.com/novnc/noVNC.git /opt/noVNC && \
+    git clone --depth 1 --branch v0.12.0 https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
+    rm -rf /opt/noVNC/.git /opt/noVNC/utils/websockify/.git && \
+    ln -s vnc.html /opt/noVNC/index.html
+
+FROM debian:13-slim
 
 RUN apt-get update && \
-    apt-get -y upgrade && \
-    apt-get -y install \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     xvfb \
-    xterm \
+    x11-utils \
     xdotool \
-    scrot \
-    imagemagick \
-    mutter \
+    openbox \
+    lxpanel \
+    xterm \
     x11vnc \
-    tint2 \
-    git \
     net-tools \
-    gedit \
-    x11-apps \
-    xpaint \
-    software-properties-common
+    python3 \
+    adwaita-icon-theme \
+    fonts-dejavu-core \
+    ca-certificates \
+    firefox-esr && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/* /var/log/* \
+    /usr/share/doc /usr/share/man /usr/share/info
 
-# Install Firefox ESR
-RUN add-apt-repository ppa:mozillateam/ppa && \
-    apt-get install -y --no-install-recommends \
-    firefox-esr
-
-# Install noVNC
-RUN git clone --branch v1.5.0 https://github.com/novnc/noVNC.git /opt/noVNC && \
-    git clone --branch v0.12.0 https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
-    ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html
+COPY --from=novnc /opt/noVNC /opt/noVNC
 
 COPY ./image /
 
-COPY --chmod=755 ./wrapper.sh /wrapper.sh
+COPY --chmod=755 ./wrapper.sh /opt/novnc/wrapper.sh
 
-ENTRYPOINT [ "/wrapper.sh" ]
+ENTRYPOINT [ "/opt/novnc/wrapper.sh" ]

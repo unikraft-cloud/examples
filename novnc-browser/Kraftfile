@@ -11,4 +11,4 @@ rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: [ "/wrapper.sh" ]
+cmd: [ "/opt/novnc/wrapper.sh" ]
