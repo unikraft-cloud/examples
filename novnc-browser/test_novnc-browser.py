@@ -29,8 +29,8 @@ def test_novnc_serves_page(build_image, run_instance, http, wait_instance):
 
     wait_instance(extract_instance_name(instance), "running")
 
-    # noVNC has a heavy startup (Xvfb, mutter, tint2, x11vnc, then noVNC
-    # proxy) so allow plenty of time for the HTTP endpoint to become ready.
+    # noVNC starts after Xvfb, openbox, lxpanel and x11vnc, so allow some
+    # time for the HTTP endpoint to become ready.
     resp = http(url, retries=30, backoff=5.0, timeout=30.0)
     assert resp.status_code == 200
     assert "noVNC" in resp.text or "vnc" in resp.text.lower()

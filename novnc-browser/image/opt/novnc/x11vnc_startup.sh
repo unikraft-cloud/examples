@@ -6,18 +6,19 @@ echo "starting vnc"
     -shared \
     -wait 50 \
     -rfbport 5900 \
+    -localhost \
     -nopw \
     2>/tmp/x11vnc_stderr.log) &
 
 x11vnc_pid=$!
 
 # Wait for x11vnc to start
-timeout=10
+timeout=100
 while [ $timeout -gt 0 ]; do
     if netstat -tuln | grep -q ":5900 "; then
         break
     fi
-    sleep 1
+    sleep 0.1
     ((timeout--))
 done
 
