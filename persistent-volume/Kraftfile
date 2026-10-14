@@ -1,0 +1,11 @@
+spec: v0.6
+name: storage-app
+
+# Specify kernel that will run the app
+runtime: base:latest
+
+# Build the file system (rootfs) using the local Dockerfile
+rootfs: ./Dockerfile
+
+# Command to start the Unikernel
+cmd: ["/app_storage"]
