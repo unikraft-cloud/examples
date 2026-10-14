@@ -44,6 +44,7 @@ if wait_for_xvfb; then
     echo "Xvfb PID: $XVFB_PID"
 else
     echo "Xvfb failed to start"
-    # kill $XVFB_PID
+    kill "$XVFB_PID" 2>/dev/null || true
+    wait "$XVFB_PID" 2>/dev/null || true
     exit 1
 fi
