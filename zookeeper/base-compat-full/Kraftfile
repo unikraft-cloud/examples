@@ -1,0 +1,9 @@
+spec: v0.6
+
+name: zookeeper
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/src/wrapper.sh", "/docker-entrypoint.sh", "/apache-zookeeper-3.7.2-bin/bin/zkServer.sh", "start-foreground"]
