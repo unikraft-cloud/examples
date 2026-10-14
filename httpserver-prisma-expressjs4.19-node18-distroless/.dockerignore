@@ -1,0 +1,3 @@
+dist
+node_modules
+prisma/store.db*
