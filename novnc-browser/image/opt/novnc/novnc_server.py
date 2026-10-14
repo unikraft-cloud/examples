@@ -11,19 +11,19 @@ and each WebSocket request must have one of these credentials:
 - The session cookie, which a browser gets when it opens a page with a
   correct token.
 
-Pages of other sites can show the desktop in a frame, with a token in the URL
-of the frame. The session cookie is partitioned: a browser sends it only while
-the top-level page is on the site where the browser got the cookie. A response
-to other credentials cannot show in a frame of another site. A browser sends
-its stored
+Pages of other sites can show the desktop in a frame only with the token in the
+URL of the frame. A frame keeps the token in its URL, and the browser gets a
+partitioned session cookie for the files of the page. A page that other
+credentials open cannot show in a frame of another site. A browser sends its
+stored
 credentials also for a WebSocket that a page of another site starts. Thus, a
 WebSocket request with an Origin of another host or port gets 403, and a
 WebSocket request with only the cookie must have the Origin of the desktop.
 
-A browser that opens a page with a correct token gets a redirect to the same
-URL without the token, thus the password does not stay in the address bar. A
-request without correct credentials gets 401, and the browser shows a login
-dialog. The log never shows the token.
+A browser that opens a page with a correct token outside a frame gets a
+redirect to the same URL without the token, thus the password does not stay
+in the address bar. A request without correct credentials gets 401, and the
+browser shows a login dialog. The log never shows the token.
 """
 
 import base64
@@ -123,18 +123,26 @@ class Handler(websocketproxy.ProxyRequestHandler):
         super().log_message("%s", TOKEN_VALUE.sub(r"\1<hidden>",
                                                   format % args))
 
-    def frame_ok(self):
-        # A request that failed before its headers has no path or headers
-        if self.server.creds is None or not hasattr(self, "headers"):
-            return False
-        return self.token_ok() or self.session_ok()
+    def parse_request(self):
+        # One handler serves all the requests of a connection
+        self.token = self.new_session = False
+        return super().parse_request()
+
+    def is_frame(self):
+        return self.headers.get("Sec-Fetch-Dest") in ("iframe", "frame",
+                                                      "embed", "object")
 
     def end_headers(self):
-        # Only the token and the partitioned cookie allow frames of other sites
-        if not self.frame_ok():
+        # The cookie does not allow frames: all subdomains of a domain are one
+        # site. do_GET sets token before auth_connection removes it.
+        if not self.token:
             self.send_header("Content-Security-Policy",
                              "frame-ancestors 'self'")
             self.send_header("X-Frame-Options", "SAMEORIGIN")
+        if self.new_session:
+            self.send_header("Set-Cookie",
+                             f"{COOKIE}={self.server.session}; Path=/; "
+                             "Secure; HttpOnly; SameSite=None; Partitioned")
         super().end_headers()
 
     def reject(self, code, headers):
@@ -158,16 +166,16 @@ class Handler(websocketproxy.ProxyRequestHandler):
         self.path = without_token(self.path)
 
     def do_GET(self):
+        self.token = self.server.creds is not None and self.token_ok()
         # Exchange a correct token for the session cookie
-        if self.server.creds is not None and self.is_navigation() and \
-                self.token_ok():
+        self.new_session = self.token and self.is_navigation()
+
+        # A frame has no address bar, and its page needs the token to show
+        if self.new_session and not self.is_frame():
             # Only a path, so that the browser stays on this host
             location = "/" + without_token(self.path).lstrip("/\\")
             self.send_response(302)
             self.send_header("Location", location)
-            self.send_header("Set-Cookie",
-                             f"{COOKIE}={self.server.session}; Path=/; "
-                             "Secure; HttpOnly; SameSite=None; Partitioned")
             self.send_header("Content-Length", "0")
             self.end_headers()
             return

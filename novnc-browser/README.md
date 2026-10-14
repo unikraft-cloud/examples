@@ -155,15 +155,17 @@ An agent can also connect to the WebSocket with the token: `wss://weathered-fog-
 > The password in a `token` parameter is in the address of the first request.
 > Proxies can write this address to their logs.
 
-A page of another site can show the desktop in a frame, with the token in the address of the frame:
+A page of another site can show the desktop in a frame.
+Put `vnc.html` and the token in the address of the frame:
 
 ```html
-<iframe src="https://weathered-fog-y5jjmwfd.fra.unikraft.app/?token=<my-password>&autoconnect=true&resize=scale"></iframe>
+<iframe src="https://weathered-fog-y5jjmwfd.fra.unikraft.app/vnc.html?token=<my-password>&autoconnect=true&resize=scale"></iframe>
 ```
 
+In a frame, the address keeps the token.
 The page that shows the frame contains the password, thus show this page only to persons who can know the password.
-The browser uses the session cookie of a frame only in pages of the same site as the page that shows the frame.
-A page of another site cannot show the desktop in a frame with HTTP Basic Auth, and cannot connect to the WebSocket of the desktop.
+Without the token in the address of the frame, a page of another site cannot show the desktop in a frame.
+A page of another site cannot connect to the WebSocket of the desktop.
 
 Do not put the credentials in the address as `https://user:password@...`.
 Some browsers do not send them with the WebSocket request.
