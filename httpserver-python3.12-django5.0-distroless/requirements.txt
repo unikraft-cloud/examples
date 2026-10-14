@@ -1,0 +1,4 @@
+Django>=5.0.3
+bjoern==3.2.2
+Werkzeug>=3.0.3
+tzdata>=2026.1
