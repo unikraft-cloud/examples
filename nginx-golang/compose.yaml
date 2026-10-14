@@ -1,0 +1,10 @@
+services:
+  proxy:
+    build: ./proxy
+    ports:
+      - 443:80
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
