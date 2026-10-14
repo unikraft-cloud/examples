@@ -95,14 +95,21 @@ unikraft instances delete vnc-browser
 
 ## Authentication
 
-The remote desktop uses HTTP Basic Auth when you set the `NOVNC_PASSWORD` environment variable.
-Basic Auth protects the noVNC page and the WebSocket connection to the desktop.
+When you set the `NOVNC_PASSWORD` environment variable, each request to the remote desktop must have one of these credentials:
+
+- HTTP Basic Auth with the user name and the password. The browser shows a login dialog.
+- The query parameter `token=<password>`, for a link that opens the desktop without a login dialog.
+- The session cookie, which the browser gets after a login with `token`.
+
 Unikraft Cloud encrypts the connection with TLS.
 
 | Variable         | Value                                           | Default           |
 | ---------------- | ----------------------------------------------- | ----------------- |
-| `NOVNC_PASSWORD` | Password for HTTP Basic Auth                    | No authentication |
+| `NOVNC_PASSWORD` | Password for the remote desktop                 | No authentication |
 | `NOVNC_USER`     | User name for HTTP Basic Auth, without a `:`    | `novnc`           |
+
+If `NOVNC_PASSWORD` is set but empty, the desktop does not start.
+The same applies to an empty `NOVNC_USER` when the desktop has a password.
 
 > [!WARNING]
 > If you do not set `NOVNC_PASSWORD`, the remote desktop has no authentication.
@@ -110,7 +117,7 @@ Unikraft Cloud encrypts the connection with TLS.
 > The instance log then shows `WARNING: noVNC has no authentication`.
 
 A program, for example an AI agent, can also use the desktop.
-It must send the `Authorization: Basic <base64 of user:password>` header with each request, also with the WebSocket request to `/websockify`.
+It can send the `Authorization: Basic <base64 of user:password>` header with each request, also with the WebSocket request to `/websockify`.
 For example:
 
 ```bash
@@ -124,7 +131,41 @@ context = browser.new_context(
     http_credentials={"username": "novnc", "password": "<my-password>"})
 ```
 
-Do not put the credentials in the address (`https://user:password@...`).
+To open the desktop with a link, put the URL-encoded password in the `token` parameter:
+
+```text
+https://weathered-fog-y5jjmwfd.fra.unikraft.app/?token=<my-password>&autoconnect=true
+```
+
+The desktop then sets a session cookie and sends the browser to the same address without `token`.
+Thus, the password does not stay in the address bar.
+The browser history can keep the link with the password, so do not open the link on a shared computer.
+The link needs HTTPS, because the browser keeps the session cookie only on a secure connection.
+
+In the `token` parameter, a `+` is a space, and a `&`, `%` or `#` breaks the link.
+To URL-encode the password, run this command and type the password:
+
+```bash
+python3 -c 'import getpass, urllib.parse; print(urllib.parse.quote(getpass.getpass(), safe=""))'
+```
+
+An agent can also connect to the WebSocket with the token: `wss://weathered-fog-y5jjmwfd.fra.unikraft.app/websockify?token=<my-password>`.
+
+> [!NOTE]
+> The password in a `token` parameter is in the address of the first request.
+> Proxies can write this address to their logs.
+
+A page of another site can show the desktop in a frame, with the token in the address of the frame:
+
+```html
+<iframe src="https://weathered-fog-y5jjmwfd.fra.unikraft.app/?token=<my-password>&autoconnect=true&resize=scale"></iframe>
+```
+
+The page that shows the frame contains the password, thus show this page only to persons who can know the password.
+The browser uses the session cookie of a frame only in pages of the same site as the page that shows the frame.
+A page of another site cannot show the desktop in a frame with HTTP Basic Auth, and cannot connect to the WebSocket of the desktop.
+
+Do not put the credentials in the address as `https://user:password@...`.
 Some browsers do not send them with the WebSocket request.
 
 ## Learn more

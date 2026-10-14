@@ -2,8 +2,12 @@
 """Apply the plugin configuration to the desktop.
 
 Read the JSON configuration from the file given as the first argument, write
-the lxpanel panel, and print shell assignments for the wrapper. A missing or
-incorrect configuration gives the default desktop.
+the lxpanel panel, and print shell assignments for the wrapper. Without the
+default file, the desktop is the default desktop. If the NOVNC_CONFIG file does
+not exist, the desktop does not start. An incorrect key gives a warning and its
+default, but a configuration that is not a JSON object, or an incorrect
+password or user, stops the desktop, so that noVNC never starts without
+authentication by mistake.
 
 Configuration keys, all optional:
 
@@ -11,8 +15,8 @@ Configuration keys, all optional:
     launchers   list of {"name": str, "exec": str, "icon": str (optional)},
                 added to the panel after the default launchers
     autostart   list of shell commands, started after the desktop
-    password    password for HTTP Basic Auth on noVNC, no authentication if
-                not set
+    password    password for noVNC (HTTP Basic Auth, or the "token" URL
+                parameter), no authentication if not set
     user        user name for HTTP Basic Auth, "novnc" if not set
 
 The environment variables NOVNC_PASSWORD and NOVNC_USER replace "password" and
@@ -42,19 +46,25 @@ def warn(msg):
     print(f"novnc-config: {msg}", file=sys.stderr)
 
 
+def fail(msg):
+    print(f"novnc-config: error: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
 def load(path):
     try:
         with open(path, encoding="utf-8") as f:
             cfg = json.load(f)
     except FileNotFoundError:
+        # Only the default file is optional
+        if os.environ.get("NOVNC_CONFIG"):
+            fail(f"cannot read {path}: the file does not exist")
         return {}
     except (OSError, ValueError) as e:
-        warn(f"ignoring {path}: {e}")
-        return {}
+        fail(f"cannot read {path}: {e}")
 
     if not isinstance(cfg, dict):
-        warn("ignoring the configuration, it is not a JSON object")
-        return {}
+        fail("the configuration is not a JSON object")
 
     return cfg
 
@@ -166,16 +176,20 @@ def main():
         else:
             warn(f"ignoring resolution {resolution!r}, use <width>x<height>")
 
-    password = os.environ.get("NOVNC_PASSWORD") or cfg.get("password")
-    user = os.environ.get("NOVNC_USER") or cfg.get("user", DEFAULT_USER)
-    if password is not None:
-        # websockify splits the auth source at the first ':'
+    # A variable that is set but empty is an error, not an absent variable
+    env_password = os.environ.get("NOVNC_PASSWORD")
+    env_user = os.environ.get("NOVNC_USER")
+    if env_password is not None or "password" in cfg:
+        password = env_password if env_password is not None \
+            else cfg.get("password")
+        user = env_user if env_user is not None \
+            else cfg.get("user", DEFAULT_USER)
+        # novnc_server.py splits the auth file at the first ':'
         if not is_text(password) or not is_text(user) or ":" in user:
-            warn("ignoring 'password' and 'user', they must be text and "
-                 "'user' must not contain ':'")
-        else:
-            write_auth(f"{user}:{password}")
-            print(f"NOVNC_AUTH_FILE={AUTH_FILE}")
+            fail("'password' and 'user' must be text, 'password' must not be "
+                 "empty and 'user' must not contain ':'")
+        write_auth(f"{user}:{password}")
+        print(f"NOVNC_AUTH_FILE={AUTH_FILE}")
 
     commands = [c for c in get_list(cfg, "autostart") if is_text(c)]
     print("AUTOSTART=(" + " ".join(shlex.quote(c) for c in commands) + ")")

@@ -13,8 +13,10 @@ export XDG_MENU_PREFIX=lxde-
 
 cd "$(dirname "$0")"
 
-# Apply the configuration
-eval "$(python3 ./config.py "${NOVNC_CONFIG:-/etc/novnc/config.json}")"
+# Apply the configuration. Only config.py sets the auth file.
+unset NOVNC_AUTH_FILE
+config="$(python3 ./config.py "${NOVNC_CONFIG:-/etc/novnc/config.json}")"
+eval "$config"
 
 # Start dependencies
 ./start_all.sh
@@ -24,17 +26,10 @@ for cmd in "${AUTOSTART[@]}"; do
     setsid sh -c "$cmd" >/dev/null 2>&1 &
 done
 
-auth=()
-if [ -n "${NOVNC_AUTH_FILE:-}" ]; then
-    auth=(--web-auth --auth-plugin novnc_auth.FileBasicAuth
-          --auth-source "$NOVNC_AUTH_FILE")
-else
+if [ -z "${NOVNC_AUTH_FILE:-}" ]; then
     echo "WARNING: noVNC has no authentication, set 'password' in the configuration or NOVNC_PASSWORD" >&2
 fi
 
 # Start the noVNC web server and the WebSocket proxy to x11vnc
-export PYTHONPATH="$PWD${PYTHONPATH:+:$PYTHONPATH}"
-exec /opt/noVNC/utils/websockify/run \
-    --web /opt/noVNC \
-    "${auth[@]}" \
-    "${NOVNC_PORT:-6080}" 127.0.0.1:5900
+export PYTHONPATH="/opt/noVNC/utils/websockify${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 ./novnc_server.py "${NOVNC_PORT:-6080}" "${NOVNC_AUTH_FILE:-}"
