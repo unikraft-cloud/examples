@@ -1,0 +1,8 @@
+spec: v0.6
+
+runtime: index.unikraft.io/official/base:unix
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/local/bin/wasmtime", "/main.wasm"]
+
