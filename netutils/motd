@@ -1,0 +1,20 @@
+ _   :=:
+| |:=:
+| |__:=: UNIKRAFT
+ \_____/ CLOUD
+
+Welcome to Unikraft Cloud!
+
+This is the netutils example image, its user space
+is built on Alpine Linux: <https://wiki.alpinelinux.org/>.
+For details about this image, visit:
+<https://github.com/unikraft-cloud/examples/netutils>.
+
+This image comes preloaded with essential networking
+tools such as nslookup, ping, traceroute, ip, socat,
+and tcpdump. Need more? Just install additional
+packages using apk. But keep an eye on your free
+RAM.
+
+Enjoy!
+
