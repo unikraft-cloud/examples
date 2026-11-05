@@ -1,0 +1,7 @@
+spec: v0.6
+
+runtime: base-compat:latest
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/node", "/app/server.js"]
