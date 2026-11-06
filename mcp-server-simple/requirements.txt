@@ -40,7 +40,7 @@ jsonschema-specifications==2025.9.1
 jsonschema==4.26.0
 keyring==25.7.0
 markdown-it-py==4.0.0
-mcp==1.27.0
+mcp==1.30.0
 mdurl==0.1.2
 more-itertools==11.0.2
 openapi-pydantic==0.5.1
