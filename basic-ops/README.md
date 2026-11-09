@@ -3,9 +3,8 @@
 This guide presents the basic operations when working with Unikraft Cloud instances and images.
 Namely, it presents:
 
-- deploying an instance (and an image)
-- creating an image
-- pushing an image
+- deploying an instance (creating and starting it)
+- building and pushing an image
 - creating an instance
 - starting an instance
 - listing instances
@@ -15,7 +14,7 @@ Namely, it presents:
 - stopping an instance
 - deleting an instance
 
-The guide explains how to do the above basic operations both using the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and directly using the underlying [Unikraft Cloud platform API](https://unikraft.com/docs/api/platform/v1).
+The guide explains how to do the above basic operations both using the [`unikraft` CLI](https://unikraft.com/docs/cli) and directly using the underlying [Unikraft Cloud platform API](https://unikraft.com/docs/api/platform/v1).
 
 The target application we use in this guide is a simple C HTTP server.
 
@@ -25,7 +24,7 @@ The files used are:
 
 - `http_server.c`: the simple C HTTP server app to be deployed on Unikraft Cloud
 - `Dockerfile`: the Dockerfile to build the OCI (["Open Container Initiative"](https://opencontainers.org/)) image running the HTTP server app
-- `Kraftfile`: the Unikraft Cloud specification file describing how to operate with the image (used by the `kraft` CLI tool)
+- `Kraftfile`: the Unikraft Cloud specification file describing how to operate with the image (used by the `unikraft` CLI)
 - `ukc.config.template`: a template configuration file for Unikraft Cloud
 - `app.config`: the application configuration file for Unikraft Cloud
 - `api/`: scripts used to directly interact with the [Unikraft Cloud platform API](https://unikraft.com/docs/api/platform/v1)
@@ -33,62 +32,44 @@ The files used are:
 
 ## Prerequisites
 
-1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install)
-
-2. Install and configure [Docker](https://docs.docker.com/engine/install/).
-
-3. (optional, but recommended) Configure BuildKit by following the instructions [here](https://unikraft.com/docs/platform/troubleshooting#how-can-you-cache-the-apps-filesystem-for-faster-builds).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 ## Set Up
 
-Create a `ukc.config` file as a copy of the `ukc.config.template`.
+Log into Unikraft Cloud:
+
+```bash title="unikraft"
+unikraft login
+```
+
+This guide uses the `fra` (Frankfurt, 🇩🇪) [metro](https://unikraft.com/docs/platform/metros).
+Replace `<my-org>` in the commands below with your organization name.
+
+To use the API scripts, create a `ukc.config` file as a copy of the `ukc.config.template`.
 Replace the `TODO` entries in the `ukc.config` file with your corresponding Unikraft Cloud configuration values: user, token and metro.
 
 ## TLDR: Deploy and Operate an Instance
 
-Below are the commands used to deploy and operate an instance (with the [`kraft` CLI](https://unikraft.org/docs/cli/install)).
+Below are the commands used to build an image and deploy and operate an instance (with the [`unikraft` CLI](https://unikraft.com/docs/cli)).
 You can copy-paste them:
 
-```console
-source ukc.config
-kraft cloud deploy -M 256M -p 443:8080/tls+http --name httpserver-c .
-kraft cloud image list
-kraft cloud instance list
-kraft cloud instance get httpserver-c
-kraft cloud instance get httpserver-c -o table
-fqdn=https://$(kraft cloud instance get httpserver-c -o json | jq -r '.[] | select(.name == "httpserver-c") | .fqdn')
+```bash title="unikraft"
+unikraft build . --output <my-org>/httpserver-c:latest
+unikraft images list
+unikraft run --metro fra --name httpserver-c -m 256M -p 443:8080/tls+http --image <my-org>/httpserver-c:latest
+unikraft instances list
+unikraft instances get httpserver-c
+unikraft instances get httpserver-c -o table
+fqdn=https://$(unikraft instances get httpserver-c -o json | jq -r '.[0].service.domains[0].fqdn')
 curl "$fqdn"
-kraft cloud instance logs httpserver-c
-kraft cloud instance stop httpserver-c
+unikraft instances logs httpserver-c
+unikraft instances stop httpserver-c
 sleep 2
-kraft cloud instance start httpserver-c
-kraft cloud instance delete httpserver-c
-kraft cloud instance list
-```
-
-## TLDR: Pack and Push an Image and Operate an Instance
-
-Below are the commands used to pack and push an image and operate an instance (with the [`kraft` CLI](https://unikraft.org/docs/cli/install)).
-You can copy-paste them:
-
-```console
-source ukc.config
-kraft pkg --plat kraftcloud --arch x86_64 --name index.unikraft.io/"$UKC_USER"/httpserver-c:latest .
-kraft pkg push index.unikraft.io/"$UKC_USER"/httpserver-c:latest
-kraft cloud image list
-kraft cloud instance create -M 256M -p 443:8080/tls+http --name httpserver-c index.unikraft.io/"$UKC_USER"/httpserver-c:latest
-kraft cloud instance start httpserver-c
-kraft cloud instance list
-kraft cloud instance get httpserver-c
-kraft cloud instance get httpserver-c -o table
-fqdn=https://$(kraft cloud instance get httpserver-c -o json | jq -r '.[] | select(.name == "httpserver-c") | .fqdn')
-curl "$fqdn"
-kraft cloud instance logs httpserver-c
-kraft cloud instance stop httpserver-c
-sleep 2
-kraft cloud instance start httpserver-c
-kraft cloud instance delete httpserver-c
-kraft cloud instance list
+unikraft instances start httpserver-c
+unikraft instances delete httpserver-c
+unikraft instances list
 ```
 
 ## TLDR: Pack and Push an Image and Operate an Instance via the API
@@ -98,7 +79,6 @@ You can copy-paste them:
 
 ```console
 ./api/pkg-image.sh
-./api/push-image.sh
 ./api/list-images.sh
 ./api/create-instance.sh
 ./api/start-instance.sh
@@ -111,219 +91,132 @@ You can copy-paste them:
 ./api/list-instances.sh
 ```
 
-## Detailed Operations with the Kraft CLI
+## Detailed Operations with the Unikraft CLI
 
-Below are detailed commands to deploy and operate instances with the [`kraft` CLI](https://unikraft.org/docs/cli/install).
+Below are detailed commands to deploy and operate instances with the [`unikraft` CLI](https://unikraft.com/docs/cli).
 
-### Source Configuration File
+### Build and Push Image
 
-Before anything, make sure you source the Unikraft Cloud configuration file `ukc.config`:
+To build the image and push it to the Unikraft Cloud registry, use:
 
-```console
-source ukc.config
+```bash title="unikraft"
+unikraft build . --output <my-org>/httpserver-c:latest
 ```
 
-This command will load the Unikraft Cloud configuration parameters (user, token, metro).
-
-### All-in-One Package, Push, Create and Start (Deploy)
-
-The easiest way to deploy a Unikraft Cloud instance is with:
-
-```console
-kraft cloud deploy -M 256M -p 443:8080/tls+http --name httpserver-c .
-```
-
-This command does 3 steps all-in-one:
-
-1. Packages the image locally.
-2. Pushes the image to the remote Unikraft Cloud image registry.
-3. Creates and starts an instance from the image.
-
-Once the command completes, you will get an output of the running instance, similar to the one below:
-
-```text
-[●] Deployed successfully!
- │
- ├────── name: httpserver-c
- ├────── uuid: 106a3c59-a074-43c3-9bf9-caad870f610c
- ├───── metro: https://api.sfo.unikraft.cloud/v1
- ├───── state: running
- ├──── domain: https://sparkling-river-as8o2yar.sfo.unikraft.app
- ├───── image: razvand/httpserver-c@sha256:7b467f0dcf7aaf271fdaa8c5282056d3e5d6d233e7d2e3cae2aea719d9a4a517
- ├─ boot time: 148.66 ms
- ├──── memory: 256 MiB
- ├─── service: sparkling-river-as8o2yar
- ├ private ip: 10.0.0.197
- └────── args: /http_server
-```
-
-### Create (Package) Image
-
-In order to create an image (locally), use:
-
-```console
-kraft pkg --plat kraftcloud --arch x86_64 --name index.unikraft.io/"$UKC_USER"/httpserver-c:latest .
-```
-
-This will create (and package) the image locally.
-We use `index.unikraft.io` as part of the name to mark the image as candidate to be pushed on the main Unikraft Cloud remote registry.
-
-You can list the local image with:
-
-```console
-kraft pkg list --all
-```
-
-You would get an output similar to:
-
-```text
-TYPE  NAME                                    VERSION  FORMAT  CREATED        UPDATED        PULLED       MANIFEST                     INDEX                        PLAT               SIZE
-app   index.unikraft.io/httpserver-c          latest   oci     1 hour ago     1 hour ago     2 hours ago  a283827fd2d40bd46e421827...  c5e72429c22a4fbf1e594a39...  kraftcloud/x86_64  39 MB
-```
-
-### Push Image
-
-To push the local image to the remote Unikraft Cloud registry (`index.unikraft.io`), use:
-
-```console
-kraft pkg push index.unikraft.io/"$UKC_USER"/httpserver-c:latest
-```
-
-### List (Remote) Images
+### List Images
 
 To list remote images, use:
 
-```console
-kraft cloud image ls
+```bash title="unikraft"
+unikraft images list
 ```
 
 You will get an output similar to:
 
-```text
-NAME                           VERSION  SIZE
-razvand/httpserver-c           latest   39 MB
+```ansi title="unikraft"
+REF                    DIGEST
+<my-org>/httpserver-c  sha256:9e5fa9887f36dfd5986d643f7cb1b84b865d35a31e618f453ead36ee44760098
 ```
 
-### Create Instance
+### Deploy (Create and Start) Instance
 
 > [!NOTE]
 > We create an instance named `httpserver-c`.
 > If a previous instance with the same name exists, you will get an error.
 > You will have to delete the initial instance.
 
-To create an instance (from an image), use:
+To create and start an instance (from an image), use:
 
-```console
-kraft cloud instance create -M 256M -p 443:8080/tls+http --name httpserver-c index.unikraft.io/"$UKC_USER"/httpserver-c:latest
+```bash title="unikraft"
+unikraft run --metro fra --name httpserver-c -m 256M -p 443:8080/tls+http --image <my-org>/httpserver-c:latest
 ```
 
 Once the command completes, you will get an output of the running instance, similar to the one below:
 
-```text
-[●] Deployed but instance is not online!
- │
- ├──────── name: httpserver-c
- ├──────── uuid: e5c76df1-4748-4fc2-a24b-c60550cfc3ce
- ├─────── metro: https://api.sfo.unikraft.cloud/v1
- ├─────── state: stopped
- ├─ stop reason:
- ├────── domain: https://restless-glade-brxs0s3i.sfo.unikraft.app
- ├─────── image: razvand/httpserver-c@sha256:7b467f0dcf7aaf271fdaa8c5282056d3e5d6d233e7d2e3cae2aea719d9a4a517
- ├─── boot time: 0.00 ms
- ├────── memory: 256 MiB
- ├───── service: restless-glade-brxs0s3i
- ├── private ip: 10.0.1.9
- └──────── args: /http_server
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-c
+uuid:         ed4fbe82-f1a1-4b67-8564-a0050a72397e
+state:        running
+image:        <my-org>/httpserver-c@sha256:9e5fa9887f36dfd5986d643f7cb1b84b865d35a31e618f453ead36ee44760098
+type:         micro
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  name:       lingering-monkey-w6b1uun3
+  uuid:       48264709-e8da-4088-b9d6-c545662311b2
+  domains:
+  - fqdn:     lingering-monkey-w6b1uun3.fra.unikraft.app
+networks:
+- uuid:       49b05b45-5bcd-4683-8df9-79d48a6e4391
+  private-ip: 10.0.6.185
+  mac:        12:b0:0a:00:06:b9
+timestamps:
+  created:    just now
+timing:
+  boot-time:  71.91ms
 ```
 
-By default, the instance is stopped.
-You can start it by default, by passing the `--start` option to the command above.
-Or, start it after creating the instance.
+### Create and Start Instance Separately
 
-### Start Instance
+To create an instance without starting it, use `unikraft instances create` with the same options:
 
-To start an instance, use:
+```bash title="unikraft"
+unikraft instances create --metro fra --name httpserver-c -m 256M -p 443:8080/tls+http --image <my-org>/httpserver-c:latest
+```
 
-```console
-kraft cloud instance start httpserver-c
+The instance is in the `stopped` state.
+To start it, use:
+
+```bash title="unikraft"
+unikraft instances start httpserver-c
 ```
 
 ### List Instances
 
 To list all instances, use:
 
-```console
-kraft cloud instance list
+```bash title="unikraft"
+unikraft instances list
 ```
 
 You will get an output similar to:
 
-```text
-NAME          FQDN                                      STATE    STATUS        IMAGE                                                    MEMORY   VCPUS  ARGS          BOOT TIME
-httpserver-c  restless-glade-brxs0s3i.sfo.unikraft.app  running  since 36secs  razvand/httpserver-c@sha256:7b467f0dcf7aaf271fdaa8c5...  256 MiB  1      /http_server  149.24 ms
+```ansi title="unikraft"
+METRO  NAME          STATE    IMAGE                  ARGS  MEMORY  VCPUS  FQDN                                        CREATED
+fra    httpserver-c  running  <my-org>/httpserver-c        256MiB  1      lingering-monkey-w6b1uun3.fra.unikraft.app  just now
 ```
 
 ### Get Information about an Instance
 
 To get information about an instance use:
 
-```console
-kraft cloud instance get httpserver-c
+```bash title="unikraft"
+unikraft instances get httpserver-c
 ```
 
-You will get an output similar to:
-
-```text
-                   uuid: e5c76df1-4748-4fc2-a24b-c60550cfc3ce
-                   name: httpserver-c
-                   fqdn: restless-glade-brxs0s3i.sfo.unikraft.app
-           private fqdn:
-             private ip: 10.0.1.9
-                  state: running
-                created: 2026-03-23T17:34:16Z
-                started: 2026-03-23T17:50:27Z
-                stopped:
-            start count: 1
-          restart count: 0
-       restart attempts:
-           next restart:
-         restart policy: never
-            stop origin:
-            stop reason:
-          app exit code:
-                  image: razvand/httpserver-c@sha256:7b467f0dcf7aaf271fdaa8c5282056d3e5d6d233e7d2e3cae2aea719d9a4a517
-                 memory: 256 MiB
-                  vcpus: 1
-                   args: /http_server
-                    env:
-                volumes:
-                service: restless-glade-brxs0s3i
-          scale to zero:
- scale to zero cooldown:
- scale to zero stateful:
-              boot time: 149.24 ms
-                up time: 47.192s
-```
+You will get the same output as the one printed when deploying the instance.
 
 To list information about the instance in a simplified tabular format, use:
 
-```console
-kraft cloud instance get httpserver-c -o table
+```bash title="unikraft"
+unikraft instances get httpserver-c -o table
 ```
 
 You will get an output similar to listing all instances:
 
-```text
-NAME          FQDN                                      STATE    STATUS        IMAGE                                                    MEMORY   VCPUS  ARGS          BOOT TIME
-httpserver-c  restless-glade-brxs0s3i.sfo.unikraft.app  running  since 53secs  razvand/httpserver-c@sha256:7b467f0dcf7aaf271fdaa8c5...  256 MiB  1      /http_server  149.24 ms
+```ansi title="unikraft"
+METRO  NAME          STATE    IMAGE                  ARGS  MEMORY  VCPUS  FQDN                                        CREATED
+fra    httpserver-c  running  <my-org>/httpserver-c        256MiB  1      lingering-monkey-w6b1uun3.fra.unikraft.app  just now
 ```
 
 ### Query Instance
 
 To query the service exposed by the instance, use:
 
-```console
-fqdn=https://$(kraft cloud instance get httpserver-c -o json | jq -r '.[] | select(.name == "httpserver-c") | .fqdn')
+```bash title="unikraft"
+fqdn=https://$(unikraft instances get httpserver-c -o json | jq -r '.[0].service.domains[0].fqdn')
 curl "$fqdn"
 ```
 
@@ -337,27 +230,27 @@ Hello, World!
 
 To get logging / printed information of the instance, use:
 
-```console
-kraft cloud instance logs httpserver-c
+```bash title="unikraft"
+unikraft instances logs httpserver-c
 ```
 
 You will get an output similar to:
 
-```text
-Listening on port 8080...
-Sent a reply
+```ansi title="unikraft"
+httpserver-c ┏ Listening on port 8080...
+httpserver-c │ Sent a reply
 ```
 
 ### Stop Instance
 
-```console
-kraft cloud instance stop httpserver-c
+```bash title="unikraft"
+unikraft instances stop httpserver-c
 ```
 
 #### Delete Instance
 
-```console
-kraft cloud instance delete httpserver-c
+```bash title="unikraft"
+unikraft instances delete httpserver-c
 ```
 
 ## Detailed Operations with the Unikraft Cloud Platform API
@@ -368,22 +261,14 @@ These scripts make HTTP requests (via `curl`) to the REST API exposed by the pla
 
 > [!NOTE]
 > Image-related operations do not interact with the platform API.
-> So, for creating and pushing images, the scripts use the `kraft` CLI tool, same as above.
+> So, for building and pushing images, the scripts use the `unikraft` CLI, same as above.
 
-### Create (Package) Image
+### Build and Push Image
 
-In order to create an image (locally), use:
+To build the image and push it to the Unikraft Cloud registry, use:
 
 ```console
 ./api/pkg-image.sh
-```
-
-### Push Image
-
-To push the local image to the remote Unikraft Cloud registry (`index.unikraft.io`), use:
-
-```console
-./api/push-image.sh
 ```
 
 ### List (Remote) Images

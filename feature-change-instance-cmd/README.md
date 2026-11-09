@@ -2,7 +2,7 @@
 
 This guide shows how to create an instance with an updated command line from the original image.
 
-The guide explains how to do the above basic operations both using the [`kraft` CLI tool](https://unikraft.org/docs/cli/install) and directly using the underlying [Unikraft Cloud platform API](https://unikraft.com/docs/api/platform/v1).
+The guide explains how to do the above basic operations both using the [`unikraft` CLI](https://unikraft.com/docs/cli) and directly using the underlying [Unikraft Cloud platform API](https://unikraft.com/docs/api/platform/v1).
 
 The target application we use in this guide is a simple C HTTP server.
 There are two binary applications to be added in the image:
@@ -19,7 +19,7 @@ The files used are:
 - `http_server.c`: the simple C HTTP server app to be deployed on Unikraft Cloud
 - `http_server_args.c`: the simple C HTTP server app to be deployed on Unikraft Cloud as an alternative binary, with an optional command line argument
 - `Dockerfile`: the Dockerfile to build the OCI (["Open Container Initiative"](https://opencontainers.org/)) image running the HTTP server app
-- `Kraftfile`: the Unikraft Cloud specification file describing how to operate with the image (used by the `kraft` CLI tool)
+- `Kraftfile`: the Unikraft Cloud specification file describing how to operate with the image (used by the `unikraft` CLI)
 - `ukc.config.template`: a template configuration file for Unikraft Cloud
 - `app.config`: the application configuration file for Unikraft Cloud
 - `api/`: scripts used to directly interact with the [Unikraft Cloud platform API](https://unikraft.com/docs/api/platform/v1)
@@ -27,53 +27,64 @@ The files used are:
 
 ## Prerequisites
 
-1. Install the [`kraft` CLI tool](https://unikraft.org/docs/cli/install)
-
-1. Install and configure [Docker](https://docs.docker.com/engine/install/).
-
-1. (optional, but recommended) Configure BuildKit by following the instructions [here](https://unikraft.com/docs/platform/troubleshooting#how-can-you-cache-the-apps-filesystem-for-faster-builds).
+1. Install the [unikraft CLI](https://unikraft.com/docs/cli).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 ## Set Up
 
-Create a `ukc.config` file as a copy of the `ukc.config.template`.
+Log into Unikraft Cloud:
+
+```bash title="unikraft"
+unikraft login
+```
+
+This guide uses the `fra` (Frankfurt, 🇩🇪) [metro](https://unikraft.com/docs/platform/metros).
+Replace `<my-org>` in the commands below with your organization name.
+
+To use the API scripts, create a `ukc.config` file as a copy of the `ukc.config.template`.
 Replace the `TODO` entries in the `ukc.config` file with your corresponding Unikraft Cloud configuration values: user, token and metro.
 
-## Use the Kraft CLI Tool
+## Use the Unikraft CLI
 
-Below are the commands used to deploy and operate an instance via the [Unikraft Cloud Platform API](https://unikraft.com/docs/api/platform/v1).
+Below are the commands used to deploy and operate an instance with the [`unikraft` CLI](https://unikraft.com/docs/cli).
 You can copy-paste them:
 
-```console
-source ukc.config
-kraft pkg --plat kraftcloud --arch x86_64 --name index.unikraft.io/"$UKC_USER"/httpserver-c:latest .
-kraft pkg push index.unikraft.io/"$UKC_USER"/httpserver-c:latest
-kraft cloud image list
-kraft cloud instance create -M 256M -p 443:8080/tls+http --name httpserver-c index.unikraft.io/"$UKC_USER"/httpserver-c:latest
-kraft cloud instance start httpserver-c
-kraft cloud instance list
-kraft cloud instance get httpserver-c
-fqdn=https://$(kraft cloud instance get httpserver-c -o json | jq -r '.[] | select(.name == "httpserver-c") | .fqdn')
+```bash title="unikraft"
+unikraft build . --output <my-org>/httpserver-c:latest
+unikraft images list
+unikraft run --metro fra --name httpserver-c -m 256M -p 443:8080/tls+http --image <my-org>/httpserver-c:latest
+unikraft instances list
+unikraft instances get httpserver-c
+fqdn=https://$(unikraft instances get httpserver-c -o json | jq -r '.[0].service.domains[0].fqdn')
 curl "$fqdn"
-kraft cloud instance logs httpserver-c
-kraft cloud instance stop httpserver-c
-kraft cloud instance delete httpserver-c
-kraft cloud instance list
-kraft cloud instance create -M 256M -p 443:8080/tls+http --name httpserver-c --entrypoint "" index.unikraft.io/"$UKC_USER"/httpserver-c:latest -- /http_server_args '"Bye, World!"'
-kraft cloud instance start httpserver-c
-kraft cloud instance list
-kraft cloud instance get httpserver-c
-fqdn=https://$(kraft cloud instance get httpserver-c -o json | jq -r '.[] | select(.name == "httpserver-c") | .fqdn')
+unikraft instances logs httpserver-c
+unikraft instances stop httpserver-c
+unikraft instances delete httpserver-c
+unikraft instances list
+unikraft run --metro fra --name httpserver-c -m 256M -p 443:8080/tls+http --image <my-org>/httpserver-c:latest --args '/http_server_args "Bye, World!"'
+unikraft instances list
+unikraft instances get httpserver-c
+fqdn=https://$(unikraft instances get httpserver-c -o json | jq -r '.[0].service.domains[0].fqdn')
 curl "$fqdn"
-kraft cloud instance logs httpserver-c
-kraft cloud instance stop httpserver-c
-kraft cloud instance delete httpserver-c
+unikraft instances logs httpserver-c
+unikraft instances stop httpserver-c
+unikraft instances delete httpserver-c
 ```
 
 In short, the above commands do the following:
 
-1. Create and push the application image.
+1. Build and push the application image.
 1. Create, query an delete an instance that uses the default command in the image: `/http_server`.
 1. Create, query an delete an instance that uses an updated command, overriding the command in the image: `/http_server_args "Bye, World!"`.
+
+The `--args` option replaces the command in the image.
+The instance lists the new command in the `ARGS` column:
+
+```ansi title="unikraft"
+METRO  NAME          STATE    IMAGE                  ARGS                                  MEMORY  VCPUS  FQDN                                     CREATED
+fra    httpserver-c  running  <my-org>/httpserver-c  ["/http_server_args", "Bye, World!"]  256MiB  1      sparkling-sun-ruy8eywy.fra.unikraft.app  just now
+```
 
 Commands are documented in the [`basic-ops/` guide](../basic-ops/).
 
@@ -84,7 +95,6 @@ You can copy-paste them:
 
 ```console
 ./api/pkg-image.sh
-./api/push-image.sh
 ./api/list-images.sh
 ./api/create-instance.sh
 ./api/start-instance.sh
@@ -105,7 +115,7 @@ You can copy-paste them:
 
 As in the previous section, the above commands do the following:
 
-1. Create and push the application image.
+1. Build and push the application image.
 1. Create, query an delete an instance that uses the default command in the image: `/http_server`.
 1. Create, query an delete an instance that uses an updated command, overriding the command in the image: `/http_server_args "Bye, World!"`.
 
