@@ -7,11 +7,11 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
-2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-elixir1.16/` directory:
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-elixir1.19/` directory:
 
    ```bash
    git clone https://github.com/unikraft-cloud/examples
-   cd examples/httpserver-elixir1.16/
+   cd examples/httpserver-elixir1.19/
    ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
@@ -24,22 +24,22 @@ unikraft login
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-elixir116:latest
+unikraft build . --output <my-org>/httpserver-elixir119:latest
 unikraft run --metro fra \
   -m 1G \
   -p 443:3000/tls+http \
   --scale-to-zero policy=idle,cooldown-time=3000,stateful=true \
-  --image <my-org>/httpserver-elixir116:latest
+  --image <my-org>/httpserver-elixir119:latest
 ```
 
 The output shows the instance address and other details:
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-elixir116-qo9k3
+name:         httpserver-elixir119-qo9k3
 uuid:         e5fbf089-b000-4b2d-a827-44a1f5d28f24
 state:        starting
-image:        <my-org>/httpserver-elixir116
+image:        <my-org>/httpserver-elixir119
 resources:
   memory:     1024MiB
   vcpus:      1
@@ -56,7 +56,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-elixir116-qo9k3` and the address is `https://small-water-tl8lr8am.fra.unikraft.app`.
+In this case, the instance name is `httpserver-elixir119-qo9k3` and the address is `https://small-water-tl8lr8am.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance of the Elixir-based HTTP web server:
@@ -77,13 +77,13 @@ unikraft instances list
 
 ```ansi title="unikraft"
 METRO  NAME                        STATE    IMAGE                          ARGS  MEMORY  VCPUS  FQDN                                   CREATED
-fra    httpserver-elixir116-qo9k3  running  <my-org>/httpserver-elixir116        1.0GiB  1      small-water-tl8lr8am.fra.unikraft.app  2 minutes ago
+fra    httpserver-elixir119-qo9k3  running  <my-org>/httpserver-elixir119        1.0GiB  1      small-water-tl8lr8am.fra.unikraft.app  2 minutes ago
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-elixir116-qo9k3
+unikraft instances delete httpserver-elixir119-qo9k3
 ```
 
 ## Customize your app

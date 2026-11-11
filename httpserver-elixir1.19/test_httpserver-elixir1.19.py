@@ -1,8 +1,8 @@
-"""End-to-end test for the ``httpserver-elixir1.16`` example.
+"""End-to-end test for the ``httpserver-elixir1.19`` example.
 
-Mirrors the manual steps from ``httpserver-elixir1.16/README.md``:
+Mirrors the manual steps from ``httpserver-elixir1.19/README.md``:
 
-1. ``unikraft build . --output <prefix>/httpserver-elixir116:<tag>``
+1. ``unikraft build . --output <prefix>/httpserver-elixir119:<tag>``
 2. ``unikraft run --metro <metro> -p 443:3000/tls+http -m 1G --image ...``
 3. ``curl https://<instance-url>`` and assert "Hello, World!".
 """
@@ -13,7 +13,7 @@ from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
 def test_httpserver_elixir_serves_hello(build_image, run_instance, http, wait_instance):
-    image = build_image("httpserver-elixir1.16", "httpserver-elixir1.16")
+    image = build_image("httpserver-elixir1.19", "httpserver-elixir1.19")
 
     instance = run_instance(
         image,
