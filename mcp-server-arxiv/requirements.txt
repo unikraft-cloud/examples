@@ -1,4 +1,4 @@
-Authlib==1.7.2
+Authlib==1.9.1
 PyJWT==2.12.1
 PyYAML==6.0.3
 Pygments==2.20.0
