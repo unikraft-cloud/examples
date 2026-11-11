@@ -1,64 +1,53 @@
-FROM --platform=linux/x86_64 rust:1.88.0-slim-trixie AS builder
+FROM --platform=$BUILDPLATFORM rust:1.88.0-slim-trixie AS builder
 
-# Install trunk from pre-built binary instead of compiling from source (~10min saved)
 ARG TRUNK_VERSION=0.21.14
-RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates \
-    && wget -qO- "https://github.com/trunk-rs/trunk/releases/download/v${TRUNK_VERSION}/trunk-x86_64-unknown-linux-musl.tar.gz" \
-       | tar -xz -C /usr/local/bin \
-    && rm -rf /var/lib/apt/lists/*
+ARG BUILDARCH
 
-# Only need the wasm32 target; trunk auto-downloads the correct wasm-bindgen-cli
+RUN set -xe; \
+    case "$BUILDARCH" in \
+      amd64) trunk_arch=x86_64 ;; \
+      arm64) trunk_arch=aarch64 ;; \
+      *) echo "unsupported architecture: $BUILDARCH" >&2; exit 1 ;; \
+    esac; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends wget ca-certificates; \
+    wget -qO- "https://github.com/trunk-rs/trunk/releases/download/v${TRUNK_VERSION}/trunk-${trunk_arch}-unknown-linux-musl.tar.gz" \
+      | tar -xz -C /usr/local/bin; \
+    rm -rf /var/lib/apt/lists/*
+
 RUN rustup target add wasm32-unknown-unknown
 
-# Set up the working directory in the container
 WORKDIR /usr/src/frontend
 
-# Copy both app and shared_lib directories to the working directory
 COPY ./frontend ./frontend
 COPY ./shared_lib ./shared_lib
 
-# Build the main application
 ENV RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
 RUN trunk build --config ./frontend/Trunk.toml --release
-
-EXPOSE 8080
 
 FROM nginx:1.25.3-bookworm AS nginx
 
 RUN set -xe; \
-    rm -f /var/log/nginx/access.log; \
-    rm -f /var/log/nginx/error.log; \
-    touch /var/log/nginx/access.log; \
-    touch /var/log/nginx/error.log \
-    ;
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils; \
+    rm -rf /var/lib/apt/lists/*
 
-# Use a smaller base image for the final runtime
-# FROM nginx:1.27.4-alpine
+RUN set -xe; \
+    rm -f /var/log/nginx/access.log /var/log/nginx/error.log; \
+    touch /var/log/nginx/access.log /var/log/nginx/error.log; \
+    install -d -m 1777 /rootfs/tmp; \
+    mkdir -p /rootfs/var/run; \
+    ln -s /usr/sbin/nginx /usr/bin/nginx; \
+    lddtree --copy-to-tree /rootfs /usr/bin/nginx; \
+    tar -C / -cf /tmp/data.tar usr/lib/nginx etc/nginx etc/passwd etc/group var/log/nginx var/cache/nginx; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    chroot /rootfs /usr/bin/nginx -V
+
 FROM scratch
 
-# Nginx binaries, modules, configuration, log and runtime files
-COPY --from=nginx /usr/sbin/nginx /usr/bin/nginx
-COPY --from=nginx /usr/lib/nginx /usr/lib/nginx
-COPY --from=nginx /etc/nginx /etc/nginx
-COPY --from=nginx /etc/passwd /etc/passwd
-COPY --from=nginx /etc/group /etc/group
-COPY --from=nginx /var/log/nginx /var/log/nginx
-COPY --from=nginx /var/cache/nginx /var/cache/nginx
-COPY --from=nginx /var/run /var/run
+COPY --from=nginx /rootfs /
 
-# Libraries
-COPY --from=nginx /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/x86_64-linux-gnu/libcrypt.so.1
-COPY --from=nginx /lib/x86_64-linux-gnu/libpcre2-8.so.0 /lib/x86_64-linux-gnu/libpcre2-8.so.0
-COPY --from=nginx /lib/x86_64-linux-gnu/libssl.so.3 /lib/x86_64-linux-gnu/libssl.so.3
-COPY --from=nginx /lib/x86_64-linux-gnu/libcrypto.so.3 /lib/x86_64-linux-gnu/libcrypto.so.3
-COPY --from=nginx /lib/x86_64-linux-gnu/libz.so.1 /lib/x86_64-linux-gnu/libz.so.1
-COPY --from=nginx /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=nginx /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=nginx /etc/ld.so.cache /etc/ld.so.cache
-
-# Custom configuration files, including using a single process for Nginx
 COPY ./rootfs/ /
 
 COPY --from=builder /usr/src/frontend/frontend/nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /usr/src/frontend/frontend/dist /usr/share/nginx/html/
-

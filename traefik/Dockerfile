@@ -1,4 +1,6 @@
-FROM node:14.16 AS build-frontend
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.10.0 AS xx
+
+FROM --platform=$BUILDPLATFORM node:14.16-stretch AS build-frontend
 
 WORKDIR /
 
@@ -8,18 +10,15 @@ RUN set -xe; \
 
 WORKDIR /traefik-2.10.6/webui
 
-# Build traefik frontend
 RUN set -xe; \
     yarn install; \
     yarn build
 
-FROM golang:1.21.4-alpine3.17 AS build-backend
+FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.17 AS build-backend
 
-RUN set -xe; \
-    apk --no-cache add \
-      gcc \
-      musl-dev \
-    ;
+COPY --from=xx / /
+
+ARG TARGETPLATFORM
 
 COPY --from=build-frontend /traefik-2.10.6 /traefik
 
@@ -29,12 +28,12 @@ ENV TRAEFIK_CODENAME=saintmarcelin
 ENV TRAEFIK_VERSION=2.10.6
 
 RUN set -xe; \
-    CGO_ENABLED=1 \
-    go build -v \
-        -buildmode=pie \
-        -ldflags "-linkmode external -extldflags '-static-pie' -X 'github.com/traefik/traefik/v2/pkg/version.Version=${TRAEFIK_VERSION}' -X 'github.com/traefik/traefik/v2/pkg/version.Codename=${TRAEFIK_CODENAME}' -X 'github.com/traefik/traefik/v2/pkg/version.BuildDate=$(date)'" \
+    CGO_ENABLED=0 \
+    xx-go build -v \
+        -ldflags "-X 'github.com/traefik/traefik/v2/pkg/version.Version=${TRAEFIK_VERSION}' -X 'github.com/traefik/traefik/v2/pkg/version.Codename=${TRAEFIK_CODENAME}' -X 'github.com/traefik/traefik/v2/pkg/version.BuildDate=$(date)'" \
         -o /usr/bin/traefik \
-        ./cmd/traefik
+        ./cmd/traefik; \
+    xx-verify --static /usr/bin/traefik
 
 FROM scratch
 

@@ -1,30 +1,18 @@
-FROM --platform=linux/x86_64 debian:bookworm AS build
+FROM gcc:13.2.0-bookworm AS build
 
-RUN set -xe ; \
-	apt -yqq update ; \
-	apt -yqq install build-essential ; \
-	apt -yqq install libboost-all-dev
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends libboost-system1.74-dev libboost-thread1.74-dev; \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
 
 COPY ./http_server.cpp /src/http_server.cpp
 
 RUN set -xe; \
-    g++ \
-	-Wall -Wextra \
-	-fPIC -pie \
-	-o /http_server http_server.cpp \
-	-lboost_system -lboost_thread -lpthread
+    g++ -Wall -Wextra -static -o /http_server http_server.cpp -lboost_system -lboost_thread -lpthread; \
+    file /http_server | grep -q "statically linked"
 
 FROM scratch
 
-# System / C++ libraries
-COPY --from=build /lib/x86_64-linux-gnu/libboost_thread.so.1.74.0 /lib/x86_64-linux-gnu/libboost_thread.so.1.74.0
-COPY --from=build /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-
-# C++ HTTP server
 COPY --from=build /http_server /http_server

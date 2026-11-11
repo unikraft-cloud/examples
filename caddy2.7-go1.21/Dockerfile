@@ -1,4 +1,10 @@
-FROM --platform=linux/x86_64 golang:1.21.3-bookworm AS build
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.10.0 AS xx
+
+FROM --platform=$BUILDPLATFORM golang:1.21.3-bookworm AS build
+
+COPY --from=xx / /
+
+ARG TARGETPLATFORM
 
 ARG CADDY_VERSION=2.7.6
 
@@ -11,11 +17,8 @@ RUN --mount=type=cache,target=/root/go/pkg/mod \
     apt-get install -y --no-install-recommends \
       git; \
     git clone --depth=1 --branch v${CADDY_VERSION} https://github.com/caddyserver/caddy.git /caddy; \
-    go build \
-      -buildmode=pie \
-      -ldflags "-linkmode external -extldflags -static-pie" \
-      -tags netgo \
-      -o /caddy/caddy cmd/caddy/main.go;
+    CGO_ENABLED=0 xx-go build -tags netgo -o /caddy/caddy cmd/caddy/main.go; \
+    xx-verify --static /caddy/caddy
 
 RUN echo "127.0.0.1 localhost" > /tmp/hosts
 

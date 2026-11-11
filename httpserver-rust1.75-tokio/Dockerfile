@@ -1,4 +1,14 @@
-FROM rust:1.75.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.10.0 AS xx
+
+FROM --platform=$BUILDPLATFORM rust:1.75.0-alpine3.19 AS build
+
+COPY --from=xx / /
+
+RUN apk add --no-cache clang lld
+
+ARG TARGETPLATFORM
+
+RUN xx-apk add --no-cache gcc musl-dev
 
 WORKDIR /src
 
@@ -6,12 +16,11 @@ COPY ./src /src/src
 COPY ./Cargo.toml /src/Cargo.toml
 COPY ./Cargo.lock /src/Cargo.lock
 
-RUN cargo build
+RUN set -xe; \
+    xx-cargo build --release --target-dir ./build; \
+    cp "./build/$(xx-cargo --print-target-triple)/release/http-tokio" /server; \
+    xx-verify --static /server
 
 FROM scratch
 
-COPY --from=build src/target/debug/http-tokio /server
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
+COPY --from=build /server /server

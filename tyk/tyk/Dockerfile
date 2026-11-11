@@ -1,4 +1,10 @@
-FROM --platform=linux/x86_64 golang:1.21.3-bookworm AS build
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.10.0 AS xx
+
+FROM --platform=$BUILDPLATFORM golang:1.21.3-bookworm AS build
+
+COPY --from=xx / /
+
+ARG TARGETPLATFORM
 
 ARG TYK_VERSION=5.2.6
 
@@ -11,10 +17,8 @@ RUN --mount=type=cache,target=/root/go/pkg/mod \
     apt-get install -y --no-install-recommends \
       git; \
     git clone --depth=1 --branch v${TYK_VERSION} https://github.com/TykTechnologies/tyk /tyk; \
-    go build  \
-      -buildmode=pie \
-      -ldflags "-linkmode external -extldflags -static-pie" \
-      -tags netgo;
+    CGO_ENABLED=0 xx-go build -tags netgo; \
+    xx-verify --static /tyk/tyk
 
 FROM scratch
 
