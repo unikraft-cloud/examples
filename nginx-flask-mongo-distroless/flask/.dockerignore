@@ -1,0 +1,6 @@
+Kraftfile
+Dockerfile
+.unikraft
+initrd
+rootfs
+.dockerignore
