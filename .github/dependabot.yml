@@ -1,0 +1,109 @@
+version: 2
+
+updates:
+- package-ecosystem: docker
+  directories:
+  - /*
+  - /*/*
+  schedule:
+    interval: monthly
+  groups:
+    docker:
+      group-by: dependency-name
+      patterns:
+      - "*"
+  ignore:
+  - dependency-name: "*"
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
+
+- package-ecosystem: npm
+  directories:
+  - /*
+  - /*/*
+  schedule:
+    interval: monthly
+  groups:
+    npm:
+      group-by: dependency-name
+      patterns:
+      - "*"
+  ignore:
+  - dependency-name: "*"
+    update-types:
+    - version-update:semver-major
+
+- package-ecosystem: pip
+  directories:
+  - /
+  - /*
+  - /*/*
+  schedule:
+    interval: monthly
+  groups:
+    pip:
+      group-by: dependency-name
+      patterns:
+      - "*"
+  ignore:
+  - dependency-name: "*"
+    update-types:
+    - version-update:semver-major
+
+- package-ecosystem: cargo
+  directories:
+  - /*
+  - /*/*
+  schedule:
+    interval: monthly
+  groups:
+    cargo:
+      group-by: dependency-name
+      patterns:
+      - "*"
+  ignore:
+  - dependency-name: "*"
+    update-types:
+    - version-update:semver-major
+
+- package-ecosystem: gomod
+  directories:
+  - /*
+  - /*/*
+  schedule:
+    interval: monthly
+  groups:
+    gomod:
+      group-by: dependency-name
+      patterns:
+      - "*"
+  ignore:
+  - dependency-name: "*"
+    update-types:
+    - version-update:semver-major
+
+- package-ecosystem: mix
+  directories:
+  - /*
+  - /*/*
+  schedule:
+    interval: monthly
+  groups:
+    mix:
+      group-by: dependency-name
+      patterns:
+      - "*"
+  ignore:
+  - dependency-name: "*"
+    update-types:
+    - version-update:semver-major
+
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: monthly
+  groups:
+    github-actions:
+      patterns:
+      - "*"
