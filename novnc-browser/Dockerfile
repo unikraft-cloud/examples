@@ -1,4 +1,4 @@
-FROM alpine:3.22 AS novnc
+FROM --platform=$BUILDPLATFORM alpine:3.22 AS novnc
 
 RUN apk add --no-cache git && \
     git clone --depth 1 --branch v1.5.0 https://github.com/novnc/noVNC.git /opt/noVNC && \

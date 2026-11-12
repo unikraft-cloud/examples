@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "playwright": "^1.47.0",
-    "playwright-chromium": "^1.47.0",
+    "playwright": "1.59.1",
+    "playwright-chromium": "1.59.1",
     "http-proxy": "^1.18.1",
     "node-http-proxy-json": "^0.1.9",
     "semaphore": "^1.1.0",
