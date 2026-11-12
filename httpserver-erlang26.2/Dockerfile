@@ -1,56 +1,30 @@
-FROM erlang:26.2.3.0-slim as build
+FROM erlang:26.2.3.0-slim AS build
+
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends ca-certificates pax-utils
 
 WORKDIR /src
 
-#COPY ./helloworld.erl .
 COPY ./http_server.erl .
 
-RUN /usr/local/bin/erl -compile http_server
+RUN erl -compile http_server
 
-FROM alpine:3 AS sys
+COPY ./wrapper.sh /rootfs/usr/bin/wrapper.sh
 
 RUN set -xe; \
-    mkdir -p /target/etc; \
-    mkdir -p /blank; \
-    apk --no-cache add \
-      ca-certificates \
-      tzdata \
-    ; \
-    update-ca-certificates; \
-    ln -sf /usr/share/zoneinfo/Etc/UTC /target/etc/localtime; \
-    echo "Etc/UTC" > /target/etc/timezone;
+    mkdir -p /rootfs/dev /rootfs/tmp /rootfs/usr/src; \
+    find /usr/local/lib/erlang -type f -print0 | xargs -0 lddtree --skip-non-elfs --copy-to-tree /rootfs; \
+    lddtree --copy-to-tree /rootfs /bin/sh /bin/rm /bin/mknod /usr/bin/dirname /usr/bin/basename; \
+    tar -C / -cf /tmp/data.tar usr/local/lib/erlang usr/local/bin/erl etc/ssl/certs/ca-certificates.crt; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    cp http_server.beam /rootfs/usr/src/; \
+    touch /rootfs/dev/null; \
+    chroot /rootfs /usr/local/bin/erl -noshell -eval 'ok = crypto:start(), halt().'; \
+    rm /rootfs/dev/null
 
 FROM scratch
 
-COPY --from=sys /target/etc /etc
-COPY --from=sys /usr/share/zoneinfo/UTC /usr/share/zoneinfo/UTC
-COPY --from=sys /usr/share/zoneinfo/Etc/UTC /usr/share/zoneinfo/Etc/UTC
-COPY --from=sys /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=sys /blank /tmp
-
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libsctp.so.1 /lib/x86_64-linux-gnu/libsctp.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.6
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-
-COPY --from=build /lib/x86_64-linux-gnu/libselinux.so.1 /lib/x86_64-linux-gnu/libselinux.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libpcre2-8.so.0 /lib/x86_64-linux-gnu/libpcre2-8.so.0
-COPY --from=build /bin/rm /bin/rm
-COPY --from=build /bin/mknod /bin/mknod
-
-COPY --from=build /usr/local/bin/erl /usr/bin/erl
-COPY --from=build /usr/local/lib/erlang /usr/local/lib/erlang
-
-COPY --from=build /usr/bin/dirname /usr/bin/dirname
-COPY --from=build /usr/bin/basename /usr/bin/basename
-
-COPY --from=build /bin/bash /bin/bash
-COPY --from=build /bin/sh /bin/sh
-
-COPY --from=build /src/http_server.beam /usr/src/http_server.beam
-
-COPY ./wrapper.sh /usr/bin/wrapper.sh
+COPY --from=build /rootfs /

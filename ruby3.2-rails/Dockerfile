@@ -1,6 +1,10 @@
 FROM ruby:3.2.2-bookworm AS build
 
-RUN gem install rails
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils
+
+RUN gem install rails -v 8.1.4.1
 RUN rails new app
 
 WORKDIR /app
@@ -8,41 +12,16 @@ RUN rails generate controller hello
 
 COPY . /app/
 
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    lddtree --copy-to-tree /rootfs /usr/local/bin/ruby; \
+    find /usr/local/lib/ruby /usr/local/bundle /app -type f -print0 | xargs -0 lddtree --skip-non-elfs --copy-to-tree /rootfs; \
+    tar -C / -cf /tmp/data.tar usr/local/lib/ruby usr/local/bundle usr/share/zoneinfo app; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/local/bin/ruby -rfiddle -e 'Dir["/usr/local/lib/ruby/**/*.so", "/usr/local/bundle/**/*.so"].each { |f| Fiddle.dlopen(f) }'
+
 FROM scratch
 
-# Ruby binary
-COPY --from=build /usr/local/bin/ruby /usr/bin/ruby
-
-# Ruby libraries
-COPY --from=build /usr/local/lib/ruby /usr/local/lib/ruby
-
-# System libraries
-COPY --from=build /usr/local/lib/libruby.so.3.2 /usr/local/lib/libruby.so.3.2
-COPY --from=build /lib/x86_64-linux-gnu/libz.so.1 /lib/x86_64-linux-gnu/libz.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libgmp.so.10 /lib/x86_64-linux-gnu/libgmp.so.10
-COPY --from=build /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/x86_64-linux-gnu/libcrypt.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=build /etc/ld.so.cache /etc/ld.so.cache
-
-# Ruby Gems & Rails contents
-COPY --from=build /usr/local/bundle /usr/local/bundle
-
-# System libraries required by Rails
-COPY --from=build /lib/x86_64-linux-gnu/libcurses.so /lib/x86_64-linux-gnu/libcurses.so
-COPY --from=build /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.so.2
-COPY --from=build /lib/x86_64-linux-gnu/libffi.so.8 /lib/x86_64-linux-gnu/libffi.so.8
-COPY --from=build /lib/x86_64-linux-gnu/libncurses.so /lib/x86_64-linux-gnu/libncurses.so
-COPY --from=build /lib/x86_64-linux-gnu/libncursesw.so /lib/x86_64-linux-gnu/libncursesw.so
-COPY --from=build /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread.so.0
-COPY --from=build /lib/x86_64-linux-gnu/libcrypto.so.3 /lib/x86_64-linux-gnu/libcrypto.so.3
-COPY --from=build /lib/x86_64-linux-gnu/libssl.so.3 /lib/x86_64-linux-gnu/libssl.so.3
-COPY --from=build /lib/x86_64-linux-gnu/libyaml-0.so.2 /lib/x86_64-linux-gnu/libyaml-0.so.2
-
-# Timezone information
-COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
-
-# Rails application
-COPY --from=build /app /app
+COPY --from=build /rootfs /

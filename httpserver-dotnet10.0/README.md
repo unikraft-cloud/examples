@@ -106,6 +106,8 @@ Lines in the `Kraftfile` have the following roles:
 
 Lines in the `Dockerfile` have the following roles:
 
+* `FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build`: Build the app with the .NET SDK on the build machine.
+
 * `WORKDIR /src`: Use the `/src` directory as the working directory.
 
 * `RUN dotnet new console`: Create a new `dotnet` project.
@@ -114,17 +116,23 @@ Lines in the `Dockerfile` have the following roles:
 
 * `COPY ./SimpleHttpServer.cs .`: Copy the source code of the HTTP server.
 
-* `RUN dotnet build .`: Build dotnet project.
+* `RUN dotnet publish -a "$TARGETARCH" --self-contained -o /app`: Build a self-contained app for the target architecture.
+
+* `FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble AS runtime`: Use the .NET runtime dependencies image for the target architecture.
+
+* `RUN ... lddtree ...`: Collect the app, the system libraries that it uses, and the ICU libraries in `/rootfs`.
+  .NET loads the ICU libraries at runtime for globalization support.
 
 * `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
 
-* `COPY --from=build ...`: Copy on the required files from the filesystem: the binary executable, the .NET framework files and the binary library files.
+* `COPY --from=runtime /rootfs /`: Copy the collected files to the app filesystem.
 
 The following options are available for customizing the app:
 
 * If you only update the implementation in the `SimpleHttpServer.cs` source file, you don't need to make any other changes.
 
-* If you create any new source files, copy them into the app filesystem by using the `COPY` command in the `Dockerfile`.
+* If you create any new source files, copy them to `/src` in the build stage with a `COPY` command in the `Dockerfile`.
+  `dotnet publish` includes them in `/app`, and the `runtime` stage copies `/app` to `/rootfs`.
 
 * More extensive changes may require extending the `Dockerfile` ([see `Dockerfile` syntax reference](https://docs.docker.com/engine/reference/builder/)).
 

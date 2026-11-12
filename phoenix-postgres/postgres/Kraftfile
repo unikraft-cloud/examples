@@ -4,9 +4,10 @@ name: postgres
 
 targets:
   - kraftcloud/x86_64
+  - kraftcloud/arm64
 
 rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: [ "docker-entrypoint.sh", "postgres", "-c", "shared_preload_libraries='pg_ukc_scaletozero'" ]
+cmd: [ "docker-entrypoint.sh", "postgres", "-c", "shared_preload_libraries=pg_ukc_scaletozero" ]

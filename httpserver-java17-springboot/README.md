@@ -91,19 +91,31 @@ Lines in the `Kraftfile` have the following roles:
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/lib/jvm/java-17-openjdk-amd64/bin/java", "-jar", "/usr/src/demo-0.0.1-SNAPSHOT.jar"]`: Use as the starting command of the instance.
+* `cmd: ["/opt/java/openjdk/bin/java", "-jar", "/usr/src/demo-0.0.1-SNAPSHOT.jar"]`: Use as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
+* `FROM --platform=$BUILDPLATFORM eclipse-temurin:17-jdk-noble AS build`: Build the app with the Eclipse Temurin 17 JDK on the build machine.
+  The JAR file does not depend on the architecture.
 
 * `COPY DemoApplication.java src/main/java/com/example/demo/`: Copy the server implementation file in the Docker filesystem.
+
+* `RUN ./mvnw package`: Build the JAR file of the app.
+
+* `FROM eclipse-temurin:17-jre-noble AS runtime`: Use the Eclipse Temurin 17 JRE for the target architecture.
+
+* `RUN ... lddtree ...`: Collect the JRE, the system libraries that it uses, and the JAR file in `/rootfs`.
+
+* `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
+
+* `COPY --from=runtime /rootfs /`: Copy the collected files to the app filesystem.
 
 The following options are available for customizing the app:
 
 * If you only update the implementation in the `DemoApplication.java` source file, you don't need to make any other changes.
 
-* If you create any new source files, copy them into the app filesystem by using the `COPY` command in the `Dockerfile`.
+* If you create any new source files, copy them to `src/main/java/com/example/demo/` in the build stage with a `COPY` command in the `Dockerfile`.
+  Maven packs them into the JAR file, and the `runtime` stage copies the JAR file to `/rootfs`.
 
 * More extensive changes may require extending the `Dockerfile` ([see `Dockerfile` syntax reference](https://docs.docker.com/engine/reference/builder/)).
 

@@ -99,7 +99,8 @@ The following options are available for customizing the app:
 
 * If you only update the implementation in the `server.php` source file, you don't need to make any other changes.
 
-* If you create any new source files, copy them into the app filesystem by using the `COPY` command in the `Dockerfile`.
+* If you create any new source files, copy them to `/rootfs/usr/src/` with a `COPY` command in the `Dockerfile`, next to `server.php`.
+  Only the contents of `/rootfs` go into the final image.
   If you need new extensions, that may require updating the `php.ini` file.
 
 * More extensive changes may require extending the `Dockerfile` ([see `Dockerfile` syntax reference](https://docs.docker.com/engine/reference/builder/)).
