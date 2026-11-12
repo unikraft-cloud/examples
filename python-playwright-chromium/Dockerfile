@@ -19,6 +19,7 @@ RUN set -xe; \
         libxrandr2 \
         libgbm1; \
     apt-get -yqq install \
+        libatomic1 \
         python3 \
         python-is-python3 \
         python3-pip \
@@ -160,7 +161,8 @@ COPY --from=build /usr/lib/python3.11 /usr/lib/python3.11
 COPY --from=build /app/.venv /app/.venv
 
 # System libraries
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 \
+COPY --from=build /lib/x86_64-linux-gnu/libatomic.so.1 \
+                  /lib/x86_64-linux-gnu/libc.so.6 \
                   /lib/x86_64-linux-gnu/libz.so.1 \
                   /lib/x86_64-linux-gnu/libbrotlidec.so.1 \
                   /lib/x86_64-linux-gnu/libbrotlienc.so.1 \
