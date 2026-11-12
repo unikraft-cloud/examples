@@ -1,4 +1,7 @@
-Django>=5.0.3
+asgiref==3.13.0
 bjoern==3.2.2
-Werkzeug>=3.0.3
-tzdata>=2026.1
+Django==5.2.19
+MarkupSafe==3.0.4
+sqlparse==0.6.1
+tzdata==2026.6
+Werkzeug==3.1.9
