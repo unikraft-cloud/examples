@@ -133,7 +133,7 @@ Lines in the `Kraftfile` have the following roles:
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/bin/ruby", "/app/bin/rails", "server", "-b", "0.0.0.0"]`: Use `/usr/bin/ruby /app/bin/rails server -b 0.0.0.0` as the starting command of the instance.
+* `cmd: ["/usr/local/bin/ruby", "/app/bin/rails", "server", "-b", "0.0.0.0"]`: Use `/usr/local/bin/ruby /app/bin/rails server -b 0.0.0.0` as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
@@ -141,9 +141,12 @@ Lines in the `Dockerfile` have the following roles:
 
 * `COPY . /app/`: Copies the local files (from `app/` and `config/`) to the app, overwriting generated contents to provide the user-specified app.
 
+* `RUN ... lddtree ...`: Collect Ruby, the gems, the app, the time zone data and the system libraries that they use in `/rootfs`.
+  Then load all the native extensions to make sure that no library is missing.
+
 * `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
 
-* `COPY --from=build /app /app`: Copy the app directory to the filesystem.
+* `COPY --from=build /rootfs /`: Copy the collected files to the app filesystem.
 
 The following options are available for customizing the app:
 

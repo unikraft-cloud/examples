@@ -1,86 +1,31 @@
-FROM --platform=$BUILDPLATFORM elixir:1.19.2-slim AS build
-
-WORKDIR /src
+FROM elixir:1.19.2-slim AS build
 
 RUN set -xe; \
     apt-get update; \
-    apt-get install -y --no-install-recommends ca-certificates; \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends ca-certificates pax-utils
+
+WORKDIR /src
 
 COPY . .
 
 RUN mix deps.get
 
-RUN MIX_TARGET=$TARGETARCH mix compile && mix release
+RUN mix compile && mix release
 
-FROM alpine:3 AS sys
+COPY ./wrapper.sh /rootfs/usr/bin/wrapper.sh
 
 RUN set -xe; \
-    mkdir -p /target/etc; \
-    mkdir -p /blank; \
-    apk --no-cache add \
-      ca-certificates \
-      tzdata \
-    ; \
-    update-ca-certificates; \
-    ln -sf /usr/share/zoneinfo/Etc/UTC /target/etc/localtime; \
-    echo "Etc/UTC" > /target/etc/timezone;
-
-FROM --platform=$TARGETPLATFORM elixir:1.19.2-slim AS runtime
+    mkdir -p /rootfs/dev /rootfs/tmp; \
+    find /usr/local/lib/erlang -type f -print0 | xargs -0 lddtree --skip-non-elfs --copy-to-tree /rootfs; \
+    lddtree --copy-to-tree /rootfs /bin/sh /usr/bin/basename /usr/bin/cat /usr/bin/cut /usr/bin/dirname /usr/bin/grep /usr/bin/readlink /usr/bin/sed; \
+    tar -C / -cf /tmp/data.tar usr/local/lib/erlang usr/local/bin/erl usr/lib/locale src/_build/dev/rel etc/ssl/certs/ca-certificates.crt; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    touch /rootfs/dev/null; \
+    chroot /rootfs /usr/bin/wrapper.sh _build/dev/rel/server/bin/server eval '{:ok,_}=Application.ensure_all_started(:crypto)'; \
+    rm /rootfs/dev/null
 
 FROM scratch
 
-COPY --from=sys /target/etc /etc
-COPY --from=sys /usr/share/zoneinfo/UTC /usr/share/zoneinfo/UTC
-COPY --from=sys /usr/share/zoneinfo/Etc/UTC /usr/share/zoneinfo/Etc/UTC
-COPY --from=sys /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=sys /blank /tmp
-
-COPY --from=runtime /lib/x86_64-linux-gnu/libc.so.6 \
-                    /lib/x86_64-linux-gnu/libgcc_s.so.1 \
-                    /lib/x86_64-linux-gnu/libm.so.6 \
-                    /lib/x86_64-linux-gnu/libsctp.so.1 \
-                    /lib/x86_64-linux-gnu/libstdc++.so.6 \
-                    /lib/x86_64-linux-gnu/libtinfo.so.6 \
-                    /lib/x86_64-linux-gnu/libcrypto.so.3 \
-                    /lib/x86_64-linux-gnu/libselinux.so.1 \
-                    /lib/x86_64-linux-gnu/libc.so.6 \
-                    /lib/x86_64-linux-gnu/libpcre2-8.so.0 \
-                    /lib/x86_64-linux-gnu/libacl.so.1 \
-                    /lib/x86_64-linux-gnu/
-
-COPY --from=runtime /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-
-COPY --from=runtime /usr/local/lib/erlang /usr/local/lib/erlang
-COPY --from=runtime /usr/local/lib/elixir /usr/local/lib/elixir
-
-# Erlang and Elixir-related executables
-COPY --from=runtime /usr/local/bin /usr/local/bin
-
-COPY --from=runtime /usr/lib/locale /usr/lib/locale
-
-COPY --from=runtime /usr/bin/dirname \
-                    /usr/bin/basename \
-                    /usr/bin/readlink \
-                    /usr/bin/env \
-                    /usr/bin/cut \
-                    /usr/bin/sed \
-                    /usr/bin/cat \
-                    /usr/bin/grep \
-                    /usr/bin/
-
-COPY --from=runtime /bin/rm \
-                    /bin/mknod \
-                    /bin/bash \
-                    /bin/sh \
-                    /bin/
-
-COPY --from=build /root /root
-
-COPY --from=build /src/deps /src/deps
-COPY --from=build /src/_build /src/_build
-COPY --from=build /src/lib /src/lib
-COPY --from=build /src/mix.exs /src/mix.exs
-COPY --from=build /src/mix.lock /src/mix.lock
-
-COPY ./wrapper.sh /usr/bin/wrapper.sh
+COPY --from=build /rootfs /

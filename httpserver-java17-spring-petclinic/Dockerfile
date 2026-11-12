@@ -1,13 +1,8 @@
-FROM --platform=linux/x86_64 debian:bookworm AS build
+FROM --platform=$BUILDPLATFORM eclipse-temurin:17-jdk-noble AS build
 
-RUN set -xe ; \
-    apt -yqq update ; \
-        apt -yqq install default-jre ; \
-        apt -yqq install default-jdk; \
-        apt -yqq install curl zip unzip git \
-    ;
-
-RUN ldconfig /usr/lib/jvm/java-17-openjdk-amd64/lib/
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends git
 
 ARG BUILD_COMMIT=d8fcd11e
 
@@ -18,19 +13,23 @@ RUN git checkout -b build ${BUILD_COMMIT}
 
 RUN --mount=type=cache,target=/root/.m2 ./mvnw package
 
+FROM eclipse-temurin:17-jre-noble AS runtime
+
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils
+
+COPY --from=build /src/target/spring-petclinic-3.3.0-SNAPSHOT.jar /rootfs/usr/src/spring-petclinic-3.3.0-SNAPSHOT.jar
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    find /opt/java/openjdk -type f -print0 | xargs -0 lddtree --skip-non-elfs --copy-to-tree /rootfs; \
+    tar -C / -cf /tmp/data.tar opt/java/openjdk; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    LD_LIBRARY_PATH=/opt/java/openjdk/lib chroot /rootfs /opt/java/openjdk/bin/java -version
+
 FROM scratch
 
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /usr/lib/x86_64-linux-gnu/libz.so.1 /usr/lib/x86_64-linux-gnu/libz.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=build /etc/ld.so.cache /etc/ld.so.cache
-
-COPY --from=build /usr/lib/jvm/java-17-openjdk-amd64/ /usr/lib/jvm/java-17-openjdk-amd64/
-COPY --from=build /etc/ssl/certs/java/cacerts /etc/ssl/certs/java/cacerts
-
-COPY --from=build /etc/java-17-openjdk/security/ /etc/java-17-openjdk/security/
-
-COPY --from=build /src/target/spring-petclinic-3.3.0-SNAPSHOT.jar /usr/src/spring-petclinic-3.3.0-SNAPSHOT.jar
+COPY --from=runtime /rootfs /

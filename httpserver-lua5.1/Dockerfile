@@ -1,36 +1,33 @@
-FROM nickblah/lua:5.1.5-luarocks-bionic AS build
+FROM debian:bookworm AS build
 
 RUN set -xe; \
-    apt update; \
-    apt install -y --no-install-recommends \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
       build-essential \
+      ca-certificates \
       libssl-dev \
-      m4; \
-    luarocks install luasocket; \
-    luarocks install http \
-    ;
+      liblua5.1-0-dev \
+      lua5.1 \
+      luarocks \
+      m4 \
+      pax-utils \
+      unzip; \
+    luarocks --lua-version=5.1 install luasocket 3.1.0-1; \
+    luarocks --lua-version=5.1 install http 0.4-0
+
+COPY ./http_server.lua /rootfs/http_server.lua
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp /rootfs/usr/lib; \
+    ln -s usr/lib /rootfs/lib; \
+    lddtree --copy-to-tree /rootfs /usr/bin/lua; \
+    find /usr/local/lib/lua -type f -print0 | xargs -0 lddtree --skip-non-elfs --copy-to-tree /rootfs; \
+    tar -C / -cf /tmp/data.tar usr/local/share/lua usr/local/lib/lua; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/bin/lua -e 'require "socket"; require "http.server"'
 
 FROM scratch
 
-# Lua binary
-COPY --from=build /usr/local/bin/lua /usr/bin/lua
-
-# Lua libraries
-COPY --from=build /usr/local/share/lua/5.1 /usr/local/share/lua/5.1
-COPY --from=build /usr/local/lib/lua/5.1 /usr/local/lib/lua/5.1
-
-# System libraries
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libreadline.so.7 /lib/x86_64-linux-gnu/libreadline.so.7
-COPY --from=build /lib/x86_64-linux-gnu/libtinfo.so.5 /lib/x86_64-linux-gnu/libtinfo.so.5
-COPY --from=build /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread.so.0
-COPY --from=build /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.so.2
-COPY --from=build /lib/x86_64-linux-gnu/librt.so.1 /lib/x86_64-linux-gnu/librt.so.1
-COPY --from=build /usr/lib/x86_64-linux-gnu/libssl.so.1.1 /usr/lib/x86_64-linux-gnu/libssl.so.1.1
-COPY --from=build /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1 /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=build /etc/ld.so.cache /etc/ld.so.cache
-
-# Lua server
-COPY ./http_server.lua /http_server.lua
+COPY --from=build /rootfs /

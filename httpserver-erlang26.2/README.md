@@ -98,7 +98,9 @@ The following options are available for customizing the app:
 
 * If you only update the implementation in the `http_server.erl` source file, you don't need to make any other changes.
 
-* If you create any new source files, copy them into the app filesystem by using the `COPY` command in the `Dockerfile`.
+* If you create any new source files, copy them into the build stage with a `COPY` command in the `Dockerfile`, and compile them with `erl -compile`.
+  Then copy the `.beam` files to `/rootfs/usr/src/` in the packing step, next to `http_server.beam`.
+  Only the contents of `/rootfs` go into the final image.
 
 * More extensive changes may require extending the `Dockerfile` ([see `Dockerfile` syntax reference](https://docs.docker.com/engine/reference/builder/)).
 

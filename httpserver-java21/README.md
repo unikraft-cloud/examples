@@ -103,25 +103,29 @@ Lines in the `Kraftfile` have the following roles:
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/lib/jvm/java-21-openjdk-amd64/bin/java", "-classpath", "/usr/src/", "SimpleHttpServer"]`: Use the Java runtime to run `SimpleHttpServer` as the starting command of the instance.
+* `cmd: ["/opt/java/openjdk/bin/java", "-classpath", "/usr/src/", "SimpleHttpServer"]`: Use the Java runtime to run `SimpleHttpServer` as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM --platform=linux/x86_64 ubuntu:24.04 AS build`: Build the app using Ubuntu 24.04, which includes Java 21 in its official repositories.
-
-* `RUN apt-get ... install openjdk-21-jdk ...`: Install OpenJDK 21.
+* `FROM --platform=$BUILDPLATFORM eclipse-temurin:21-jdk-noble AS build`: Build the app with the Eclipse Temurin 21 JDK on the build machine.
+  The Java class file does not depend on the architecture.
 
 * `RUN javac SimpleHttpServer.java`: Compile the Java source file.
 
+* `FROM eclipse-temurin:21-jre-noble AS runtime`: Use the Eclipse Temurin 21 JRE for the target architecture.
+
+* `RUN ... lddtree ...`: Collect the JRE, the system libraries that it uses, and the compiled `SimpleHttpServer.class` in `/rootfs`.
+
 * `FROM scratch`: Build the runtime filesystem from a minimal base image.
 
-* `COPY ...`: Copy required files to the app filesystem: system libraries, the Java 21 runtime, and the compiled `SimpleHttpServer.class`.
+* `COPY --from=runtime /rootfs /`: Copy the collected files to the app filesystem.
 
 The following options are available for customizing the app:
 
 * If you only update the implementation in the `SimpleHttpServer.java` source file, you don't need to make any other changes.
 
-* If you want to add extra files, you need to copy them into the filesystem using the `COPY` command in the `Dockerfile`.
+* If you want to add extra files, copy them to `/rootfs` in the `runtime` stage with a `COPY` command in the `Dockerfile`.
+  Only the contents of `/rootfs` go into the final image.
 
 * If you want to replace `SimpleHttpServer.java` with a different source file, update the `cmd` line in the `Kraftfile` and replace `SimpleHttpServer` with the name of your new class.
 

@@ -2,10 +2,11 @@ spec: v0.7
 
 targets:
   - kraftcloud/x86_64
+  - kraftcloud/arm64
 
 rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: ["/usr/lib/jvm/java-17-openjdk-amd64/bin/java", "-jar", "/usr/src/spring-petclinic-3.3.0-SNAPSHOT.jar"]
+cmd: ["/opt/java/openjdk/bin/java", "-jar", "/usr/src/spring-petclinic-3.3.0-SNAPSHOT.jar"]
 

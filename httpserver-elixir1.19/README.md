@@ -91,6 +91,7 @@ unikraft instances delete httpserver-elixir119-qo9k3
 To customize the app, update the files in the repository, listed below:
 
 * `lib/`, `mix.exs`: the actual Elixir HTTP server implementation
+* `mix.lock`: the locked versions of the dependencies
 * `Kraftfile`: the Unikraft Cloud specification
 * `Dockerfile`: the Docker-specified app filesystem
 
@@ -99,7 +100,9 @@ The following options are available for customizing the app:
 * If you only update the implementation in the `lib/server.ex` or `lib/server/app.ex` source code files, no other changes apply.
   If you add new source files in the `lib/` directory, you don't need to make any other changes.
 
-* If you create any new source files, copy them into the app filesystem by using the `COPY` command in the `Dockerfile`.
+* If the app needs other files at run time, put them in the `priv/` directory.
+  The release includes this directory.
+  Only the release in `_build/dev/rel/server` and the Erlang runtime go into the final image.
 
 * More extensive changes may require extending the `Dockerfile` ([see `Dockerfile` syntax reference](https://docs.docker.com/engine/reference/builder/)).
 

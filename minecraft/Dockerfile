@@ -1,4 +1,4 @@
-FROM itzg/minecraft-server:java25
+FROM itzg/minecraft-server:2026.11.0-java25
 
 RUN set -xe; \
     apt-get -yqq update; \
@@ -13,7 +13,5 @@ RUN mkdir -p /run/sshd
 
 COPY --chmod=755 wrapper.sh /wrapper.sh
 
-# Patch startup scripts to create a Unikraft Cloud template snapshot right
-# before the Java server process starts (i.e., before world generation).
 COPY --chmod=755 patches/start-configuration /image/scripts/start-configuration
 COPY --chmod=755 patches/start-finalExec /image/scripts/start-finalExec

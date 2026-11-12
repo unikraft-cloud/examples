@@ -1,23 +1,24 @@
 FROM perl:5.42.0-bookworm AS build
 
-RUN set -xe ; \
-    cpanm HTTP::Daemon
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils
+
+RUN set -xe; \
+    cpanm HTTP::Daemon@6.17
+
+COPY ./server.pl /rootfs/usr/src/server.pl
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    lddtree --copy-to-tree /rootfs /usr/local/bin/perl; \
+    find /usr/local/lib/perl5 -type f -print0 | xargs -0 lddtree --skip-non-elfs --copy-to-tree /rootfs; \
+    tar -C / -cf /tmp/data.tar usr/local/lib/perl5; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/local/bin/perl -c /usr/src/server.pl
 
 FROM scratch
 
-# Perl binary
-COPY --from=build /usr/local/bin/perl /usr/bin/perl
-
-# Perl libraries
-COPY --from=build /usr/local/lib/perl5 /usr/local/lib/perl5
-
-# System libraries
-COPY --from=build /usr/local/lib/perl5/5.42.0/x86_64-linux-gnu/CORE/libperl.so /usr/local/lib/perl5/5.42.0/x86_64-linux-gnu/CORE/libperl.so
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/x86_64-linux-gnu/libcrypt.so.1
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=build /etc/ld.so.cache /etc/ld.so.cache
-
-# Simple Perl HTTP server
-COPY ./server.pl /usr/src/server.pl
+COPY --from=build /rootfs /
