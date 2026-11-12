@@ -101,11 +101,29 @@ Lines in the `Kraftfile` have the following roles:
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/bin/python3", "-m", "uvicorn", "src.server:app", "--host", "0.0.0.0", "--port", "8080"]`: Use this as the starting command of the instance.
+* `cmd: ["/usr/local/bin/python3", "-m", "uvicorn", "src.server:app", "--host", "0.0.0.0", "--port", "8080"]`: Use this as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
+* `FROM python:3.12-bookworm AS build`: Use the official Python 3.12 image as the build stage.
+  The build uses the image for the target architecture (`x86_64` or `arm64`).
+
+* `RUN ... apt-get install ... pax-utils`: Install `lddtree`, which finds the shared libraries that an executable needs.
+
+* `RUN pip3 install ...`: Install the packages listed in `requirements.txt` for the target architecture.
+  `requirements.txt` lists FastAPI 0.121.3 and the packages that it needs, each with an exact version.
+
+* `COPY ./server.py /src/server.py`: Copy the server implementation file (`server.py`) in the build stage (in `/src/server.py`).
+
+* `RUN set -xe; ...`: Create the app filesystem in `/rootfs`.
+  `lddtree` copies the Python interpreter, the compiled Python modules and the shared libraries that they need.
+  `tar` copies the Python standard library with the installed packages, the dynamic linker cache (`/etc/ld.so.cache`) and the server.
+  `chroot` makes sure that the server and all the compiled Python modules load in the new filesystem.
+  `lddtree` and `chroot` skip the `_tkinter` module, because the app doesn't use it and it needs large X11 and Tk libraries.
+
 * `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
+
+* `COPY --from=build /rootfs /`: Copy the app filesystem from the build stage.
 
 The following options are available for customizing the app:
 

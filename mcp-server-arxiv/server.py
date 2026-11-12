@@ -14,9 +14,8 @@ from fastmcp.server.proxy import ProxyClient
 
 def build_mcp_proxy(storage_path):
     transport = StdioTransport(
-        command="uvx",
+        command="/root/.local/bin/arxiv-mcp-server",
         args=[
-            "arxiv-mcp-server",
             "--storage-path", storage_path
         ]
     )

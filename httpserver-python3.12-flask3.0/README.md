@@ -102,13 +102,26 @@ Lines in the `Kraftfile` have the following roles:
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/bin/python3", "/src/server.py"]`: Use `/usr/bin/python3 /src/server.py` as the starting command of the instance.
+* `cmd: ["/usr/local/bin/python3", "/src/server.py"]`: Use `/usr/local/bin/python3 /src/server.py` as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
+* `FROM python:3.12-bookworm AS build`: Use the official Python 3.12 image as the build stage.
+  The build uses the image for the target architecture (`x86_64` or `arm64`).
+
+* `RUN ... apt-get install ... pax-utils`: Install `lddtree`, which finds the shared libraries that an executable needs.
+
+* `COPY ./server.py /src/server.py`: Copy the server implementation file (`server.py`) in the build stage (in `/src/server.py`).
+
+* `RUN set -xe; ...`: Create the app filesystem in `/rootfs`.
+  `lddtree` copies the Python interpreter, the compiled Python modules and the shared libraries that they need.
+  `tar` copies the Python standard library with the installed packages, the dynamic linker cache (`/etc/ld.so.cache`) and the server.
+  `chroot` makes sure that the server and all the compiled Python modules load in the new filesystem.
+  `lddtree` and `chroot` skip the `_tkinter` module, because the app doesn't use it and it needs large X11 and Tk libraries.
+
 * `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
 
-* `COPY ./server.py /app/server.py`: Copy the server implementation file (`server.py`) in the Docker filesystem (in `/app/server.py`).
+* `COPY --from=build /rootfs /`: Copy the app filesystem from the build stage.
 
 The following options are available for customizing the app:
 
@@ -138,28 +151,23 @@ To create an `pip`-based app:
 
    3.2. `RUN` the `pip3 install` command to install dependencies.
 
-   3.3. `COPY` of the resulting and required files (`/usr/local/lib/python3.12` and `server.py`) in the app filesystem, using the [`scratch` container](https://hub.docker.com/_/scratch/).
+   3.3. Copy the resulting files (`/usr/local/lib/python3.12` and `server.py`) and the shared libraries that they need in the app filesystem, using the [`scratch` container](https://hub.docker.com/_/scratch/).
 
 The following lists the files:
 
-The `requirements.txt` file lists the `flask` dependency.
+The `requirements.txt` file lists the `flask` dependency and the packages that it needs, each with an exact version.
 
 The `Kraftfile` is the same one used for `httpserver-python3.12`.
 
 For `Dockerfile` newly added lines have the following roles:
-
-* `FROM python:3.12-bookworm AS base`: Use the base image of the `python:3.12-bookworm` container.
-  This provides the `pip3` binary and other Python-related components.
-  Name the current image `base`.
 
 * `WORKDIR /app`: Use `/app` as working directory.
   All other commands in the `Dockerfile` run inside this directory.
 
 * `COPY requirements.txt /app`: Copy the package configuration file to the Docker filesystem.
 
-* `RUN pip3 install ...`: Install `pip` components listed in `requirements.txt`.
-
-* `COPY --from=base ...`: Copy generated Python files in the new `base` image in the `scratch`-based image.
+* `RUN pip3 install ...`: Install `pip` components listed in `requirements.txt` in `/usr/local/lib/python3.12/site-packages`.
+  `pip` installs the packages for the target architecture.
 
 Similar actions apply to other `pip3`-based apps.
 

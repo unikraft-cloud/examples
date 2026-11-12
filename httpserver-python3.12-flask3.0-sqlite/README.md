@@ -122,23 +122,28 @@ Lines in the `Kraftfile` have the following roles:
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/bin/python3", "/app/server.py"]`: Use `/usr/bin/python3 /app/server.py` as the starting command of the instance.
+* `cmd: ["/usr/local/bin/python3", "/app/server.py"]`: Use `/usr/local/bin/python3 /app/server.py` as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
+* `FROM python:3.12-bookworm AS build`: Use the official Python 3.12 image as the build stage.
+  The build uses the image for the target architecture (`x86_64` or `arm64`).
 
 * `COPY` rules copy required files.
   The process copies the `requirements.txt` file before running `pip3 install`.
   The process copies other files (including `schema.sql`, `init_db.py`) for the initialization of the database.
 
-* `RUN` commands trigger actions such as installing Python packages and initializing the database.
+* `RUN` commands trigger actions such as installing `lddtree` and the Python packages, and initializing the database.
 
-* The new `scratch` image contains the relevant contents required by the app:
+* The last `RUN` command creates the app filesystem in `/rootfs`.
+  `lddtree` copies the Python interpreter, the compiled Python modules and the shared libraries that they need, for example the SQLite library.
+  `tar` copies the Python standard library with the installed packages, the dynamic linker cache (`/etc/ld.so.cache`) and the `/app` directory.
+  `chroot` makes sure that the server and all the compiled Python modules load in the new filesystem.
+  `lddtree` and `chroot` skip the `_tkinter` module, because the app doesn't use it and it needs large X11 and Tk libraries.
 
-  * the SQLite dynamic library: `/usr/lib/x86_64-linux-gnu/libsqlite3.so.0`
-  * the Python package files: `/usr/local/lib/python3.12`
-  * the `/app` directory
+* `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
+
+* `COPY --from=build /rootfs /`: Copy the app filesystem from the build stage.
 
 ## Customize your app
 
@@ -156,7 +161,8 @@ The following options are available for customizing the app:
 * If you create any new source files, copy them into the app filesystem by using the `COPY` command in the `Dockerfile`.
 
 * If you add new dependencies in `requirements.txt`, the `RUN pip3 install` in the `Dockerfile` command should take care of everything.
-  It may be the case that you need to copy other files, such as the `/usr/lib/x86_64-linux-gnu/libsqlite3.so.0` for SQLite, via `COPY` commands in the `Dockerfile`.
+  Use an exact version (`==`) for each package.
+  `lddtree` finds the shared libraries of the new compiled Python modules.
   More extensive changes may require extending the `Dockerfile` ([see `Dockerfile` syntax reference](https://docs.docker.com/engine/reference/builder/)).
 
 * If you add a new Python source file that's running the `main()` function, update the `cmd` line in the `Kraftfile` and replace `server.py` to run that file when creating the instance.
