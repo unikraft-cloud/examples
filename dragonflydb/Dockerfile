@@ -1,30 +1,22 @@
 FROM docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.1 AS build
 
+USER root
+
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -xe; \
+    mkdir -p -m 1777 /rootfs/tmp; \
+    ln -s /usr/local/bin/dragonfly /usr/bin/dragonfly; \
+    lddtree -l /usr/bin/dragonfly /bin/bash /usr/bin/mount /usr/bin/mkdir | sort -u > /tmp/libs.txt; \
+    tar -chf /tmp/libs.tar -T /tmp/libs.txt; \
+    tar -C /rootfs -xf /tmp/libs.tar; \
+    chroot /rootfs /usr/bin/dragonfly --version; \
+    chroot /rootfs /bin/bash -c '/usr/bin/mount --version && /usr/bin/mkdir --version'
+
 FROM scratch
 
-# Binary executable
-COPY --from=build /usr/local/bin/dragonfly /usr/bin/dragonfly
-
-# System libraries
-COPY --from=build /lib/x86_64-linux-gnu/libz.so.1 /lib/x86_64-linux-gnu/libz.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.so.2
-COPY --from=build /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread.so.0
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-
-# Shell and utilities libraries
-COPY --from=build /lib/x86_64-linux-gnu/libmount.so.1 /lib/x86_64-linux-gnu/libmount.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libselinux.so.1 /lib/x86_64-linux-gnu/libselinux.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libblkid.so.1 /lib/x86_64-linux-gnu/libblkid.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libpcre2-8.so.0 /lib/x86_64-linux-gnu/libpcre2-8.so.0
-COPY --from=build /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.6
-
-# Shell and mount
-COPY --from=build /bin/bash /bin/bash
-COPY --from=build /usr/bin/mount /usr/bin/mount
-COPY --from=build /usr/bin/mkdir /usr/bin/mkdir
-
-# Wrapper script
+COPY --from=build /rootfs /
 COPY ./wrapper.sh /usr/bin/wrapper.sh

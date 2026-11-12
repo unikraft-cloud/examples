@@ -90,7 +90,6 @@ To customize the app, update the files in the repository, listed below:
 The following options are available for customizing the app:
 
 * If you create any new source files, copy them into the app filesystem by using the `COPY` command in the `Dockerfile`.
-  See the commented out `COPY` command in the `Dockerfile`.
 
 * If you use a new executable, update the `cmd` line in the `Kraftfile` and replace `/usr/share/grafana/bin/grafana` with the path to the new executable.
 

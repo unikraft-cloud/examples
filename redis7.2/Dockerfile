@@ -1,16 +1,19 @@
-FROM redis:7.2.2-bookworm AS build
+FROM redis:7.2-bookworm AS build
+
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    ln -s /usr/local/bin/redis-server /usr/bin/redis-server; \
+    lddtree --copy-to-tree /rootfs /usr/bin/redis-server; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/bin/redis-server --version
 
 FROM scratch
 
-# Redis binaries, modules, configuration, log and runtime files
-COPY --from=build /usr/local/bin/redis-server /usr/bin/redis-server
-
-# Libraries
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libssl.so.3 /lib/x86_64-linux-gnu/libssl.so.3
-COPY --from=build /lib/x86_64-linux-gnu/libcrypto.so.3 /lib/x86_64-linux-gnu/libcrypto.so.3
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-
-# Custom configuration files, including using a single process for Redis
+COPY --from=build /rootfs /
 COPY ./fs/ /
