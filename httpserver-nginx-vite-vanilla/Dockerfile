@@ -1,4 +1,4 @@
-FROM node:23 AS build
+FROM --platform=$BUILDPLATFORM node:23-bookworm AS build
 
 WORKDIR /app
 
@@ -8,38 +8,27 @@ RUN set -xe; \
     npm ci; \
     npm run build
 
-FROM nginx:1.25.3-bookworm AS nginx
+FROM nginx:1.25.3-bookworm AS rootfs
 
 RUN set -xe; \
-    rm -f /var/log/nginx/access.log; \
-    rm -f /var/log/nginx/error.log; \
-    touch /var/log/nginx/access.log; \
-    touch /var/log/nginx/error.log \
-    ;
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils; \
+    rm -rf /var/lib/apt/lists/*
+
+COPY ./rootfs/ /
+COPY --from=build /app/dist /wwwroot
+
+RUN set -xe; \
+    rm -f /var/log/nginx/access.log /var/log/nginx/error.log; \
+    touch /var/log/nginx/access.log /var/log/nginx/error.log; \
+    mkdir -p /rootfs/tmp; \
+    lddtree --copy-to-tree /rootfs /usr/sbin/nginx; \
+    tar -C / -cf /tmp/data.tar etc/nginx etc/passwd etc/group var/log/nginx var/cache/nginx var/run run wwwroot; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/sbin/nginx -t
 
 FROM scratch
 
-# Nginx binaries, modules, configuration, log and runtime files
-COPY --from=nginx /usr/sbin/nginx /usr/bin/nginx
-COPY --from=nginx /usr/lib/nginx /usr/lib/nginx
-COPY --from=nginx /etc/nginx /etc/nginx
-COPY --from=nginx /etc/passwd /etc/passwd
-COPY --from=nginx /etc/group /etc/group
-COPY --from=nginx /var/log/nginx /var/log/nginx
-COPY --from=nginx /var/cache/nginx /var/cache/nginx
-COPY --from=nginx /var/run /var/run
-
-# Libraries
-COPY --from=nginx /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/x86_64-linux-gnu/libcrypt.so.1
-COPY --from=nginx /lib/x86_64-linux-gnu/libpcre2-8.so.0 /lib/x86_64-linux-gnu/libpcre2-8.so.0
-COPY --from=nginx /lib/x86_64-linux-gnu/libssl.so.3 /lib/x86_64-linux-gnu/libssl.so.3
-COPY --from=nginx /lib/x86_64-linux-gnu/libcrypto.so.3 /lib/x86_64-linux-gnu/libcrypto.so.3
-COPY --from=nginx /lib/x86_64-linux-gnu/libz.so.1 /lib/x86_64-linux-gnu/libz.so.1
-COPY --from=nginx /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=nginx /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=nginx /etc/ld.so.cache /etc/ld.so.cache
-
-# Custom configuration files, including using a single process for Nginx
-COPY ./rootfs/ /
-
-COPY --from=build /app/dist /wwwroot
+COPY --from=rootfs /rootfs /

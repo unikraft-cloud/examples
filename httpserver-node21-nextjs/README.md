@@ -99,15 +99,34 @@ Lines in the `Kraftfile` have the following roles:
 
 * `spec: v0.7`: The current `Kraftfile` specification version is `0.7`.
 
+* `targets`: Build the app for the `kraftcloud/x86_64` and `kraftcloud/arm64` targets.
+
 * `rootfs`: Build the app root filesystem.
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: [["/usr/bin/node", "/usr/src/server.js"]]`: Use `/usr/bin/node /usr/src/server.js` as the starting command of the instance.
+* `cmd: ["/usr/local/bin/node", "/usr/src/server.js"]`: Use `/usr/local/bin/node /usr/src/server.js` as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
+* `FROM node:21-alpine3.20 AS build`: Build the app using the Node.js 21 Alpine image of the target architecture.
+
+* `RUN npm ci`: Install the dependencies at the versions in `package-lock.json`.
+
+* `RUN npm run build`: Build the Next.js app as a standalone server in `.next/standalone`.
+
+* `FROM node:21-alpine3.20 AS rootfs`: Prepare the app filesystem in a new stage of the same image.
+
+* `RUN apk add --no-cache lddtree pax-utils`: Install `lddtree`, which finds the libraries that a binary needs.
+
+* `COPY ...`: Copy the standalone server, the static files, and the `public` directory to `/usr/src`.
+
+* `RUN ...`: Copy the `node` binary, the libraries that `node` and the native modules need, and `/usr/src` to `/rootfs`.
+  Then make sure that `node` starts in `/rootfs` and loads the `sharp` native module.
+
 * `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
+
+* `COPY --from=rootfs /rootfs /`: Copy the prepared files to the app filesystem.
 
 The following options are available for customizing the app:
 
@@ -126,68 +145,58 @@ The following options are available for customizing the app:
 It's used to install dependencies for Node apps.
 `npm` uses a `package.json` file to list required dependencies (with versions).
 
-The [`httpserver-expressjs4.18-node21`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-expressjs4.18-node21) example in the [`examples`](https://github.com/unikraft-cloud/examples) repository details the use of `npm` to deploy an app using the [ExpressJS](https://expressjs.com/) framework on Unikraft Cloud.
-Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `httpserver-expressjs4.18-node21` directory:
-
-```bash
-git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-expressjs4.18-node21/
-```
-
-Run the command below to deploy the app on Unikraft Cloud:
-
-```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-expressjs418-node21:latest
-unikraft run --metro fra \
-  -m 256M \
-  -p 443:3000/tls+http \
-  --scale-to-zero policy=on,cooldown-time=1000,stateful=true \
-  --image <my-org>/httpserver-expressjs418-node21:latest
-```
-
 Differences from the `http-node21` app are also the steps required to create an `npm`-based app:
 
-1. Add the `package.json` file used by `npm`.
+1. Add the `package.json` and `package-lock.json` files used by `npm`.
 
 2. Add framework-specific source files.
-   In this case, this means `app/index.js`.
+   In this case, this means the `app/` and `public/` directories and the Next.js configuration files.
 
 3. Update the `Dockerfile` to:
 
-   3.1. `COPY` the local files.
+   3.1. `RUN` the `npm ci` command to install dependencies.
 
-   3.2. `RUN` the `npm install` command to install dependencies.
+   3.2. `RUN` the `npm run build` command to build the app.
 
-   3.3. `COPY` of the resulting and required files (`node_modules/` and `app/index.js`) in the app filesystem, using the [`scratch` container](https://hub.docker.com/_/scratch/).
+   3.3. `COPY` the `node` binary, the libraries that it needs, and the build output to the app filesystem, using the [`scratch` container](https://hub.docker.com/_/scratch/).
 
 The following lists the files:
 
-The `package.json` file lists the `express` [dependency](https://docs.npmjs.com/cli/v8/configuring-npm/package-json#dependencies).
+The `package.json` file lists the `next`, `react`, and `react-dom` [dependencies](https://docs.npmjs.com/cli/v8/configuring-npm/package-json#dependencies).
+The `package-lock.json` file pins the versions of all dependencies.
+The `next.config.mjs` file sets `output: "standalone"`, so `npm run build` creates a standalone server in `.next/standalone`.
 
 The `Kraftfile` is the same one used for `http-node21`.
 
 For `Dockerfile` newly added lines have the following roles:
 
-* `FROM node:21-alpine AS build`: Use the base image of the `node:21-alpine` container.
+* `FROM node:21-alpine3.20 AS build`: Use the base image of the `node:21-alpine3.20` container for the target architecture.
   This provides the `npm` binary and other Node-related components.
   Name the current image `build`.
 
 * `WORKDIR /usr/src`: Use `/usr/src` as working directory.
-  All other commands in the `Dockerfile` run inside this directory.
+  All other commands in the `build` stage run inside this directory.
+
+* `COPY package.json package-lock.json ./`: Copy the `npm` files to the Docker filesystem.
+
+* `RUN npm ci`: Install the `npm` components at the versions listed in `package-lock.json`.
 
 * `COPY . /usr/src/`: Copy the contents of the local current directory to the Docker filesystem.
   Note that paths in the `.dockerignore` file aren't copied.
-  This means that `package.json` and `app/index.js` are copied.
 
-* `RUN npm install`: Install `npm` components listed in `packages.json`.
+* `RUN npm run build`: Build the Next.js app.
 
-* `COPY --from=build ...`: Copy existing files in the new `build` image in the `scratch`-based image.
-  `/etc/os-release` must copy to provide the distribution information required by node.
-  `/usr/src/node_modules` are the `npm`-generated files.
-  `/usrc/src/app/index.js` is the original `ExpressJS` source code file.
+* `FROM node:21-alpine3.20 AS rootfs`: Prepare the app filesystem in a new stage of the same image.
+
+* `COPY --from=build ...`: Copy the standalone server to `/usr/src` and the static files to `/usr/src/.next/static`.
+
+* `RUN ...`: Copy the `node` binary, the libraries that `node` and the native modules in `node_modules/` need, and `/usr/src` to `/rootfs`.
+  Then make sure that `node` starts in `/rootfs` and loads the `sharp` native module.
+
+* `COPY --from=rootfs /rootfs /`: Copy the prepared files to the `scratch`-based image.
 
 Similar actions apply to other `npm`-based apps.
-See also other Node examples: [`httpserver-node18-prisma-rest-express`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-node18-prisma-rest-express) and [`httpserver-node21-nextjs`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-node21-nextjs).
+See also other Node examples: [`httpserver-expressjs4.18-node21`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-expressjs4.18-node21) and [`httpserver-prisma-expressjs4.19-node18`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-prisma-expressjs4.19-node18).
 
 ## Learn more
 

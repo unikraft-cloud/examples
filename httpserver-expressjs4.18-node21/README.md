@@ -99,19 +99,30 @@ Lines in the `Kraftfile` have the following roles:
 
 * `spec: v0.7`: The current `Kraftfile` specification version is `0.7`.
 
+* `targets`: Build the app for the `kraftcloud/x86_64` and `kraftcloud/arm64` targets.
+
 * `rootfs`: Build the app root filesystem.
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/bin/node", "/usr/src/server.js"]`: Use `/usr/bin/node /usr/src/server.js` as the starting command of the instance.
+* `cmd: ["/usr/local/bin/node", "/usr/src/server.js"]`: Use `/usr/local/bin/node /usr/src/server.js` as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM node:21-alpine AS build`: Build the app using the Node.js 21 Alpine image.
+* `FROM node:21-alpine3.20 AS build`: Build the app using the Node.js 21 Alpine image of the target architecture.
 
-* `COPY ...`: Copy required files to the app filesystem: the `node` binary executable, libraries, configuration files, and the Express.js app.
+* `RUN apk add --no-cache lddtree pax-utils`: Install `lddtree`, which finds the libraries that a binary needs.
 
-* `RUN npm install`: Install Express.js and other dependencies.
+* `RUN npm ci`: Install Express.js and other dependencies at the versions in `package-lock.json`.
+
+* `COPY ./app/index.js /usr/src/server.js`: Copy the Express.js app to the build environment.
+
+* `RUN ...`: Copy the `node` binary, the libraries that it needs, and the `/usr/src` directory to `/rootfs`.
+  Then make sure that `node` starts in `/rootfs`.
+
+* `FROM scratch`: Build the runtime filesystem from a minimal base image.
+
+* `COPY --from=build /rootfs /`: Copy the prepared files to the app filesystem.
 
 The following options are available for customizing the app:
 

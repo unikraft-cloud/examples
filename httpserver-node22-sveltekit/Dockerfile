@@ -1,35 +1,42 @@
-FROM node:22-alpine AS base
+FROM --platform=$BUILDPLATFORM node:22-alpine3.24 AS build
 
 WORKDIR /app
 
-COPY package.json /app
+COPY package.json package-lock.json .npmrc /app/
 
-RUN npm install
-
-FROM base AS build
+RUN npm ci
 
 COPY . /app
 
-RUN npm run build; \
-    npm prune --production
+RUN npm run build
 
 RUN <<EOF cat >> /app/build/package.json
 {"type": "module"}
 EOF
 
+FROM node:22-alpine3.24 AS rootfs
+
+RUN apk add --no-cache lddtree pax-utils
+
+WORKDIR /app
+
+COPY package.json package-lock.json .npmrc /app/
+
+RUN npm ci --omit=dev
+
+COPY --from=build /app/build /app/build
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    find /usr/local/bin/node /app -type f -exec scanelf -BF '%F' {} + > /tmp/elfs.txt; \
+    tr '\n' '\0' < /tmp/elfs.txt | xargs -0 lddtree -l | sort -u > /tmp/libs.txt; \
+    tar -cf /tmp/libs.tar -T /tmp/libs.txt; \
+    tar -C /rootfs -xf /tmp/libs.tar; \
+    tar -C / -cf /tmp/data.tar app; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/local/bin/node -e 1
+
 FROM scratch
 
-# Node binary
-COPY --from=build /usr/local/bin/node /usr/bin/node
-
-# System libraries
-COPY --from=build /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
-COPY --from=build /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
-COPY --from=build /usr/lib/libstdc++.so.6 /usr/lib/libstdc++.so.6
-
-# Distribution configuration
-COPY --from=build /etc/os-release /etc/os-release
-
-# Svelte
-COPY --from=build /app/build /app/build
-COPY --from=build /app/node_modules /app/node_modules
+COPY --from=rootfs /rootfs /

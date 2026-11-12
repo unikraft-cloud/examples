@@ -19,7 +19,6 @@ def test_node_vite_ssr_serves_page(build_image, run_instance, http, wait_instanc
         image,
         publish=["443:8080/tls+http"],
         memory="1G",
-        env={"PWD": "/app", "NODE_ENV": "production"},
     )
 
     url = extract_instance_url(instance)

@@ -143,39 +143,51 @@ Lines in the `Kraftfile` have the following roles:
 
 * `spec: v0.7`: The current `Kraftfile` specification version is `0.7`.
 
+* `targets`: Build the app for the `kraftcloud/x86_64` and `kraftcloud/arm64` targets.
+
 * `rootfs`: Build the app root filesystem.
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: [["/usr/bin/node", "/app/build/index.js"]]`: Use `/usr/bin/node /app/build/index.js` as the starting command of the instance.
+* `cmd: ["/usr/local/bin/node", "/app/build/index.js"]`: Use `/usr/local/bin/node /app/build/index.js` as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM node:21-alpine AS deps`: Use the base image of the `node:21-alpine` container.
+* `FROM --platform=$BUILDPLATFORM node:22-alpine3.24 AS build`: Use the base image of the `node:22-alpine3.24` container.
   This provides the `npm` binary and other Node-related components.
-  Name the current image `deps`.
+  The build output is JavaScript, so this stage runs on the architecture of the build machine.
+  Name the current image `build`.
 
 * `WORKDIR /app`: Use `/app` as working directory.
   All other commands in the `Dockerfile` run inside this directory.
 
-* `COPY package.json /app`: Copy the `npm` configuration file to be able to install dependencies.
+* `COPY package.json package-lock.json .npmrc /app/`: Copy the `npm` configuration files to be able to install dependencies.
 
-* `RUN npm install`: Install `npm` components listed in `packages.json`.
-
-* `FROM deps AS build`: Create a fresh checkpoint of the base image for the build phase.
+* `RUN npm ci`: Install the `npm` components at the versions listed in `package-lock.json`.
 
 * `COPY . /app`: Copy contents of the current directory (the actual app files) in the Docker filesystem.
   Note that paths in the `.dockerignore` file aren't copied.
 
-* `RUN npm run build; ...`: Build the files required for running the app standalone.
+* `RUN npm run build`: Build the files required for running the app standalone.
   The app entry point is the resulting `/app/build/index.js` file that's used as the start command in the `Kraftfile`.
-  To run the app, configure it as a module.
 
-* `FROM scratch as prod`: Use [the `scratch` empty filesystem`](https://hub.docker.com/_/scratch/) as the actual runtime environment.
+* `RUN <<EOF ...`: Configure the app as a module.
+
+* `FROM node:22-alpine3.24 AS rootfs`: Prepare the app filesystem with the Node.js image of the target architecture.
+
+* `RUN apk add --no-cache lddtree pax-utils`: Install `lddtree`, which finds the libraries that a binary needs.
+
+* `RUN npm ci --omit=dev`: Install the runtime dependencies for the target architecture.
+
+* `COPY --from=build /app/build /app/build`: Copy the app build directory from the `build` image.
+
+* `RUN ...`: Copy the `node` binary, the libraries that it needs, and `/app` to `/rootfs`.
+  Then make sure that `node` starts in `/rootfs`.
+
+* `FROM scratch`: Use [the `scratch` empty filesystem](https://hub.docker.com/_/scratch/) as the actual runtime environment.
   It will only contain the required files from the build.
 
-* `COPY --from=build ...`: Copy existing files from new `build` image to the `scratch`-based image.
-  This means the app build directory (`/app/build`) and the required dependencies (`/app/node_modules`).
+* `COPY --from=rootfs /rootfs /`: Copy the prepared files to the `scratch`-based image.
 
 #### Customization options
 
