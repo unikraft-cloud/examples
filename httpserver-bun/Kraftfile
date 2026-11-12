@@ -4,9 +4,10 @@ name: bun
 
 targets:
   - kraftcloud/x86_64
+  - kraftcloud/arm64
 
 rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: ["/usr/bin/bun", "run", "/usr/src/server.ts"]
+cmd: ["/usr/local/bin/bun", "run", "/usr/src/server.ts"]

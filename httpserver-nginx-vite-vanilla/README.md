@@ -111,21 +111,35 @@ Lines in the `Kraftfile` have the following roles:
 
 * `spec: v0.7`: The current `Kraftfile` specification version is `0.7`.
 
+* `targets`: Build the app for the `kraftcloud/x86_64` and `kraftcloud/arm64` targets.
+
 * `rootfs`: Build the app root filesystem.
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/bin/nginx", "-c", "/etc/nginx/nginx.conf"]`: Use nginx to serve the built static files as the starting command of the instance.
+* `cmd: ["/usr/sbin/nginx", "-c", "/etc/nginx/nginx.conf"]`: Use nginx to serve the built static files as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM node:23 AS build`: Build the Vite project using the Node.js 23 image.
+* `FROM --platform=$BUILDPLATFORM node:23-bookworm AS build`: Build the Vite project using the Node.js 23 image.
+  The static files don't depend on the architecture, so this stage runs on the architecture of the build machine.
 
 * `RUN npm ci; npm run build`: Install dependencies and build the Vite project for production.
 
-* `FROM scratch`: Build the runtime filesystem from a minimal base image.
+* `FROM nginx:1.25.3-bookworm AS rootfs`: Use the nginx image of the target architecture to prepare the app filesystem.
+
+* `RUN ... apt-get install ... pax-utils ...`: Install `lddtree`, which finds the libraries that a binary needs.
+
+* `COPY ./rootfs/ /`: Add the custom nginx configuration, which uses a single process for nginx.
 
 * `COPY --from=build /app/dist /wwwroot`: nginx serves the built Vite artifacts from `/wwwroot`.
+
+* `RUN ...`: Copy the `nginx` binary, the libraries that it needs, its configuration, log and runtime directories, and `/wwwroot` to `/rootfs`.
+  Then check the nginx configuration in `/rootfs`.
+
+* `FROM scratch`: Build the runtime filesystem from a minimal base image.
+
+* `COPY --from=rootfs /rootfs /`: Copy the prepared files to the app filesystem.
 
 The following options are available for customizing the app:
 

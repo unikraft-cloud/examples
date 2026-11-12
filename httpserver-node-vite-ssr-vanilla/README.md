@@ -46,8 +46,6 @@ unikraft run --metro fra \
   -m 1G \
   -p 443:8080/tls+http \
   --scale-to-zero policy=on,cooldown-time=2000,stateful=true \
-  -e PWD=/app \
-  -e NODE_ENV=production \
   --image <my-org>/httpserver-node-vite-ssr-vanilla:latest
 ```
 

@@ -4,10 +4,11 @@ name: node21-expressjs
 
 targets:
   - kraftcloud/x86_64
+  - kraftcloud/arm64
 
 
 rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: ["/usr/bin/node", "/usr/src/server.js"]
+cmd: ["/usr/local/bin/node", "/usr/src/server.js"]

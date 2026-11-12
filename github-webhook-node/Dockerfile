@@ -1,18 +1,26 @@
-FROM node:24-alpine AS build
+FROM node:24-alpine3.24 AS build
+
+RUN apk add --no-cache lddtree pax-utils
 
 WORKDIR /app
 
-COPY server.js package*.json ./
+COPY package.json package-lock.json ./
 
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
+
+COPY server.js ./
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    find /usr/local/bin/node /app -type f -exec scanelf -BF '%F' {} + > /tmp/elfs.txt; \
+    tr '\n' '\0' < /tmp/elfs.txt | xargs -0 lddtree -l | sort -u > /tmp/libs.txt; \
+    tar -cf /tmp/libs.tar -T /tmp/libs.txt; \
+    tar -C /rootfs -xf /tmp/libs.tar; \
+    tar -C / -cf /tmp/data.tar app; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/local/bin/node -e 1
 
 FROM scratch
 
-COPY --from=build /usr/local/bin/node /usr/local/bin/node
-
-COPY --from=build /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
-COPY --from=build /usr/lib/libstdc++.so.6 /usr/lib/libstdc++.so.6
-COPY --from=build /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
-
-COPY --from=build /app/node_modules /app/node_modules
-COPY --from=build /app/server.js /app/server.js
+COPY --from=build /rootfs /

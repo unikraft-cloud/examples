@@ -98,19 +98,28 @@ Lines in the `Kraftfile` have the following roles:
 
 * `spec: v0.7`: The current `Kraftfile` specification version is `0.7`.
 
+* `targets`: Build the app for the `kraftcloud/x86_64` and `kraftcloud/arm64` targets.
+
 * `rootfs`: Build the app root filesystem.
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
-* `cmd: ["/usr/bin/bun", "run", "/usr/src/server.ts"]`: Use `/usr/bin/bun run /usr/src/server.ts` as the starting command of the instance.
+* `cmd: ["/usr/local/bin/bun", "run", "/usr/src/server.ts"]`: Use `/usr/local/bin/bun run /usr/src/server.ts` as the starting command of the instance.
 
 Lines in the `Dockerfile` have the following roles:
 
+* `FROM oven/bun:1.4.4-alpine AS build`: Use the Bun Alpine image of the target architecture as the build environment.
+
+* `RUN apk add --no-cache lddtree pax-utils`: Install `lddtree`, which finds the libraries that a binary needs.
+
+* `COPY ./server.ts /usr/src/server.ts`: Copy the `server.ts` implementation to the build environment.
+
+* `RUN ...`: Copy the `bun` binary, the libraries that it needs, and `/usr/src/server.ts` to `/rootfs`.
+  Then make sure that `bun` starts in `/rootfs`.
+
 * `FROM scratch`: Build the filesystem from the [`scratch` container image](https://hub.docker.com/_/scratch/), to [create a base image](https://docs.docker.com/build/building/base-images/).
 
-* `COPY ...`: Copy required files to the app filesystem: the `bun` binary executable, libraries, configuration files, the `/usr/src/server.ts` implementation.
-
-* `RUN ...`: Run specific commands to generate or to prepare the filesystem contents.
+* `COPY --from=build /rootfs /`: Copy the prepared files to the app filesystem.
 
 The following options are available for customizing the app:
 

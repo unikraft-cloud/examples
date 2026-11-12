@@ -18,8 +18,8 @@ module.exports = {
         resolve(__dirname, './prisma/schema.prisma'),
         resolve(__dirname, './prisma/store.db'),
         {
-          to: resolve(__dirname, './dist/libquery_engine-linux-musl-openssl-3.0.x.so.node'),
-          from: resolve(__dirname, './node_modules/.prisma/client/libquery_engine-linux-musl-openssl-3.0.x.so.node'),
+          from: './node_modules/.prisma/client/libquery_engine-*.so.node',
+          to: '[name][ext]',
         }
       ],
     }),

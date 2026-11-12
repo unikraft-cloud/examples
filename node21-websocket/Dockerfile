@@ -1,22 +1,26 @@
-FROM node:21-alpine AS build
+FROM node:21-alpine3.20 AS build
+
+RUN apk add --no-cache lddtree pax-utils
 
 WORKDIR /usr/src
-COPY package.json .
-COPY package-lock.json .
-RUN npm install
+
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+COPY ./server.js /usr/src/server.js
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    find /usr/local/bin/node /usr/src -type f -exec scanelf -BF '%F' {} + > /tmp/elfs.txt; \
+    tr '\n' '\0' < /tmp/elfs.txt | xargs -0 lddtree -l | sort -u > /tmp/libs.txt; \
+    tar -cf /tmp/libs.tar -T /tmp/libs.txt; \
+    tar -C /rootfs -xf /tmp/libs.tar; \
+    tar -C / -cf /tmp/data.tar usr/src; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/local/bin/node -e 1
 
 FROM scratch
 
-# Node binary
-COPY --from=build /usr/local/bin/node /usr/bin/node
-
-# System libraries
-COPY --from=build /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
-COPY --from=build /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
-COPY --from=build /usr/lib/libstdc++.so.6 /usr/lib/libstdc++.so.6
-
-# Distribution configuration
-COPY --from=build /etc/os-release /etc/os-release
-
-COPY --from=build /usr/src /usr/src
-COPY ./server.js /usr/src/server.js
+COPY --from=build /rootfs /

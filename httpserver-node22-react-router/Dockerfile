@@ -1,37 +1,39 @@
-FROM node:22-alpine AS base
+FROM --platform=$BUILDPLATFORM node:22-alpine3.24 AS build
 
 WORKDIR /usr/src
 
-FROM base AS build
+COPY package.json package-lock.json ./
 
-COPY package.json /usr/src/package.json
-COPY package-lock.json /usr/src/package-lock.json
-RUN npm install
+RUN npm ci
 
 COPY . /usr/src/
+
 RUN npm run build
 
-FROM base AS runtime
+FROM node:22-alpine3.24 AS rootfs
 
-COPY package.json /usr/src/package.json
-COPY package-lock.json /usr/src/package-lock.json
-RUN npm install --omit dev
+RUN apk add --no-cache lddtree pax-utils
+
+WORKDIR /usr/src
+
+COPY package.json package-lock.json ./
+
+RUN npm ci --omit=dev
+
+COPY --from=build /usr/src/build/ /usr/src/build/
+COPY ./server.js /usr/src/server.js
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    find /usr/local/bin/node /usr/src -type f -exec scanelf -BF '%F' {} + > /tmp/elfs.txt; \
+    tr '\n' '\0' < /tmp/elfs.txt | xargs -0 lddtree -l | sort -u > /tmp/libs.txt; \
+    tar -cf /tmp/libs.tar -T /tmp/libs.txt; \
+    tar -C /rootfs -xf /tmp/libs.tar; \
+    tar -C / -cf /tmp/data.tar usr/src; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /usr/local/bin/node -e 1
 
 FROM scratch
 
-# Node binary
-COPY --from=base /usr/local/bin/node /usr/bin/node
-
-# System libraries
-COPY --from=base /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
-COPY --from=base /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
-COPY --from=base /usr/lib/libstdc++.so.6 /usr/lib/libstdc++.so.6
-
-# Distribution configuration
-COPY --from=base /etc/os-release /etc/os-release
-
-# React Router app
-COPY --from=runtime /usr/src/node_modules /usr/src/node_modules
-COPY --from=build /usr/src/build/ /usr/src/build/
-COPY --from=build /usr/src/server.js /usr/src/server.js
-COPY --from=build /usr/src/package.json /usr/src/package.json
+COPY --from=rootfs /rootfs /

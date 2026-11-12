@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim AS build
+FROM --platform=$BUILDPLATFORM node:24-bookworm-slim AS build
 
 RUN set -xe; \
     apt-get update; \
@@ -6,45 +6,39 @@ RUN set -xe; \
       ca-certificates \
       git \
     ; \
-    npm install --global corepack@latest; \
-    corepack enable pnpm; \
-    corepack use pnpm@latest-10
+    corepack enable pnpm
 
 WORKDIR /allkaraoke
 
 RUN set -xe; \
-    git clone --depth=1 https://github.com/Asvarox/allkaraoke.git /allkaraoke; \
-    pnpm install; \
-    pnpm exec playwright install-deps; \
-    pnpm exec playwright install; \
+    git init -q; \
+    git fetch -q --depth=1 https://github.com/Asvarox/allkaraoke.git 9587d6daad5abc6bda1a2a90720652fb3f42d032; \
+    git checkout -q FETCH_HEAD; \
+    pnpm install --frozen-lockfile; \
+    pnpm exec playwright install --with-deps chromium; \
     pnpm build
 
-# Install serve globally for use as static file server
-RUN npm install -g serve
+FROM node:24-bookworm-slim AS rootfs
+
+RUN set -xe; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils; \
+    rm -rf /var/lib/apt/lists/*; \
+    npm install -g serve@14.2.7
+
+COPY --from=build /allkaraoke/build/client /wwwroot
+COPY ./entrypoint.sh /entrypoint.sh
+
+RUN set -xe; \
+    mkdir -p /rootfs/tmp; \
+    lddtree --copy-to-tree /rootfs /usr/local/bin/node /bin/sh; \
+    find /usr/local/lib/node_modules/serve -type f -print0 | xargs -0 lddtree --skip-non-elfs --copy-to-tree /rootfs; \
+    tar -C / -cf /tmp/data.tar usr/local/lib/node_modules/serve wwwroot entrypoint.sh; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp; \
+    chroot /rootfs /bin/sh -c 'exec node /usr/local/lib/node_modules/serve/build/main.js --version'
 
 FROM scratch
 
-# System binaries
-COPY --from=build /usr/local/bin/node /usr/local/bin/node
-COPY --from=build /bin/sh /bin/sh
-COPY --from=build /usr/bin/env /usr/bin/env
-
-# serve (static file server)
-COPY --from=build /usr/local/lib/node_modules/serve /usr/local/lib/node_modules/serve
-
-# Required system libraries
-COPY --from=build /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.so.2
-COPY --from=build /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread.so.0
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=build /etc/ld.so.cache /etc/ld.so.cache
-
-# Distribution configuration
-COPY --from=build /etc/os-release /etc/os-release
-
-COPY --from=build /allkaraoke/build/client /wwwroot
-
-COPY ./entrypoint.sh /entrypoint.sh
+COPY --from=rootfs /rootfs /

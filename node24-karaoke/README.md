@@ -109,6 +109,8 @@ Lines in the `Kraftfile` have the following roles:
 
 * `spec: v0.7`: The current `Kraftfile` specification version is `0.7`.
 
+* `targets`: Build the app for the `kraftcloud/x86_64` and `kraftcloud/arm64` targets.
+
 * `rootfs`: Build the app root filesystem.
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
   `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
@@ -117,17 +119,27 @@ Lines in the `Kraftfile` have the following roles:
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM node:24-bookworm-slim AS build`: Build the AllKaraoke project using the Node.js 24 Bookworm slim image.
+* `FROM --platform=$BUILDPLATFORM node:24-bookworm-slim AS build`: Build the AllKaraoke project using the Node.js 24 Bookworm slim image.
+  The built files are static, so this stage runs on the architecture of the build machine.
 
-* `RUN git clone ...; pnpm install; pnpm build`: Clone the AllKaraoke repository, install dependencies, and build it for production.
+* `RUN git fetch ...; pnpm install; pnpm build`: Get a fixed commit of the AllKaraoke repository, install the dependencies from its lockfile, and build it for production.
 
-* `FROM node:24-bookworm-slim AS prod`: Use a fresh Node.js 24 Bookworm slim image for the runtime.
+* `FROM node:24-bookworm-slim AS rootfs`: Use a fresh Node.js 24 Bookworm slim image of the target architecture to prepare the app filesystem.
 
-* `COPY ...`: Copy required files to the app filesystem: the `node` binary executable, system libraries, the built AllKaraoke artifacts, and the entrypoint script.
+* `RUN ... npm install -g serve@14.2.7`: Install `lddtree`, which finds the libraries that a binary needs, and the `serve` static file server.
+
+* `COPY ...`: Copy the built AllKaraoke artifacts and the entrypoint script.
+
+* `RUN ...`: Copy the `node` and `sh` binaries, the libraries that they need, `serve`, the built artifacts, and the entrypoint script to `/rootfs`.
+  Then make sure that `serve` starts in `/rootfs`.
+
+* `FROM scratch`: Build the runtime filesystem from a minimal base image.
+
+* `COPY --from=rootfs /rootfs /`: Copy the prepared files to the app filesystem.
 
 The following options are available for customizing the app:
 
-* If you want to use a specific version of AllKaraoke, update the `git clone` command in the `Dockerfile` to pin a particular commit or tag.
+* If you want to use a different version of AllKaraoke, update the commit in the `git fetch` command in the `Dockerfile`.
 
 * If you want to add extra files, you need to copy them into the filesystem using the `COPY` command in the `Dockerfile`.
 
