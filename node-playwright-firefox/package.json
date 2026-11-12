@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "playwright": "^1.55.1",
-    "playwright-firefox": "^1.55.1"
+    "playwright": "1.65.0",
+    "playwright-firefox": "1.65.0"
   }
 }
