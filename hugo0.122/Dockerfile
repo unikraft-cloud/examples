@@ -1,28 +1,21 @@
-FROM --platform=linux/x86_64 debian:bookworm-slim AS build
+FROM debian:bookworm-slim AS build
 
 ARG HUGO_VERSION=0.160.0
+ARG TARGETARCH
 
 RUN set -xe; \
     apt-get update; \
-    apt-get install -y --no-install-recommends ca-certificates curl; \
-    curl -fsSL "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz" \
-      | tar -xz -C /usr/local/bin hugo; \
+    apt-get install -y --no-install-recommends ca-certificates curl pax-utils; \
+    curl -fsSL "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-${TARGETARCH}.tar.gz" \
+      | tar -xz -C /usr/bin hugo; \
     rm -rf /var/lib/apt/lists/*
+
+RUN set -xe; \
+    install -d -m 1777 /rootfs/tmp; \
+    lddtree --copy-to-tree /rootfs /usr/bin/hugo; \
+    chroot /rootfs /usr/bin/hugo version
 
 FROM scratch
 
-# Binary executable
-COPY --from=build /usr/local/bin/hugo /usr/bin/hugo
-
-# System libraries
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.so.2
-COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=build /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread.so.0
-COPY --from=build /lib/x86_64-linux-gnu/libresolv.so.2 /lib/x86_64-linux-gnu/libresolv.so.2
-COPY --from=build /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so.6
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-
-# Site
+COPY --from=build /rootfs /
 COPY ./site /site

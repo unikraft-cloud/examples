@@ -1,4 +1,14 @@
-FROM --platform=x86_64 rust:1.88.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.10.0 AS xx
+
+FROM --platform=$BUILDPLATFORM rust:1.88.0-alpine3.22 AS build
+
+COPY --from=xx / /
+
+RUN apk add --no-cache clang lld
+
+ARG TARGETPLATFORM
+
+RUN xx-apk add --no-cache gcc musl-dev
 
 RUN cargo new --bin app
 WORKDIR /app
@@ -6,13 +16,13 @@ COPY Cargo.toml ./
 COPY Cargo.lock ./
 COPY Rocket.toml ./
 COPY src ./src
-RUN cargo build --release
+
+RUN set -xe; \
+    xx-cargo build --release --target-dir ./build; \
+    cp "./build/$(xx-cargo --print-target-triple)/release/hello" /server; \
+    xx-verify --static /server
 
 FROM scratch
 
 COPY ./Rocket.toml /Rocket.toml
-COPY --from=build /app/target/release/hello /server
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/
-COPY --from=build /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/
-COPY --from=build /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
+COPY --from=build /server /server

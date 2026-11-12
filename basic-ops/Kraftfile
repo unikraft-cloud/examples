@@ -4,6 +4,7 @@ name: httpserver-c
 
 targets:
   - kraftcloud/x86_64
+  - kraftcloud/arm64
 
 rootfs:
   source: ./Dockerfile

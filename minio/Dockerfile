@@ -1,9 +1,11 @@
-FROM --platform=linux/x86_64 golang:1.21.4-alpine3.17 AS build
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.10.0 AS xx
+
+FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.17 AS build
+
+COPY --from=xx / /
 
 RUN set -xe; \
     apk --no-cache add \
-      gcc \
-      musl-dev \
       wget \
       ca-certificates \
     ; \
@@ -19,13 +21,15 @@ RUN set -xe; \
 
 WORKDIR /minio
 
+ARG TARGETPLATFORM
+
 RUN set -xe; \
-    CGO_ENABLED=1 \
-    go build -v \
-        -buildmode=pie \
-        -ldflags "-linkmode external -extldflags '-static-pie' -X github.com/minio/minio/cmd.Version=${MINIO_VERSION} -X github.com/minio/minio/cmd.CopyrightYear=${MINIO_VERSION:0:4} -X github.com/minio/minio/cmd.ReleaseTag=RELEASE.${MINIO_VERSION} -X github.com/minio/minio/cmd.CommitID=${MINIO_COMMIT} -X github.com/minio/minio/cmd.ShortCommitID=${MINIO_COMMIT:0:12} -X github.com/minio/minio/cmd.GOPATH=/go -X github.com/minio/minio/cmd.GOROOT=" \
+    CGO_ENABLED=0 \
+    xx-go build -v \
+        -ldflags "-X github.com/minio/minio/cmd.Version=${MINIO_VERSION} -X github.com/minio/minio/cmd.CopyrightYear=${MINIO_VERSION:0:4} -X github.com/minio/minio/cmd.ReleaseTag=RELEASE.${MINIO_VERSION} -X github.com/minio/minio/cmd.CommitID=${MINIO_COMMIT} -X github.com/minio/minio/cmd.ShortCommitID=${MINIO_COMMIT:0:12} -X github.com/minio/minio/cmd.GOPATH=/go -X github.com/minio/minio/cmd.GOROOT=" \
         -o /usr/bin/minio \
-        .
+        .; \
+    xx-verify --static /usr/bin/minio
 
 FROM scratch
 

@@ -1,4 +1,10 @@
-FROM golang:1.21.6-bookworm AS build
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.10.0 AS xx
+
+FROM --platform=$BUILDPLATFORM golang:1.21.6-bookworm AS build
+
+COPY --from=xx / /
+
+ARG TARGETPLATFORM
 
 WORKDIR /src
 
@@ -8,12 +14,8 @@ COPY ./go.sum /src/go.sum
 COPY ./testdata /src/testdata
 
 RUN set -xe; \
-    go build -v \
-      -buildmode=pie \
-      -ldflags "-linkmode external -extldflags -static-pie" \
-      -tags netgo \
-      -o /age-calculator age-calculator.go \
-    ;
+    CGO_ENABLED=0 xx-go build -v -tags netgo -o /age-calculator age-calculator.go; \
+    xx-verify --static /age-calculator
 
 FROM scratch
 
