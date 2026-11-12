@@ -1,8 +1,5 @@
 FROM alpine:3.20 AS base
 
-###
-### Build Postgres
-###
 FROM base AS pg-build
 
 ENV PG_VERSION=16.4
@@ -60,7 +57,6 @@ RUN set -e; \
     make install-world-bin DESTDIR=/usr/src/postgresql/dist; \
     make install
 
-# Build pg_ukc_scaletozero plugin
 ADD https://github.com/unikraft-cloud/pg_ukc_scaletozero/archive/refs/heads/stable.zip /tmp/pg_ukc_scaletozero.zip
 
 RUN mkdir /usr/src/pg_ukc_scaletozero; \
@@ -72,10 +68,7 @@ RUN cd /usr/src/pg_ukc_scaletozero; \
     make; \
     make install DESTDIR=/usr/src/postgresql/dist
 
-##
-## Retrieve dependencies
-##
-FROM base AS base-deps
+FROM base AS build
 
 RUN apk add --no-cache \
         libuuid \
@@ -88,59 +81,34 @@ RUN apk add --no-cache \
         icu-libs \
         bash \
         libedit \
-        openssl \
-        krb5-libs \
-        libldap \
-        cyrus-sasl \
-        libcom_err \
-        keyutils-libs \
+        lddtree \
+        pax-utils \
     ;
 
-##
-## Build root file system
-##
-FROM busybox
-
-# Libraries
-COPY --from=base-deps /lib/ld-musl-x86_64.so.1 /lib/
-COPY --from=base-deps /lib/libz.so.1 /lib/
-COPY --from=base-deps /lib/libuuid.so.1 /lib/
-COPY --from=base-deps /usr/lib/libgcc_s.so.1 /usr/lib/
-COPY --from=base-deps /usr/lib/libstdc++.so.6 /usr/lib/
-COPY --from=base-deps /usr/lib/liblz4.so.1 /usr/lib/
-COPY --from=base-deps /usr/lib/liblzma.so.5 /usr/lib/
-COPY --from=base-deps /usr/lib/libxml2.so.2 /usr/lib/
-COPY --from=base-deps /usr/lib/libxslt.so.1 /usr/lib/
-COPY --from=base-deps /usr/lib/libncursesw.so.6 /usr/lib/
-COPY --from=base-deps /usr/lib/libreadline.so.8 /usr/lib/
-COPY --from=base-deps /usr/lib/libedit.so.0 /usr/lib/
-COPY --from=base-deps /lib/libssl.so.3 /lib/
-COPY --from=base-deps /lib/libcrypto.so.3 /lib/
-COPY --from=base-deps /usr/lib/libgssapi_krb5.so.2 /usr/lib/
-COPY --from=base-deps /usr/lib/libkrb5.so.3 /usr/lib/
-COPY --from=base-deps /usr/lib/libk5crypto.so.3 /usr/lib/
-COPY --from=base-deps /usr/lib/libkrb5support.so.0 /usr/lib/
-COPY --from=base-deps /usr/lib/libldap.so.2 /usr/lib/
-COPY --from=base-deps /usr/lib/liblber.so.2 /usr/lib/
-COPY --from=base-deps /usr/lib/libsasl2.so.3 /usr/lib/
-COPY --from=base-deps /lib/libcom_err.so.2 /lib/
-COPY --from=base-deps /usr/lib/libkeyutils.so.1 /usr/lib/
-COPY --from=base-deps /usr/lib/libicudata.so.74 /usr/lib/
-COPY --from=base-deps /usr/lib/libicuuc.so.74 /usr/lib/
-COPY --from=base-deps /usr/lib/libicui18n.so.74 /usr/lib/
-
-# Data files
-COPY --from=base-deps /usr/share/icu /usr/share/icu
-COPY --from=base-deps /usr/share/zoneinfo /usr/share/zoneinfo
-
-# Bash
-COPY --from=base-deps /bin/bash /bin/bash
-
-# PostgreSQL binaries
 COPY --from=pg-build /usr/src/postgresql/dist/ /
 
-# Configuration and runtime files
-COPY fs/ /
+RUN set -xe; \
+    mkdir -p /rootfs/dev /rootfs/sbin /rootfs/usr/bin /rootfs/usr/sbin; \
+    find /bin/busybox /bin/bash /usr/local -type f -exec scanelf -BF '%F' {} + | tr '\n' '\0' | xargs -0 -r lddtree -l | sort -u > /tmp/libs.txt; \
+    tar -cf /tmp/libs.tar -T /tmp/libs.txt; \
+    tar -C /rootfs -xf /tmp/libs.tar; \
+    tar -C / -cf /tmp/data.tar etc/group usr/local/lib usr/local/share usr/share/icu usr/share/zoneinfo; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    chroot /rootfs /bin/busybox --install -s
 
-# Wrapper script
-COPY --chmod=755 wrapper.sh /usr/local/bin/wrapper.sh
+COPY fs/ /rootfs/
+COPY --chmod=755 wrapper.sh /rootfs/usr/local/bin/wrapper.sh
+
+RUN set -xe; \
+    chmod 1777 /rootfs/tmp; \
+    mknod -m 666 /rootfs/dev/null c 1 3; \
+    mknod -m 444 /rootfs/dev/urandom c 1 9; \
+    chroot /rootfs /usr/local/bin/postgres --version; \
+    chroot /rootfs /usr/local/bin/initdb -D /tmp/pgdata; \
+    echo 'SELECT 1;' | chroot /rootfs /usr/local/bin/postgres --single -D /tmp/pgdata -c shared_preload_libraries=pg_ukc_scaletozero postgres; \
+    chroot /rootfs /usr/bin/env bash -c 'mkdir -p /tmp/x && chmod 700 /tmp/x && ls /tmp/x && cat /etc/passwd'; \
+    rm -rf /rootfs/dev/null /rootfs/dev/urandom /rootfs/tmp/pgdata /rootfs/tmp/x
+
+FROM scratch
+
+COPY --from=build /rootfs /

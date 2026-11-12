@@ -23,7 +23,6 @@ RUN set -xe; \
                          mariadb-client \
     ;
 
-# Configure Wordpress.
 ARG WORDPRESS_DB_NAME="wordpress"
 ARG WORDPRESS_DB_USER="wordpress"
 ARG WORDPRESS_DB_PASSWORD="wordpress"
@@ -39,12 +38,8 @@ RUN set -xe; \
     chown -R www-data:www-data /var/www/html \
     ;
 
-# Configure Nginx.
 COPY ./rootfs/ /
 
-# Configure MariaDB.
 COPY ./init.sql /init.sql
 
-# Configure entry point.
 COPY ./wrapper.sh /usr/local/bin/wrapper.sh
-#ENTRYPOINT /usr/local/bin/wrapper.sh

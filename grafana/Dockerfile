@@ -1,29 +1,36 @@
-FROM golang:1.21.4-alpine3.18 AS grafana-build
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.10.0 AS xx
+
+FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.18 AS grafana-build
+
+COPY --from=xx / /
 
 WORKDIR /grafana
 
-# Dependencies
 RUN set -xe; \
     apk --no-cache add \
+      clang \
       gcc \
+      lld \
       make \
       musl-dev \
       wget \
     ; \
     wget -O /grafana.tar.gz https://github.com/grafana/grafana/archive/refs/tags/v10.2.2.tar.gz; \
-    tar -xzvf /grafana.tar.gz --strip-components 1 -C /grafana \
-    ;
+    tar -xzf /grafana.tar.gz --strip-components 1 -C /grafana; \
+    make gen-go
 
-# Build backend
+ARG TARGETPLATFORM
+
+RUN xx-apk add --no-cache gcc musl-dev
+
 RUN set -xe; \
-    make gen-go; \
     CGO_ENABLED=1 \
-    go build -v \
-      -buildmode=pie \
-      -ldflags "-linkmode external -extldflags '-static-pie' -X 'main.version=10.2.2' -X 'main.commit=161e3ca' -X 'main.buildstamp=$(date)' -X 'main.buildBranch=main'" \
+    xx-go build \
+      -ldflags "-linkmode external -extldflags '-static' -X 'main.version=10.2.2' -X 'main.commit=161e3ca' -X 'main.buildstamp=$(date)' -X 'main.buildBranch=main'" \
       -o /usr/share/grafana/bin/grafana \
       ./pkg/cmd/grafana \
-    ;
+    ; \
+    xx-verify --static /usr/share/grafana/bin/grafana
 
 FROM grafana/grafana:10.2.2 AS grafana
 

@@ -1,33 +1,26 @@
 FROM nginx:1.25.3-bookworm AS build
 
 RUN set -xe; \
-    rm -f /var/log/nginx/access.log; \
-    rm -f /var/log/nginx/error.log; \
-    touch /var/log/nginx/access.log; \
-    touch /var/log/nginx/error.log \
-    ;
+    apt-get update; \
+    apt-get install -y --no-install-recommends pax-utils; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -xe; \
+    rm -f /var/log/nginx/access.log /var/log/nginx/error.log; \
+    touch /var/log/nginx/access.log /var/log/nginx/error.log; \
+    mkdir -p /rootfs/run /rootfs/tmp; \
+    ln -s /usr/sbin/nginx /usr/bin/nginx; \
+    lddtree --copy-to-tree /rootfs /usr/bin/nginx; \
+    tar -C / -cf /tmp/data.tar etc/nginx etc/passwd etc/group var/log/nginx var/cache/nginx var/run; \
+    tar -C /rootfs -xf /tmp/data.tar; \
+    rm -f /rootfs/etc/nginx/modules; \
+    find /rootfs -type d -exec chmod 755 {} +; \
+    chmod 1777 /rootfs/tmp
+
+COPY ./rootfs/ /rootfs/
+
+RUN chroot /rootfs /usr/bin/nginx -t -c /etc/nginx/nginx.conf
 
 FROM scratch
 
-# Nginx binaries, modules, configuration, log and runtime files
-COPY --from=build /usr/sbin/nginx /usr/bin/nginx
-COPY --from=build /usr/lib/nginx /usr/lib/nginx
-COPY --from=build /etc/nginx /etc/nginx
-COPY --from=build /etc/passwd /etc/passwd
-COPY --from=build /etc/group /etc/group
-COPY --from=build /var/log/nginx /var/log/nginx
-COPY --from=build /var/cache/nginx /var/cache/nginx
-COPY --from=build /var/run /var/run
-
-# Libraries
-COPY --from=build /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/x86_64-linux-gnu/libcrypt.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libpcre2-8.so.0 /lib/x86_64-linux-gnu/libpcre2-8.so.0
-COPY --from=build /lib/x86_64-linux-gnu/libssl.so.3 /lib/x86_64-linux-gnu/libssl.so.3
-COPY --from=build /lib/x86_64-linux-gnu/libcrypto.so.3 /lib/x86_64-linux-gnu/libcrypto.so.3
-COPY --from=build /lib/x86_64-linux-gnu/libz.so.1 /lib/x86_64-linux-gnu/libz.so.1
-COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=build /etc/ld.so.cache /etc/ld.so.cache
-
-# Custom configuration files, including using a single process for Nginx
-COPY ./rootfs/ /
+COPY --from=build /rootfs /
