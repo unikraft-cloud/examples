@@ -2,8 +2,6 @@ spec: v0.7
 
 name: dotnet
 
-runtime: base-compat:latest
-
 targets:
   - kraftcloud/x86_64
 
