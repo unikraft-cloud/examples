@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 rust:1.88.0-slim-bullseye AS builder
+FROM --platform=linux/x86_64 rust:1.88.0-slim-trixie AS builder
 
 # Install trunk from pre-built binary instead of compiling from source (~10min saved)
 ARG TRUNK_VERSION=0.21.14
