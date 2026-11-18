@@ -108,6 +108,7 @@ COPY --from=build \
                   /usr/lib/x86_64-linux-gnu/libcairo.so.2 \
                   /usr/lib/x86_64-linux-gnu/libcap.so.2 \
                   /usr/lib/x86_64-linux-gnu/libcom_err.so.2 \
+                  /usr/lib/x86_64-linux-gnu/libcrypto.so.3 \
                   /usr/lib/x86_64-linux-gnu/libc.so.6 \
                   /usr/lib/x86_64-linux-gnu/libdatrie.so.1 \
                   /usr/lib/x86_64-linux-gnu/libdav1d.so.6 \
