@@ -145,7 +145,7 @@ unikraft run --metro fra \
   --image <my-org>/httpserver-expressjs418-node21:latest
 ```
 
-Differences from the `http-node21` app are also the steps required to create an `npm`-based app:
+Differences from the `httpserver-node26` app are also the steps required to create an `npm`-based app:
 
 1. Add the `package.json` file used by `npm`.
 
@@ -164,7 +164,7 @@ The following lists the files:
 
 The `package.json` file lists the `express` [dependency](https://docs.npmjs.com/cli/v8/configuring-npm/package-json#dependencies).
 
-The `Kraftfile` is the same one used for `http-node21`.
+The `Kraftfile` is the same one used for `httpserver-node26`.
 
 For `Dockerfile` newly added lines have the following roles:
 
@@ -187,7 +187,7 @@ For `Dockerfile` newly added lines have the following roles:
   `/usrc/src/app/index.js` is the original `ExpressJS` source code file.
 
 Similar actions apply to other `npm`-based apps.
-See also other Node examples: [`httpserver-node18-prisma-rest-express`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-node18-prisma-rest-express) and [`httpserver-node21-nextjs`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-node21-nextjs).
+See also other Node examples: [`httpserver-prisma-expressjs4.19-node18`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-prisma-expressjs4.19-node18) and [`httpserver-node21-nextjs`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-node21-nextjs).
 
 ## Learn more
 
