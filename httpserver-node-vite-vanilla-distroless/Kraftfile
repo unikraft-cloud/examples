@@ -1,0 +1,12 @@
+spec: v0.7
+
+runtime: base-compat:latest
+
+targets:
+  - kraftcloud/x86_64
+
+rootfs:
+  source: ./Dockerfile
+  format: erofs
+
+cmd: ["/usr/local/bin/node", "/app/node_modules/vite/bin/vite.js", "--host", "0.0.0.0", "--port", "8080"]
