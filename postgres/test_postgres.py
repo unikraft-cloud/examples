@@ -12,9 +12,14 @@ CI workflow (example-postgres-stable.yaml):
 
 from __future__ import annotations
 
+import logging
+import time
+
 import psycopg2
 
 from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
+
+log = logging.getLogger(__name__)
 
 # The README deploys with POSTGRES_PASSWORD=unikraft.
 PG_USER = "postgres"
@@ -22,18 +27,30 @@ PG_PASSWORD = "unikraft"
 PG_DATABASE = "postgres"
 PG_PORT = 5432
 
+# The instance is "running" before PostgreSQL is ready: it runs initdb first.
+PG_READY_TIMEOUT_S = 60
+PG_RETRY_DELAY_S = 1
+
 
 def _connect(host: str):
-    """Open a psycopg2 connection to the instance over TLS."""
-    return psycopg2.connect(
-        host=host,
-        port=PG_PORT,
-        user=PG_USER,
-        password=PG_PASSWORD,
-        dbname=PG_DATABASE,
-        sslmode="require",
-        connect_timeout=30,
-    )
+    """Open a psycopg2 connection over TLS, retrying until PostgreSQL is ready."""
+    deadline = time.monotonic() + PG_READY_TIMEOUT_S
+    while True:
+        try:
+            return psycopg2.connect(
+                host=host,
+                port=PG_PORT,
+                user=PG_USER,
+                password=PG_PASSWORD,
+                dbname=PG_DATABASE,
+                sslmode="require",
+                connect_timeout=30,
+            )
+        except psycopg2.OperationalError as exc:
+            if time.monotonic() >= deadline:
+                raise
+            log.info("postgres not ready yet, retrying: %s", str(exc).strip())
+            time.sleep(PG_RETRY_DELAY_S)
 
 
 def test_postgres(build_image, run_instance, wait_instance):
