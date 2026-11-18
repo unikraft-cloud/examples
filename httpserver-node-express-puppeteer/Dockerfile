@@ -1,4 +1,4 @@
-FROM debian:bookworm AS build
+FROM node:22-bookworm AS build
 
 RUN set -xe; \
     apt-get -yqq update; \
@@ -12,11 +12,13 @@ RUN set -xe; \
         libatspi2.0-0 \
         libxdamage1 \
         libatk-bridge2.0-0 \
-        libxkbcommon0; \
+        libxkbcommon0 \
+        libgbm1 \
+        libxcomposite1 \
+        libxfixes3 \
+        libxrandr2; \
     apt-get -yqq install \
         git \
-        nodejs \
-        npm \
     ;
 
 WORKDIR /app
@@ -131,16 +133,13 @@ COPY --from=build /usr/lib/x86_64-linux-gnu/libfreebl3.so \
                   /usr/lib/x86_64-linux-gnu/
 
 # Node binary
-COPY --from=build /usr/bin/node /usr/bin/node
+COPY --from=build /usr/local/bin/node /usr/bin/node
 
 # System libraries
-COPY --from=build /lib/x86_64-linux-gnu/libnode.so.108 \
-                  /lib/x86_64-linux-gnu/libc.so.6 \
+COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 \
                   /lib/x86_64-linux-gnu/libz.so.1 \
-                  /lib/x86_64-linux-gnu/libuv.so.1 \
                   /lib/x86_64-linux-gnu/libbrotlidec.so.1 \
                   /lib/x86_64-linux-gnu/libbrotlienc.so.1 \
-                  /lib/x86_64-linux-gnu/libcares.so.2 \
                   /lib/x86_64-linux-gnu/libnghttp2.so.14 \
                   /lib/x86_64-linux-gnu/libcrypto.so.3 \
                   /lib/x86_64-linux-gnu/libssl.so.3 \
@@ -168,7 +167,6 @@ COPY --from=build /usr/lib/sysctl.d /usr/lib/sysctl.d
 
 # Data files
 COPY --from=build /usr/share/fonts /usr/share/fonts
-COPY --from=build /usr/share/nodejs /usr/share/nodejs
 
 COPY --from=build /run /run
 
