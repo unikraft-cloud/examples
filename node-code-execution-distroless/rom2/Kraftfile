@@ -1,0 +1,4 @@
+spec: v0.7
+
+roms:
+- ./fs
