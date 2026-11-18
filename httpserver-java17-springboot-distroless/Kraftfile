@@ -1,0 +1,12 @@
+spec: v0.7
+
+runtime: base-compat:latest
+
+targets:
+  - kraftcloud/x86_64
+
+rootfs:
+  source: ./Dockerfile
+  format: erofs
+
+cmd: ["/usr/bin/java", "-jar", "/usr/src/demo-0.0.1-SNAPSHOT.jar"]
