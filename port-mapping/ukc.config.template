@@ -1,0 +1,4 @@
+export UKC_USER="TODO"
+export UKC_TOKEN="TODO"
+export UKC_METRO="TODO"
+export UKC_API="https://api.${UKC_METRO}.unikraft.cloud/v1"
