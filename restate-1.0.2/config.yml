@@ -1,0 +1,14 @@
+meta:
+  storage_path: /var/lib/restate/meta
+worker:
+  invoker:
+    retry_policy:
+      initial_interval: 50ms
+      max_attempts: 3
+  storage_rocksdb:
+    path: /var/lib/restate/rocksdb
+bifrost:
+  default_provider: File
+  providers_config:
+    File:
+      path: /var/lib/restate/bifrost
