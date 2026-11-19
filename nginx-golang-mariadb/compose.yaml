@@ -1,0 +1,34 @@
+services:
+  backend:
+    build:
+      context: backend
+    environment:
+    - MARIADB_USER=example
+    - MARIADB_HOST=nginx-golang-mariadb-db.internal
+    - MARIADB_DATABASE=example
+    - MARIADB_PASSWORD=changeme
+
+  db:
+    image: mariadb:10-focal
+    command: '--default-authentication-plugin=mysql_native_password'
+    restart: always
+    mem_reservation: 2G
+    volumes:
+    - db-data:/var/lib/mysql
+    environment:
+    - MARIADB_USER=example
+    - MARIADB_DATABASE=example
+    - MARIADB_PASSWORD=changeme
+    - MARIADB_ROOT_PASSWORD=changeme
+
+  proxy:
+    image: nginx
+    mem_reservation: 1G
+    ports:
+    - 443:8080
+    depends_on: 
+    - backend
+
+volumes:
+  db-data:
+
