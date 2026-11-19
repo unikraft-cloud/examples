@@ -1,0 +1,9 @@
+spec: v0.6
+name: autoscaling-test
+runtime: base:latest
+rootfs: ./Dockerfile
+# The command executed automatically when the unikernel starts
+cmd: ["/autoscaling-test"]
+# Set the internal port expected by the platform
+env:
+  PORT: "8080"
