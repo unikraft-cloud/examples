@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@react-router/express": "^8.5.1",
-    "@react-router/fs-routes": "^8.5.1",
     "@react-router/node": "^8.5.1",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
