@@ -1,0 +1,9 @@
+spec: v0.7
+
+runtime: base-compat:latest
+
+rootfs:
+  source: ./Dockerfile
+  format: erofs
+
+cmd: ["/usr/bin/prometheus", "--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus"]
