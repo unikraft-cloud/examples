@@ -52,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.changes.outputs.matrix }}
+      arm_matrix: ${{ steps.changes.outputs.arm_matrix }}
     steps:
     - uses: actions/checkout@v5
       with:
@@ -63,33 +64,31 @@ jobs:
         INPUT_TEST_DIR: ${{ inputs.test_directory }}
       run: |
         # Collect directories into a bash array, then emit as JSON.
-        declare -a DIRS=()
+        declare -a CANDIDATES=() DIRS=() ARM_DIRS=()
+        FORCED=""
+        ARM_ALL=0
+
+        all_dirs() {
+          for d in */; do
+            CANDIDATES+=("${d%/}")
+          done
+        }
 
         # workflow_dispatch: honour the test_directory input.
         if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           DIR="$INPUT_TEST_DIR"
           if [[ -z "$DIR" || "$DIR" == "all" ]]; then
-            # Run all directories that have a test file.
-            for d in */; do
-              d="${d%/}"
-              if compgen -G "${d}/test_*.py" > /dev/null 2>&1; then
-                DIRS+=("$d")
-              fi
-            done
+            all_dirs
           elif [[ "$DIR" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]] && [[ -d "$DIR" ]]; then
-            DIRS+=("$DIR")
+            CANDIDATES+=("$DIR")
+            FORCED="$DIR"
           else
             echo "::error::Invalid test_directory input: $DIR"
             exit 1
           fi
         # Always run everything for scheduled runs.
         elif [[ "${{ github.event_name }}" == "schedule" ]]; then
-          for d in */; do
-            d="${d%/}"
-            if compgen -G "${d}/test_*.py" > /dev/null 2>&1; then
-              DIRS+=("$d")
-            fi
-          done
+          all_dirs
         else
           # For PRs and pushes to main, only test affected examples.
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -103,45 +102,68 @@ jobs:
           # On branch creation or certain force-pushes, 'before' is all zeros.
           if [[ "$BASE" == "0000000000000000000000000000000000000000" ]]; then
             echo "Initial push detected — running all tests."
-            for d in */; do
-              d="${d%/}"
-              if compgen -G "${d}/test_*.py" > /dev/null 2>&1; then
-                DIRS+=("$d")
-              fi
-            done
+            all_dirs
           else
             # Files whose changes should trigger the full test suite.
             INFRA_PATTERN='^(conftest\.py|pytest\.ini|requirements\.txt|_testlib/|\.github/workflows/test-examples\.yaml)'
 
             CHANGED_FILES=$(git diff --name-only "$BASE" "$HEAD")
 
+            if echo "$CHANGED_FILES" | grep -qE '^scripts/(build-example|kraftfile-targets)\.sh$'; then
+              ARM_ALL=1
+            fi
+
             if echo "$CHANGED_FILES" | grep -qE "$INFRA_PATTERN"; then
-              for d in */; do
-                d="${d%/}"
-                if compgen -G "${d}/test_*.py" > /dev/null 2>&1; then
-                  DIRS+=("$d")
-                fi
-              done
+              all_dirs
             else
-              # Collect unique top-level directories that changed and contain a test file.
               for dir in $(echo "$CHANGED_FILES" | cut -d/ -f1 | sort -u); do
-                if compgen -G "${dir}/test_*.py" > /dev/null 2>&1; then
-                  DIRS+=("$dir")
+                if [[ -d "$dir" ]]; then
+                  CANDIDATES+=("$dir")
                 fi
               done
             fi
           fi
         fi
 
-        if [[ ${#DIRS[@]} -eq 0 ]]; then
-          echo "No example directories with tests to run."
-          echo "matrix=" >> "$GITHUB_OUTPUT"
-        else
-          # Build JSON array for the matrix without relying on jq.
-          JSON=$(python3 -c 'import json, sys; print(json.dumps(sys.argv[1:]))' "${DIRS[@]}")
-          echo "Matrix: $JSON"
-          echo "matrix=$JSON" >> "$GITHUB_OUTPUT"
+        for d in "${CANDIDATES[@]}"; do
+          if [[ "$d" == "$FORCED" ]] || compgen -G "${d}/test_*.py" > /dev/null 2>&1; then
+            DIRS+=("$d")
+          fi
+        done
+
+        if [[ $ARM_ALL -eq 1 ]]; then
+          CANDIDATES=()
+          all_dirs
         fi
+        for d in "${CANDIDATES[@]}"; do
+          if find "$d" -maxdepth 2 -name Kraftfile -exec scripts/kraftfile-targets.sh {} arm64 \; -print | grep -q .; then
+            ARM_DIRS+=("$d")
+          fi
+        done
+
+        emit() {
+          local name=$1
+          shift
+          if [[ $# -eq 0 ]]; then
+            echo "${name}=" >> "$GITHUB_OUTPUT"
+          else
+            local json
+            json=$(python3 -c 'import json, sys; print(json.dumps(sys.argv[1:]))' "$@")
+            echo "${name}: ${json}"
+            echo "${name}=${json}" >> "$GITHUB_OUTPUT"
+          fi
+        }
+
+        emit matrix "${DIRS[@]}"
+        emit arm_matrix "${ARM_DIRS[@]}"
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Check multi-architecture examples
+      run: bash scripts/lint-multiarch.sh
 
   pytest:
     needs: detect-changes
@@ -151,6 +173,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 16
       matrix:
         example: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
@@ -180,7 +203,7 @@ jobs:
         version: ${{ inputs.unikraft_version || 'latest' }}
 
     - name: Authenticate unikraft CLI
-      run: echo $UKC_TOKEN | unikraft login --token -
+      run: echo "$UKC_TOKEN" | unikraft login --token -
 
     - name: Override metros in CLI config
       run: |
@@ -205,6 +228,7 @@ jobs:
     - name: Run tests
       env:
         UKC_TEST_ID: ${{ github.run_id }}-${{ matrix.example}}-${{ github.run_attempt }}
+        UKC_ARCH: x86_64
       run: exec pytest --log-cli-level=INFO "${{ matrix.example }}"
 
     - name: Cleanup test resources
@@ -212,3 +236,29 @@ jobs:
       env:
         UKC_TEST_ID: ${{ github.run_id }}-${{ matrix.example}}-${{ github.run_attempt }}
       run: bash scripts/cleanup-test-resources.sh
+
+  build-arm64:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.arm_matrix != ''
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04-arm
+
+    strategy:
+      fail-fast: false
+      matrix:
+        example: ${{ fromJson(needs.detect-changes.outputs.arm_matrix) }}
+
+    name: build-arm64 (${{ matrix.example }})
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Install Unikraft CLI
+      uses: unikraft/setup-action@main
+      with:
+        version: ${{ inputs.unikraft_version || 'latest' }}
+
+    - name: Build
+      env:
+        EXAMPLE: ${{ matrix.example }}
+      run: bash scripts/build-example.sh "$EXAMPLE" arm64

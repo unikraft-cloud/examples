@@ -33,6 +33,7 @@ pip install -r requirements.txt
 | `UKC_IMAGE_PREFIX`  | yes      | Image repository prefix, typically your org name (`my-org`).  |
 | `UKC_ALLOW_INSECURE`| no       | If truthy (`1`/`true`), disable TLS verification for HTTP calls (for self-signed certs). |
 | `UNIKRAFT_BIN`      | no       | Path to the `unikraft` binary (default: `unikraft` on `PATH`).|
+| `UKC_ARCH`          | no       | Build images only for this architecture (e.g. `x86_64`).      |
 
 Authentication is handled by your existing `unikraft` CLI profile — run
 `unikraft login` once before running the tests. Tests that require one of the
@@ -50,6 +51,30 @@ pytest nginx
 # Verbose + live logs
 pytest -s
 ```
+
+## Multi-architecture builds
+
+An example is multi-architecture when a `Kraftfile` in it lists `kraftcloud/arm64`.
+Each `Kraftfile` of a multi-architecture example must list both `kraftcloud/x86_64` and `kraftcloud/arm64`.
+CI tests it on `x86_64`, and builds it on a native `arm64` runner.
+
+To build a multi-architecture example for one architecture, without pushing it and without a `unikraft` login:
+
+```bash
+scripts/build-example.sh <example> arm64
+```
+
+A build for an architecture other than the one of your machine needs QEMU.
+Docker Desktop includes it.
+On Linux, install it once:
+
+```bash
+docker run --privileged --rm tonistiigi/binfmt --install all
+```
+
+Compiled examples use [xx](https://github.com/tonistiigi/xx) to cross-compile, so only short steps run in QEMU.
+
+`scripts/lint-multiarch.sh` checks that the Dockerfiles of multi-architecture examples contain no architecture-specific paths.
 
 ## Layout
 

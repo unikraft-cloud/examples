@@ -132,6 +132,9 @@ class UnikraftCLI:
             context, 
             output
         )
+        arch = os.environ.get("UKC_ARCH")
+        if arch and not any(a.split("=")[0] == "--arch" for a in extra_args):
+            extra_args = ["--arch", arch, *extra_args]
         self.run(["build", str(context), "--output", output, *extra_args])
 
     def run_instance(
